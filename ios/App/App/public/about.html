@@ -1,0 +1,393 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Shree Gold | Timeless Elegance</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+
+        :root {
+            --bg-brown: #3d2314;
+            --brown-deep: #2f1a0e;
+            --gold: #d4af37;
+            --gold-soft: #e4c85e;
+            --white: #ffffff;
+            --text-muted: rgba(255, 255, 255, 0.85);
+            --border-glow: rgba(212, 175, 55, 0.4);
+        }
+
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', 'Poppins', 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Roboto', sans-serif;
+            background-color: var(--bg-brown);
+            /* intricate mandala-inspired pattern – subtle and luxurious */
+            background-image: radial-gradient(circle at 25% 40%, rgba(212, 175, 55, 0.08) 1.2px, transparent 1.2px),
+                              radial-gradient(circle at 70% 85%, rgba(255, 215, 0, 0.06) 1px, transparent 1px);
+            background-size: 42px 42px, 36px 36px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: var(--white);
+            padding: 20px;
+        }
+
+
+        /* main card — elegant & refined */
+        .popup-card {
+            position: relative;
+            width: 100%;
+            max-width: 460px;
+            background: rgba(61, 35, 20, 0.65);
+            backdrop-filter: blur(2px);
+            border-radius: 48px 32px 48px 32px;
+            padding: 44px 24px 48px 24px;
+            text-align: center;
+            box-sizing: border-box;
+            border: 1px solid rgba(212, 175, 55, 0.25);
+            box-shadow: 0 25px 45px -12px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+            transition: all 0.2s ease;
+        }
+
+
+        /* Close button refined — subtle gold hover */
+        .close-trigger {
+            position: absolute;
+            top: 16px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border: none;
+            color: var(--white);
+            font-size: 28px;
+            cursor: pointer;
+            line-height: 1;
+            padding: 0;
+            width: 36px;
+            height: 36px;
+            border-radius: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.25s ease;
+            font-weight: 300;
+            backdrop-filter: blur(4px);
+        }
+
+
+        .close-trigger:hover {
+            background: var(--gold);
+            color: var(--bg-brown);
+            transform: scale(1.05);
+            box-shadow: 0 0 8px var(--gold);
+        }
+
+
+        /* brand header with subtle underline */
+        .brand-header {
+            margin-bottom: 36px;
+            position: relative;
+        }
+
+
+        .brand-name {
+            font-size: 34px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            font-weight: 700;
+            color: var(--gold);
+            margin: 0;
+            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+            background: linear-gradient(135deg, #f3e5ab 0%, #d4af37 80%);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            text-shadow: none;
+        }
+
+
+        .brand-name::after {
+            content: '';
+            display: block;
+            width: 60px;
+            height: 2px;
+            background: var(--gold);
+            margin: 12px auto 0;
+            border-radius: 2px;
+            opacity: 0.7;
+        }
+
+
+        /* ========= ENHANCED CIRCLES ========= */
+        /* each info-group: centered, with breathing space */
+        .info-group {
+            margin-bottom: 38px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: transform 0.2s;
+        }
+
+
+        /* icon-circle: refined ring with glow + subtle shadow */
+        .icon-circle {
+            width: 80px;
+            height: 80px;
+            background: rgba(30, 20, 12, 0.65);
+            backdrop-filter: blur(3px);
+            border: 1.8px solid var(--gold);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 16px;
+            font-size: 38px;
+            box-shadow: 0 8px 18px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 0 0 3px rgba(212, 175, 55, 0.2);
+            transition: all 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            color: var(--gold-soft);
+        }
+
+
+        /* interactive micro-animation on hover */
+        .info-group:hover .icon-circle {
+            transform: scale(1.03);
+            border-color: var(--gold-soft);
+            box-shadow: 0 12px 22px rgba(0, 0, 0, 0.4), 0 0 0 4px rgba(212, 175, 55, 0.35);
+            color: #ffde8a;
+        }
+
+
+        /* label styling: elegant uppercase, tracking, gold accent */
+        .label {
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 2.5px;
+            color: var(--gold);
+            margin-bottom: 10px;
+            font-weight: 600;
+            word-spacing: 1px;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 4px 12px;
+            border-radius: 40px;
+            display: inline-block;
+            backdrop-filter: blur(2px);
+        }
+
+
+        /* content style: clean readability */
+        .content {
+            font-size: 16px;
+            line-height: 1.55;
+            font-weight: 400;
+            color: var(--text-muted);
+            max-width: 280px;
+            margin: 0 auto;
+        }
+
+
+        .highlight {
+            font-weight: 700;
+            display: block;
+            color: #fff3e0;
+            letter-spacing: 0.3px;
+        }
+
+
+        a.content {
+            color: #ffecb3;
+            text-decoration: none;
+            border-bottom: 1px dashed rgba(212, 175, 55, 0.6);
+            transition: color 0.2s, border-color 0.2s;
+            font-weight: 500;
+        }
+
+
+        a.content:hover {
+            color: var(--gold);
+            border-bottom-color: var(--gold);
+        }
+
+
+        /* spacing for contact numbers (two lines) */
+        .content .highlight + .highlight {
+            margin-top: 5px;
+        }
+
+
+        /* responsiveness: smaller screens */
+        @media (max-width: 480px) {
+            .popup-card {
+                padding: 38px 18px 42px 18px;
+            }
+            .icon-circle {
+                width: 70px;
+                height: 70px;
+                font-size: 32px;
+            }
+            .brand-name {
+                font-size: 28px;
+            }
+            .label {
+                font-size: 12px;
+                letter-spacing: 2px;
+            }
+            .content {
+                font-size: 14.5px;
+            }
+        }
+
+
+        /* additional golden decorative ring for first icon? keep uniform elegance */
+        @keyframes softGlow {
+            0% { box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.2), inset 0 1px 0 rgba(255,255,255,0.1);}
+            100% { box-shadow: 0 0 0 6px rgba(212, 175, 55, 0), inset 0 1px 0 rgba(255,255,255,0.1);}
+        }
+        
+        /* subtle entrance for circles (optional but refined) */
+        .info-group {
+            opacity: 0;
+            animation: fadeUp 0.45s forwards;
+        }
+        .info-group:nth-child(2) { animation-delay: 0.05s; }
+        .info-group:nth-child(3) { animation-delay: 0.12s; }
+        .info-group:nth-child(4) { animation-delay: 0.19s; }
+        .info-group:nth-child(5) { animation-delay: 0.26s; }
+        
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(12px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* custom scrollbar for body if needed */
+        ::-webkit-scrollbar {
+            width: 4px;
+            background: #2f1a0e;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--gold);
+            border-radius: 6px;
+        }
+    </style>
+</head>
+<body>
+
+
+<div class="popup-card">
+    <!-- Close button navigates to index.html -->
+    <button class="close-trigger" onclick="window.location.href='main.html'">&times;</button>
+
+
+    <div class="brand-header">
+        <h1 class="brand-name">Shree Gold</h1>
+    </div>
+
+
+    <!-- 1. BOOKING TIMINGS - Enhanced Circle: Clock & Calendar fusion -->
+    <div class="info-group">
+        <div class="icon-circle">
+            <!-- refined clock icon with subtle luxury -->
+            <svg width="38" height="38" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10" stroke="currentColor" fill="none"/>
+                <polyline points="12 6 12 12 16 14" stroke="currentColor" fill="none"/>
+                <path d="M4 4 L8 8" stroke="currentColor" stroke-width="1.2"/>
+                <path d="M20 4 L16 8" stroke="currentColor" stroke-width="1.2"/>
+            </svg>
+        </div>
+        <div class="label">Booking Timings</div>
+        <div class="content">
+            <span class="highlight">Mon–Sat: 10:00 AM – 11:00 PM</span>
+            Sundays Holiday
+        </div>
+    </div>
+
+
+    <!-- 2. ADDRESS - Enhanced Circle: Location pointer with elegant map vibe -->
+    <div class="info-group">
+        <div class="icon-circle">
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" stroke-width="1.3" stroke-linecap="round">
+                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" stroke="currentColor" fill="rgba(212,175,55,0.08)"/>
+                <circle cx="12" cy="9" r="2.5" stroke="currentColor" fill="rgba(212,175,55,0.2)"/>
+                <path d="M12 6v3" stroke="currentColor" stroke-width="1.2"/>
+            </svg>
+        </div>
+        <div class="label">Address</div>
+        <div class="content">
+            <span class="highlight">Shree Gold</span>
+            Shop No.2, Bothra Sankul, Opp. Drawing College,<br>
+            Nagarkar Lane, Saraf Bazar, Nashik - 422001
+        </div>
+    </div>
+
+
+    <!-- 3. EMAIL - Enhanced Circle: Envelope with premium swirl -->
+    <div class="info-group">
+        <div class="icon-circle">
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" stroke-width="1.2">
+                <rect x="2" y="4" width="20" height="16" rx="2" stroke="currentColor" fill="none"/>
+                <path d="M22 7L12 13 2 7" stroke="currentColor" stroke-width="1.3" fill="none"/>
+                <path d="M6 12L2 16" stroke="currentColor" stroke-width="1.2"/>
+                <path d="M18 12L22 16" stroke="currentColor" stroke-width="1.2"/>
+            </svg>
+        </div>
+        <div class="label">Email</div>
+        <a href="mailto:chaitanyasonar443@gmail.com" class="content">chaitanyasonar443@gmail.com</a>
+    </div>
+
+
+    <!-- 4. CONTACT - Enhanced Circle: Dual phone / call iconic with sophistication -->
+    <div class="info-group">
+        <div class="icon-circle">
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" stroke-width="1.3">
+                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.362 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.338 1.85.573 2.81.7A2 2 0 0 1 22 16.92z" stroke="currentColor" fill="none"/>
+                <circle cx="17" cy="5" r="1.5" stroke="currentColor" fill="rgba(212,175,55,0.3)" stroke-width="1"/>
+                <circle cx="14" cy="8" r="1" stroke="currentColor" fill="none"/>
+            </svg>
+        </div>
+        <div class="label">Contact</div>
+        <div class="content">
+            <span class="highlight">+91 7020152697</span>
+            <span class="highlight">+91 7507702928</span>
+        </div>
+    </div>
+</div>
+
+
+<!-- Additional small decorative script for optional hover micro interaction - just for elegance, no intrusive behavior -->
+<script>
+    (function() {
+        // optional: add a subtle ripple effect on circles? but purely visual non-invasive
+        // enhance the closing behavior: already using window.location
+        // also ensure that all icons have consistent aria labels for accessibility
+        const circles = document.querySelectorAll('.icon-circle');
+        circles.forEach((circle, idx) => {
+            // add tiny title for better tooltip
+            const parentGroup = circle.closest('.info-group');
+            const labelElem = parentGroup?.querySelector('.label');
+            if(labelElem && labelElem.innerText) {
+                circle.setAttribute('aria-label', `${labelElem.innerText} icon`);
+            }
+        });
+        
+        // optional add small shimmer effect to first circle? not needed, but keep stable.
+        // also ensure if user clicks close, no conflicts
+        const closeBtn = document.querySelector('.close-trigger');
+        if(closeBtn) {
+            closeBtn.setAttribute('aria-label', 'Close and return to main page');
+        }
+    })();
+</script>
+</body>
+</html>

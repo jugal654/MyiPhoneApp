@@ -1,0 +1,810 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>SHREE GOLD · secure vault terminal</title>
+    <!-- tailwind + font awesome + inter font -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #1a0f0a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 1rem;
+            position: relative;
+        }
+        .gold-gradient { background: radial-gradient(circle at 50% 0%, #3d251a 0%, #1a0f0a 100%); }
+        .premium-glass {
+            background: rgba(20, 12, 8, 0.6);
+            backdrop-filter: blur(14px) saturate(180%);
+            border: 1px solid rgba(245, 158, 11, 0.18);
+            box-shadow: 0 25px 40px -12px rgba(0,0,0,0.8);
+        }
+        .input-fusion {
+            background: rgba(0, 0, 0, 0.45);
+            border: 1px solid rgba(255, 215, 140, 0.2);
+            color: white;
+            transition: all 0.2s ease;
+        }
+        .input-fusion:focus {
+            border-color: #f59e0b;
+            box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.15);
+            outline: none;
+        }
+        .btn-gold {
+            background: linear-gradient(145deg, #b45309, #92400e);
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            box-shadow: 0 8px 18px -6px #b4530940;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+        .btn-gold:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 12px 22px -8px #b4530960;
+        }
+        .btn-gold:active {
+            transform: translateY(0);
+        }
+        .btn-secondary {
+            background: rgba(255,255,255,0.07);
+            border: 1px solid rgba(255,215,120,0.25);
+            color: white;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+        .btn-secondary:hover {
+            background: rgba(255,255,255,0.15);
+            border-color: rgba(255,215,120,0.5);
+            transform: translateY(-1px);
+        }
+        .btn-secondary:active {
+            transform: translateY(0);
+        }
+        .hidden { display: none !important; }
+        @keyframes slideUp { 
+            from { opacity: 0; transform: translateY(20px); } 
+            to { opacity: 1; transform: translateY(0); } 
+        }
+        .animate-slide { animation: slideUp 0.5s ease-out forwards; }
+
+
+
+
+        /* back button style */
+        .back-btn {
+            position: absolute;
+            top: 1.2rem;
+            left: 1.2rem;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(245,158,11,0.25);
+            color: #d4a373;
+            width: 2.4rem;
+            height: 2.4rem;
+            border-radius: 999px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.2s;
+            cursor: pointer;
+            backdrop-filter: blur(4px);
+            z-index: 10;
+        }
+        .back-btn:hover {
+            border-color: #f59e0b;
+            color: #fbbf24;
+            background: rgba(180, 83, 9, 0.2);
+            transform: scale(1.05);
+        }
+
+
+
+
+        /* delete account button positioned top-right */
+        .delete-account-btn {
+            position: absolute;
+            top: 1.2rem;
+            right: 1.2rem;
+            background: rgba(0,0,0,0.4);
+            border: 1px solid rgba(220, 80, 80, 0.4);
+            color: #fca5a5;
+            width: 2.4rem;
+            height: 2.4rem;
+            border-radius: 999px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.2s;
+            cursor: pointer;
+            backdrop-filter: blur(4px);
+            z-index: 10;
+            font-size: 1rem;
+        }
+        .delete-account-btn:hover {
+            border-color: #ef4444;
+            color: #fff;
+            background: rgba(185, 28, 28, 0.6);
+            transform: scale(1.05);
+        }
+
+
+
+
+        /* modal overlay styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            animation: fadeIn 0.2s ease;
+        }
+        .modal-container {
+            max-width: 420px;
+            width: 90%;
+            background: #1f1a16;
+            border-radius: 2rem;
+            border: 1px solid rgba(245,158,11,0.3);
+            box-shadow: 0 30px 50px rgba(0,0,0,0.6);
+            padding: 2rem 1.8rem;
+            text-align: center;
+        }
+        .modal-container h3 {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: #fbbf24;
+            margin-bottom: 0.5rem;
+        }
+        .modal-container p {
+            color: #d1b48c;
+            font-size: 0.85rem;
+            margin-bottom: 1.5rem;
+        }
+        .modal-input {
+            background: rgba(0,0,0,0.6);
+            border: 1px solid rgba(245,158,11,0.4);
+            border-radius: 1.5rem;
+            padding: 0.9rem 1.2rem;
+            width: 100%;
+            color: white;
+            margin-bottom: 1rem;
+            outline: none;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+        .modal-input:focus {
+            border-color: #f59e0b;
+            box-shadow: 0 0 0 2px rgba(245,158,11,0.3);
+        }
+        .modal-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+            justify-content: center;
+        }
+        .modal-btn-cancel {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid #6b7280;
+            padding: 0.7rem 1.2rem;
+            border-radius: 2rem;
+            color: #e5e7eb;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .modal-btn-cancel:hover {
+            background: rgba(255,255,255,0.2);
+            transform: scale(0.98);
+        }
+        .modal-btn-confirm {
+            background: linear-gradient(145deg, #9b2c2c, #7f1a1a);
+            border: none;
+            padding: 0.7rem 1.5rem;
+            border-radius: 2rem;
+            color: white;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .modal-btn-confirm:hover { 
+            background: linear-gradient(145deg, #b91c1c, #991b1b);
+            transform: scale(0.98);
+        }
+        .modal-btn-confirm:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        @keyframes fadeIn { 
+            from { opacity: 0; } 
+            to { opacity: 1; } 
+        }
+        
+        /* notification toast for better UX */
+        .toast-notification {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            background: #1f1a16;
+            backdrop-filter: blur(12px);
+            border: 1px solid #f59e0b;
+            color: #ffdd99;
+            padding: 0.8rem 1.5rem;
+            border-radius: 3rem;
+            font-size: 0.85rem;
+            font-weight: 500;
+            z-index: 1100;
+            opacity: 0;
+            transition: all 0.3s ease;
+            pointer-events: none;
+            white-space: nowrap;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.4);
+            font-family: 'Inter', monospace;
+            letter-spacing: 0.3px;
+        }
+        .toast-notification.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+        
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        /* responsive adjustments */
+        @media (max-width: 640px) {
+            .toast-notification {
+                white-space: normal;
+                text-align: center;
+                max-width: 85%;
+                font-size: 0.75rem;
+            }
+            .modal-container {
+                padding: 1.5rem;
+            }
+            .back-btn, .delete-account-btn {
+                width: 2rem;
+                height: 2rem;
+                font-size: 0.8rem;
+            }
+        }
+    </style>
+</head>
+<body class="gold-gradient w-full relative">
+
+
+
+
+    <!-- BACK BUTTON (always visible, returns to main.html) -->
+    <div onclick="goBack()" class="back-btn" title="Back to main page">
+        <i class="fa-solid fa-arrow-left"></i>
+    </div>
+
+
+
+
+  
+
+
+
+
+    <!-- Toast notification container -->
+    <div id="toastMsg" class="toast-notification"></div>
+
+
+
+
+    <div class="premium-glass w-full max-w-md rounded-[3rem] p-8 md:p-9 shadow-2xl animate-slide">
+        <div class="text-center mb-8">
+            <h1 class="text-5xl font-black tracking-[-0.02em] text-white">SHREE<span class="text-amber-400">GOLD</span></h1>
+            <div class="flex items-center justify-center gap-1 mt-2 opacity-80">
+                <span class="text-[0.6rem] font-bold tracking-[0.35em] text-amber-500/80 uppercase">secure vault access</span>
+            </div>
+        </div>
+
+
+
+
+        <!-- LOGIN PANEL (visible by default) -->
+        <div id="login-panel" class="space-y-5">
+            <div class="text-center mb-2">
+                <h2 class="text-xl font-bold text-white">Client Login</h2>
+            </div>
+            <div class="space-y-4">
+                <div class="relative">
+                    <i class="fa-regular fa-user absolute left-5 top-1/2 -translate-y-1/2 text-amber-500/60 text-sm"></i>
+                    <input type="text" id="login-user" placeholder="Username" class="input-fusion w-full py-5 px-12 rounded-2xl text-sm" autocomplete="username">
+                </div>
+                <div class="relative">
+                    <i class="fa-solid fa-lock absolute left-5 top-1/2 -translate-y-1/2 text-amber-500/60 text-sm"></i>
+                    <input type="password" id="login-pass" placeholder="Password" class="input-fusion w-full py-5 px-12 rounded-2xl text-sm" autocomplete="current-password">
+                </div>
+            </div>
+            <button onclick="handleAuth('login', event)" id="login-btn" class="btn-gold w-full py-5 rounded-2xl uppercase text-sm tracking-[0.2em] text-white">
+                Login
+            </button>
+            <button onclick="openDeleteAccountModal('login', event)" id="login-btn" class="btn-gold w-full py-5 rounded-2xl uppercase text-sm tracking-[0.2em] text-white">
+                Logout
+            </button>
+            <p class="text-center text-[0.65rem] text-stone-400 uppercase tracking-wider">
+                new client? <span class="text-amber-500 cursor-pointer hover:text-amber-400 transition" onclick="togglePanels()">open account</span>
+            </p>
+        </div>
+
+
+
+
+        <!-- SIGNUP PANEL (hidden by default) -->
+        <div id="signup-panel" class="space-y-5 hidden">
+            <div class="text-center mb-2">
+                <h2 class="text-xl font-bold text-white">Sign Up</h2>
+            </div>
+            <div class="space-y-4">
+                <input type="text" id="reg-user" placeholder="Choose Username" class="input-fusion w-full py-4 px-6 rounded-2xl text-sm" autocomplete="off">
+                <input type="tel" id="reg-phone" placeholder="Mobile Number" class="input-fusion w-full py-4 px-6 rounded-2xl text-sm" autocomplete="off">
+                <input type="text" id="reg-address" placeholder="Full Business Address" class="input-fusion w-full py-4 px-6 rounded-2xl text-sm" autocomplete="off">
+                <input type="text" id="reg-gst" placeholder="GST Number (Optional)" class="input-fusion w-full py-4 px-6 rounded-2xl text-sm uppercase" autocomplete="off">
+                <input type="password" id="reg-pass" placeholder="Create Password" class="input-fusion w-full py-4 px-6 rounded-2xl text-sm" autocomplete="new-password">
+            </div>
+            <button onclick="handleAuth('signup', event)" id="signup-btn" class="btn-secondary w-full py-5 rounded-2xl uppercase text-sm tracking-[0.15em] text-white">
+                register account
+            </button>
+            <p class="text-center text-[0.65rem] text-stone-400 uppercase tracking-wider">
+                already member? <span class="text-amber-500 cursor-pointer hover:text-amber-400 transition" onclick="togglePanels()">log in</span>
+            </p>
+        </div>
+    </div>
+
+
+
+
+    <script type="module">
+        // 🔥 FIREBASE — FIRESTORE DATABASE (full integration)
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, doc, setDoc, getDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+
+
+
+        // ✅ CORRECT Firestore configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBIghUCcQUxCcfYJOdCMgPsTuRSgnJpe6E",
+            authDomain: "shreegold-120eb.firebaseapp.com",
+            projectId: "shreegold-120eb",
+            storageBucket: "shreegold-120eb.firebasestorage.app",
+            messagingSenderId: "915011378925",
+            appId: "1:915011378925:web:c03003bc7eca3ccc0bb6e4",
+            measurementId: "G-B714GY65N7"
+        };
+
+
+
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+
+
+
+        // Show toast notification
+        function showToast(message, isError = false) {
+            const toast = document.getElementById('toastMsg');
+            if (!toast) return;
+            toast.textContent = message;
+            toast.style.borderColor = isError ? '#ef4444' : '#f59e0b';
+            toast.style.color = isError ? '#ffbbbb' : '#ffdd99';
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3200);
+        }
+
+
+
+
+        // toggle login / signup panels
+        window.togglePanels = () => {
+            const loginPanel = document.getElementById('login-panel');
+            const signupPanel = document.getElementById('signup-panel');
+            if (loginPanel && signupPanel) {
+                loginPanel.classList.toggle('hidden');
+                signupPanel.classList.toggle('hidden');
+            }
+        };
+
+
+
+
+        // Store user data in localStorage
+        function storeUserDataLocally(userData) {
+            localStorage.setItem('shree_user_name', userData.username || '');
+            localStorage.setItem('shree_user_phone', userData.phone || '');
+            localStorage.setItem('shree_user_address', userData.address || '');
+            localStorage.setItem('shree_user_gst', userData.gst || '');
+            localStorage.setItem('shree_user_data', JSON.stringify({
+                username: userData.username || '',
+                phone: userData.phone || '',
+                address: userData.address || '',
+                gst: userData.gst || '',
+                userId: userData.userId || ''
+            }));
+            console.log("✅ User data stored in localStorage");
+        }
+
+
+
+
+        // catchData function for console logging and storage
+        function catchData(userData) {
+            console.log("=== User data from Firestore ===");
+            console.log(JSON.stringify(userData, null, 2));
+            console.log("===============================");
+
+
+
+
+            localStorage.setItem('shree_user_data', JSON.stringify({
+                username: userData.username || '',
+                phone: userData.phone || '',
+                address: userData.address || '',
+                gst: userData.gst || '',
+                userId: userData.userId || 'USR_' + Date.now()
+            }));
+
+
+
+
+            localStorage.setItem('shree_user_logged_in', 'true');
+            localStorage.setItem('shree_user_name', userData.username || '');
+            localStorage.setItem('shree_user_phone', userData.phone || '');
+            localStorage.setItem('shree_user_address', userData.address || '');
+            localStorage.setItem('shree_user_gst', userData.gst || '');
+        }
+
+
+
+
+        // Clear all stored user data from localStorage
+        function clearLocalUserData() {
+            localStorage.removeItem('shree_user_name');
+            localStorage.removeItem('shree_user_phone');
+            localStorage.removeItem('shree_user_address');
+            localStorage.removeItem('shree_user_gst');
+            localStorage.removeItem('shree_user_data');
+            localStorage.removeItem('shree_user_logged_in');
+            console.log("🗑️ Local user data cleared");
+        }
+
+
+
+
+        // Handle Authentication (LOGIN / SIGNUP)
+        window.handleAuth = async (action, event) => {
+            const btn = event.currentTarget;
+            btn.disabled = true;
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-pulse mr-2"></i> Processing...';
+
+
+
+
+            try {
+                if (action === 'signup') {
+                    // ---- REGISTRATION ----
+                    const username = document.getElementById('reg-user').value.trim().toLowerCase();
+                    const phone = document.getElementById('reg-phone').value.trim();
+                    const address = document.getElementById('reg-address').value.trim();
+                    const gst = document.getElementById('reg-gst').value.trim().toUpperCase();
+                    const password = document.getElementById('reg-pass').value;
+
+
+
+
+                    if (!username || !phone || !password || !address) {
+                        showToast("Please fill all required fields", true);
+                        btn.disabled = false;
+                        btn.innerHTML = originalText;
+                        return;
+                    }
+                    
+                    if (password.length < 4) {
+                        showToast("Password must be at least 4 characters", true);
+                        btn.disabled = false;
+                        btn.innerHTML = originalText;
+                        return;
+                    }
+
+
+
+
+                    // Check if username already exists
+                    const userRef = doc(db, 'users', username);
+                    const snapshot = await getDoc(userRef);
+
+
+
+
+                    if (snapshot.exists()) {
+                        showToast("Username already taken", true);
+                    } else {
+                        // Create user data object
+                        const userData = {
+                            username: username,
+                            phone: phone,
+                            address: address,
+                            gst: gst || '',
+                            password: password,
+                            createdAt: new Date().toISOString(),
+                            userId: 'USR_' + Date.now()
+                        };
+                       
+                        await setDoc(userRef, userData);
+                       
+                        showToast("✅ Account created! You can now login.");
+                       
+                        // Clear signup form
+                        document.getElementById('reg-user').value = '';
+                        document.getElementById('reg-phone').value = '';
+                        document.getElementById('reg-address').value = '';
+                        document.getElementById('reg-gst').value = '';
+                        document.getElementById('reg-pass').value = '';
+                       
+                        togglePanels(); // switch to login panel
+                    }
+                } else {
+                    // ---- LOGIN ----
+                    const username = document.getElementById('login-user').value.trim().toLowerCase();
+                    const password = document.getElementById('login-pass').value;
+
+
+
+
+                    if (!username || !password) {
+                        showToast("Enter both username and password", true);
+                        btn.disabled = false;
+                        btn.innerHTML = originalText;
+                        return;
+                    }
+
+
+
+
+                    const userRef = doc(db, 'users', username);
+                    const snapshot = await getDoc(userRef);
+
+
+
+
+                    if (snapshot.exists()) {
+                        const fullUserData = snapshot.data();
+                       
+                        if (fullUserData.password === password) {
+                            const { password: pwd, ...safeUserData } = fullUserData;
+                            catchData(safeUserData);
+                            showToast("✅ Login successful! Redirecting...");
+                           
+                            // Clear login fields
+                            document.getElementById('login-user').value = '';
+                            document.getElementById('login-pass').value = '';
+
+
+
+
+                            // Redirect to main.html after successful login
+                            setTimeout(() => {
+                                window.location.href = 'main.html';
+                            }, 800);
+                        } else {
+                            showToast("Invalid username or password", true);
+                        }
+                    } else {
+                        showToast("Invalid username or password", true);
+                    }
+                }
+            } catch (error) {
+                showToast("Error: " + error.message, true);
+                console.error(error);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+            }
+        };
+
+
+
+
+        // ========== DELETE ACCOUNT WITH VERIFICATION & REDIRECT TO INDEX.HTML ==========
+        window.openDeleteAccountModal = () => {
+            // Check if modal already exists
+            if (document.getElementById('delete-account-modal')) return;
+            
+            // Create modal overlay
+            const modalOverlay = document.createElement('div');
+            modalOverlay.className = 'modal-overlay';
+            modalOverlay.id = 'delete-account-modal';
+            
+            modalOverlay.innerHTML = `
+                <div class="modal-container">
+                    <i class="fa-solid fa-triangle-exclamation text-4xl text-red-400 mb-2 block"></i>
+                    <h3>⚠️ PERMANENT DELETION</h3>
+                    <p>Enter your credentials to permanently delete your account.<br>This action <strong class="text-red-400">cannot be undone</strong>.</p>
+                    <input type="text" id="delete-username" class="modal-input" placeholder="Username" autocomplete="off">
+                    <input type="password" id="delete-password" class="modal-input" placeholder="Password" autocomplete="off">
+                    <div class="modal-buttons">
+                        <button id="modal-cancel-btn" class="modal-btn-cancel"><i class="fa-solid fa-xmark mr-1"></i> Cancel</button>
+                        <button id="modal-confirm-delete" class="modal-btn-confirm"><i class="fa-solid fa-trash-can mr-1"></i> Delete Permanently</button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modalOverlay);
+            
+            // Focus on username field
+            setTimeout(() => {
+                const usernameInput = document.getElementById('delete-username');
+                if (usernameInput) usernameInput.focus();
+            }, 100);
+            
+            // Helper to close modal
+            const closeModal = () => {
+                const modal = document.getElementById('delete-account-modal');
+                if (modal && modal.remove) modal.remove();
+            };
+            
+            // Cancel button event
+            const cancelBtn = document.getElementById('modal-cancel-btn');
+            if (cancelBtn) {
+                cancelBtn.addEventListener('click', closeModal);
+            }
+            
+            // Confirm deletion logic
+            const confirmBtn = document.getElementById('modal-confirm-delete');
+            if (confirmBtn) {
+                confirmBtn.addEventListener('click', async () => {
+                    const usernameInput = document.getElementById('delete-username');
+                    const passwordInput = document.getElementById('delete-password');
+                    
+                    const username = usernameInput ? usernameInput.value.trim().toLowerCase() : '';
+                    const password = passwordInput ? passwordInput.value : '';
+                    
+                    if (!username || !password) {
+                        showToast("❌ Please enter both username and password", true);
+                        return;
+                    }
+                    
+                    // Disable button while processing
+                    confirmBtn.disabled = true;
+                    const originalBtnText = confirmBtn.innerHTML;
+                    confirmBtn.innerHTML = '<i class="fa-solid fa-spinner fa-pulse"></i> Verifying...';
+                    
+                    try {
+                        const userRef = doc(db, 'users', username);
+                        const snapshot = await getDoc(userRef);
+                        
+                        if (!snapshot.exists()) {
+                            showToast("❌ Account not found", true);
+                            confirmBtn.disabled = false;
+                            confirmBtn.innerHTML = originalBtnText;
+                            return;
+                        }
+                        
+                        const userData = snapshot.data();
+                        
+                        // Verify password match
+                        if (userData.password !== password) {
+                            showToast("❌ Incorrect password", true);
+                            confirmBtn.disabled = false;
+                            confirmBtn.innerHTML = originalBtnText;
+                            return;
+                        }
+                        
+                        // Proceed to delete the document from Firestore
+                        await deleteDoc(userRef);
+                        console.log(`🔥 Account "${username}" permanently deleted from Firestore`);
+                        
+                        // Clear local storage data
+                        clearLocalUserData();
+                        
+                        // Close modal
+                        closeModal();
+                        
+                        // Show success message
+                        showToast(`✅ Account "${username}" has been permanently deleted. Redirecting...`);
+                        
+                        // ✅ REDIRECT TO INDEX.HTML AFTER ACCOUNT DELETION
+                        setTimeout(() => {
+                            window.location.href = 'main.html';
+                        }, 1500);
+                        
+                    } catch (error) {
+                        console.error("Delete account error:", error);
+                        showToast("⚠️ Error: " + error.message, true);
+                        confirmBtn.disabled = false;
+                        confirmBtn.innerHTML = originalBtnText;
+                    }
+                });
+            }
+            
+            // Click outside to close
+            modalOverlay.addEventListener('click', (e) => {
+                if (e.target === modalOverlay) closeModal();
+            });
+            
+            // Prevent escape key from causing issues
+            const handleEsc = (e) => {
+                if (e.key === 'Escape') {
+                    closeModal();
+                    document.removeEventListener('keydown', handleEsc);
+                }
+            };
+            document.addEventListener('keydown', handleEsc);
+        };
+        
+        // BACK BUTTON FUNCTION — navigates to main.html
+        window.goBack = function() {
+            window.location.href = 'main.html';
+        };
+        
+        // On page load, ensure clean state
+        window.addEventListener('load', () => {
+            console.log("⚡ SHREE GOLD terminal ready - Firestore integrated");
+            console.log("🗑️ Delete account: verification modal → permanent deletion → redirect to main.html");
+            console.log("🔐 Login/Register: full Firestore authentication flow");
+            
+            // Remove any stray modal
+            const existingModal = document.getElementById('delete-account-modal');
+            if (existingModal) existingModal.remove();
+            
+            // Add enter key support for login
+            const loginPass = document.getElementById('login-pass');
+            if (loginPass) {
+                loginPass.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        const loginBtn = document.getElementById('login-btn');
+                        if (loginBtn && !loginBtn.disabled) {
+                            loginBtn.click();
+                        }
+                    }
+                });
+            }
+            
+            // Add enter key support for signup
+            const regPass = document.getElementById('reg-pass');
+            if (regPass) {
+                regPass.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        const signupBtn = document.getElementById('signup-btn');
+                        if (signupBtn && !signupBtn.disabled) {
+                            signupBtn.click();
+                        }
+                    }
+                });
+            }
+            
+            // Focus on username field initially
+            const loginUserField = document.getElementById('login-user');
+            if (loginUserField) loginUserField.focus();
+        });
+        
+        // Expose functions globally for debugging and HTML onclick access
+        window.clearLocalUserData = clearLocalUserData;
+        window.showToast = showToast;
+    </script>
+</body>
+</html>

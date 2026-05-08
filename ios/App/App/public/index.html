@@ -1,0 +1,129 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shree Gold - Splash Screen</title>
+    <style>
+        :root {
+            --gold: #d4af37;
+            --dark-gold: #996515;
+            --bg-white: #ffffff;
+            --text-muted: #777;
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: var(--bg-white);
+            font-family: 'Segoe UI', sans-serif;
+            overflow: hidden;
+        }
+
+        .bg-overlay {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            /* Soft light gradient for a high-end feel */
+            background: radial-gradient(circle at center, #ffffff 0%, #f7f7f7 100%);
+            z-index: -1;
+        }
+
+        .container {
+            text-align: center;
+        }
+
+        .logo-image {
+            width: 140px;
+            height: 140px;
+            margin-bottom: 25px;
+            border-radius: 50%;
+            border: 2px solid var(--gold); 
+            object-fit: cover;
+            animation: pulse 2.5s infinite ease-in-out;
+            /* Shadow adjusted for white background */
+            box-shadow: 0 10px 30px rgba(212, 175, 55, 0.2);
+        }
+
+        /* 
+          Original font-size: 2.8rem 
+          Reduced by 10%: 2.8rem * 0.9 = 2.52rem
+        */
+        h1 {
+            font-size: 2.52rem;
+            margin: 0;
+            letter-spacing: 6px;
+            text-transform: uppercase;
+            /* Gold gradient adjusted for visibility on white */
+            background: linear-gradient(to bottom, #d4af37 0%, #996515 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 900;
+        }
+
+        .subtitle {
+            font-size: 0.85rem;
+            letter-spacing: 4px;
+            color: var(--text-muted);
+            margin-top: 8px;
+            text-transform: uppercase;
+        }
+
+        .loader-container {
+            width: 220px;
+            height: 3px;
+            background: #e0e0e0; /* Light grey track */
+            margin: 40px auto 12px;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .loader-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--dark-gold), var(--gold), var(--dark-gold));
+            animation: fillProgress 3.5s forwards cubic-bezier(0.1, 0.5, 0.5, 1);
+        }
+
+        @keyframes fillProgress {
+            0% { width: 0%; }
+            100% { width: 100%; }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); filter: drop-shadow(0 0 5px rgba(212, 175, 55, 0.4)); }
+            50% { transform: scale(1.05); filter: drop-shadow(0 0 15px rgba(212, 175, 55, 0.6)); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="bg-overlay"></div>
+
+    <div class="container">
+        <img src="https://i.ibb.co/Gf4LqS6z/logo.jpg" 
+             alt="Shree Gold" 
+             class="logo-image" 
+             onerror="this.src='https://via.placeholder.com/150/ffffff/d4af37?text=SG'">
+        
+        <h1>SHREE GOLD</h1>
+        <p class="subtitle">Premium Bullion & Trading</p>
+
+        <div class="loader-container">
+            <div class="loader-fill"></div>
+        </div>
+    </div>
+
+    <script>
+        // Exact original functionality preserved
+        setTimeout(function() {
+            console.log("Loading complete...");
+            window.location.href = "main.html";
+        }, 3500);
+    </script>
+</body>
+</html>

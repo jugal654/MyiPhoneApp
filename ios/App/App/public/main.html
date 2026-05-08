@@ -1,0 +1,4895 @@
+﻿
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>SHREE GOLD Ã¢â‚¬Â¢ PROFESSIONAL TERMINAL</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
+        
+        /* ========== FULL SCREEN WIDTH FIX ========== */
+        * {
+            box-sizing: border-box;
+        }
+        
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: #1a0f0a; 
+            margin: 0; 
+            display: flex; 
+            flex-direction: column; 
+            min-height: 100vh;
+            color: white; 
+            overflow-x: hidden;
+        }
+        
+        /* REMOVE THE MAX-WIDTH RESTRICTION - MAKE IT FULL WIDTH */
+        .max-w-md {
+            max-width: 100% !important;
+            width: 100%;
+            margin: 0 !important;
+        }
+        
+        /* Make header full width on all screens */
+        header.fixed {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            width: 100%;
+            z-index: 50;
+            border-radius: 0 !important;
+        }
+        
+        /* Make main content full width */
+        main {
+            width: 100%;
+            padding-top: 180px;
+            padding-bottom: 80px;
+            padding-left: 16px;
+            padding-right: 16px;
+        }
+        
+        /* Make bottom navigation full width */
+        nav.fixed.bottom-0 {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            width: 100%;
+            background: rgba(26, 15, 10, 0.95);
+            backdrop-filter: blur(10px);
+            padding-top: 8px;
+            padding-bottom: calc(env(safe-area-inset-bottom) + 8px);
+            z-index: 50;
+            border-radius: 0 !important;
+        }
+        
+        /* Popup full width on mobile, centered on desktop */
+        #buy-popup {
+            left: 0;
+            right: 0;
+        }
+        
+        #buy-popup .bg-white {
+            width: 100%;
+            max-width: 100%;
+            border-radius: 32px 32px 0 0;
+        }
+        
+        @media (min-width: 768px) {
+            #buy-popup .bg-white {
+                max-width: 500px;
+                margin: 0 auto;
+                border-radius: 32px;
+            }
+            
+            #buy-popup {
+                display: flex;
+                justify-content: center;
+                align-items: flex-end;
+            }
+        }
+        
+        /* Responsive padding for different screen sizes */
+        @media (min-width: 1200px) {
+            main {
+                padding-left: 24px;
+                padding-right: 24px;
+            }
+            
+            .px-4 {
+                padding-left: 24px !important;
+                padding-right: 24px !important;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            main {
+                padding-left: 12px;
+                padding-right: 12px;
+            }
+        }
+        
+        /* Better touch targets for mobile */
+        button, 
+        .manual-rate-item,
+        [onclick] {
+            cursor: pointer;
+        }
+        
+        /* Responsive quantity buttons */
+        @media (max-width: 480px) {
+            .qty-btn {
+                width: 44px;
+                height: 44px;
+            }
+            #order-qty {
+                width: 80px;
+            }
+        }
+        
+        /* Responsive grid gaps */
+        @media (max-width: 768px) {
+            .grid-cols-3 {
+                gap: 8px;
+            }
+        }
+        
+        /* ========== YOUR ORIGINAL STYLES BELOW (KEEP EVERYTHING AS IS) ========== */
+        .gold-gradient { background: linear-gradient(180deg, #3d251a 0%, #23140e 100%); }
+        .price-up { background-color: #008c00 !important; color: white !important; }
+        .price-down { background-color: #d10000 !important; color: white !important; }
+        .price-cell { transition: background-color 0.8s ease-out; border-radius: 6px; padding: 8px 4px; }
+        
+        /* Popup Animations */
+        .panel-hidden { transform: translateY(100%); transition: transform 0.3s ease-in-out; }
+        .panel-visible { transform: translateY(0%); transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+        
+        .status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 4px; }
+        
+        /* Qty Control Styles */
+        .qty-btn { width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; border-radius: 12px; background-color: #f3f4f6; color: #1f2937; font-weight: bold; transition: all 0.2s; }
+        
+        /* Range Slider Styling */
+        input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; }
+        input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 8px; cursor: pointer; background: #e5e7eb; border-radius: 10px; }
+        input[type=range]::-webkit-slider-thumb { height: 26px; width: 26px; border-radius: 50%; background: #b45309; cursor: pointer; -webkit-appearance: none; margin-top: -9px; border: 4px solid white; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+        
+        ::-webkit-scrollbar { display: none; }
+        
+        /* AUTH OVERLAY STYLES */
+        #main-auth-overlay {
+            position: fixed;
+            inset: 0;
+            background: #ffffff;
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .auth-card {
+            background: #ffffff;
+            width: 100%;
+            max-width: 360px;
+            padding: 40px 30px;
+            border-radius: 32px;
+            text-align: center;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
+            border: 1px solid #f1f5f9;
+        }
+        
+        .input-field {
+            width: 100%;
+            background: #f1f5f9;
+            border: 2px solid transparent;
+            padding: 16px;
+            border-radius: 16px;
+            text-align: center;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 16px;
+            transition: all 0.3s;
+        }
+        
+        .input-field:focus {
+            background: #ffffff;
+            border-color: #b45309;
+            outline: none;
+            box-shadow: 0 0 0 4px rgba(180, 83, 9, 0.1);
+        }
+        
+        .login-btn {
+            width: 100%;
+            background: #1e293b;
+            color: white;
+            padding: 16px;
+            border-radius: 16px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.2s;
+        }
+        
+        .login-btn:active { transform: scale(0.98); background: #0f172a; }
+        
+        /* STOP BOOKING INDICATORS */
+        .row-disabled { filter: grayscale(1); opacity: 0.6; cursor: not-allowed !important; }
+        .closed-pill {
+            background: #ef4444;
+            color: white;
+            font-size: 9px;
+            font-weight: 900;
+            padding: 4px 10px;
+            border-radius: 50px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            animation: pulse 2s infinite;
+            white-space: nowrap;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(0.95); opacity: 0.8; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        
+        .stop-badge {
+            background: #ef4444;
+            color: white;
+            font-size: 8px;
+            font-weight: 800;
+            padding: 2px 6px;
+            border-radius: 20px;
+            margin-left: 6px;
+            vertical-align: middle;
+        }
+        
+        /* Loading Spinner */
+        .spinner {
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top: 3px solid #b45309;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Error Message */
+        .error-message {
+            background: #ef4444;
+            color: white;
+            padding: 12px;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-size: 12px;
+            font-weight: bold;
+            display: none;
+        }
+        
+        /* User info display */
+        .user-info-badge {
+            background: rgba(180, 83, 9, 0.2);
+            border: 1px solid rgba(180, 83, 9, 0.3);
+            border-radius: 8px;
+            padding: 8px;
+            font-size: 10px;
+            color: #fbbf24;
+            margin-bottom: 10px;
+        }
+        
+        /* --- Manual Rates Styles --- */
+        .manual-rates-card {
+            background: linear-gradient(135deg, #2d1e14 0%, #1f140e 100%);
+            border-radius: 20px;
+            padding: 12px;
+            margin-bottom: 12px;
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            display: none; 
+        }
+        .manual-rate-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 12px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 12px;
+            margin-bottom: 6px;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+        .manual-rate-item.flash-up { background: rgba(0, 140, 0, 0.3); transform: scale(1.02); }
+        .manual-rate-item.flash-down { background: rgba(209, 0, 0, 0.3); transform: scale(1.02); }
+        .live-badge {
+            background: rgba(0, 255, 0, 0.2);
+            color: #4ade80;
+            font-size: 7px;
+            padding: 2px 6px;
+            border-radius: 20px;
+            animation: pulse 1.5s infinite;
+        }
+        
+        /* Container that hides the text when it's outside the box */
+        .ticker-wrapper {
+            width: 100%;
+            overflow: hidden;
+            white-space: nowrap;
+        }
+        
+        /* The actual scrolling text */
+        .ticker-text {
+            display: inline-block;
+            padding-left: 100%;
+            animation: ticker-move 15s linear infinite;
+        }
+        
+        /* The animation logic */
+        @keyframes ticker-move {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-100%); }
+        }
+
+
+
+
+
+
+
+        /* ========== CORNER CURVED TOP BAR (BOTTOM CORNERS ROUNDED) ========== */
+/* Replace the existing header styling with this curved design */
+
+/* Override the previous header.fixed styles to allow curved corners */
+header.fixed {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    z-index: 50;
+    /* CRUCIAL: This creates the curved bottom corners */
+    border-radius: 0 0 42px 42px !important;
+    background: #ffffff;
+    padding: 18px 20px 20px 20px;
+    box-shadow: 0 20px 35px -12px rgba(0,0,0,0.25);
+}
+
+/* Alternative - if you want a more pronounced curve */
+.curved-header {
+    border-radius: 0 0 56px 56px !important;
+}
+
+/* For an even more dramatic curve (like the second file) */
+.dramatic-curve-header {
+    border-radius: 0 0 64px 64px !important;
+}
+
+/* Optional: Add a subtle inner glow to enhance the curve effect */
+header.fixed::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, transparent, rgba(180, 83, 9, 0.3), transparent);
+    border-radius: 0 0 42px 42px;
+    pointer-events: none;
+}
+
+/* Ensure the header content stays properly aligned */
+header.fixed .flex.justify-between {
+    position: relative;
+    z-index: 2;
+}
+
+/* For responsive behavior on smaller screens */
+@media (max-width: 768px) {
+    header.fixed {
+        border-radius: 0 0 36px 36px !important;
+        padding: 14px 16px 18px 16px;
+    }
+}
+
+/* For very large screens, keep the curve proportional */
+@media (min-width: 1200px) {
+    header.fixed {
+        border-radius: 0 0 48px 48px !important;
+    }
+}
+
+/* Custom slider thumb styling */
+input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    height: 28px;
+    width: 28px;
+    border-radius: 50%;
+    background: #b45309;
+    cursor: pointer;
+    margin-top: -11px;
+    border: 3px solid white;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+input[type=range]::-webkit-slider-runnable-track {
+    width: 100%;
+    height: 6px;
+    cursor: pointer;
+    background: #e5e7eb;
+    border-radius: 10px;
+}
+
+/* Remove spinner arrows from number input */
+#order-qty::-webkit-inner-spin-button,
+#order-qty::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* Mobile responsive for popup */
+@media (max-width: 480px) {
+    #order-qty {
+        width: 130px !important;
+        font-size: 2.8rem !important;
+    }
+    
+    button[style*="width: 64px"] {
+        width: 52px !important;
+        height: 52px !important;
+    }
+    
+    button[style*="width: 64px"] i {
+        font-size: 1.3rem !important;
+    }
+}
+
+#turbo-ui-indicator { display: none; background: rgba(234, 88, 12, 0.2); color: #fdba74; font-size: 8px; font-weight: 800; padding: 2px 6px; border-radius: 10px; margin-left: 5px; animation: pulse 1.5s infinite; }
+    </style>
+
+
+<script src="config.js"></script>
+<script src="connection.js"></script>
+</head>
+<body class="max-w-md mx-auto relative shadow-2xl">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <!-- SECURE TERMINAL ACCESS OVERLAY -->
+    <div id="main-auth-overlay">
+        <div class="auth-card">
+            <div class="mb-8">
+                <div class="w-16 h-16 bg-amber-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                    <i class="fa-solid fa-shield-halved text-amber-600 text-2xl"></i>
+                </div>
+                <h1 class="text-2xl font-black text-gray-900 tracking-tighter">Terminal Access</h1>
+                <p class="text-gray-400 text-xs font-semibold mt-1">Live Database Connection Required</p>
+            </div>
+            <input type="password" id="terminal-password" placeholder="Password" class="input-field">
+            <button onclick="checkTerminalAccess()" class="login-btn mb-6">Unlock Terminal</button>
+            <div class="pt-6 border-t border-gray-100">
+                <p class="text-gray-400 text-[10px] font-bold uppercase tracking-widest mb-2">Need Password?</p>
+                <a href="tel:+917020152697" class="flex items-center justify-center gap-2 text-amber-600 font-extrabold text-lg active:scale-95 transition-transform">
+                    <i class="fa-solid fa-phone-volume text-sm"></i> +91 70201 52697
+                </a>
+            </div>
+            <p id="error-txt" class="text-red-500 text-[10px] mt-4 font-bold uppercase hidden">Invalid Password. Try Again.</p>
+        </div>
+    </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <header class="fixed top-0 w-full max-w-md bg-white pt-4 pb-4 px-6 rounded-b-[30px] shadow-xl z-50 text-gray-800">
+        <div class="flex justify-between items-center mb-4">
+            <a href="tel:+917020152697" class="w-9 h-9 bg-gray-50 border border-gray-100 rounded-full flex items-center justify-center active:scale-90 transition-transform"><i class="fa-solid fa-phone text-[#3d251a] text-xs"></i></a>
+            <div class="text-center">
+                <h1 class="text-xl font-black tracking-tighter text-[#3d251a] leading-none">SHREE GOLD</h1>
+                <p class="text-[8px] tracking-[0.4em] font-bold text-amber-700">BULLION</p>
+            </div>
+            <div class="flex gap-4 items-center">
+                <a href="https://wa.me/917020152697" target="_blank" class="active:scale-90 transition-transform"><i class="fa-brands fa-whatsapp text-green-600 text-xl"></i></a>
+                <button onclick="window.location.href='about.html'" class="active:scale-90 transition-transform"><i class="fa-solid fa-circle-info text-gray-300 text-lg"></i></button>
+            </div>
+        </div>
+        
+        <div class="bg-gray-50 rounded-2xl flex justify-between items-center py-2 px-3 border border-gray-100">
+            <div class="text-center flex-1 border-r border-gray-200"><p class="text-[8px] text-gray-400 font-bold uppercase">Gold $</p><p class="text-sm font-extrabold" id="global-gold">--</p></div>
+            <div class="text-center flex-1 border-r border-gray-200"><p class="text-[8px] text-gray-400 font-bold uppercase">Silver $</p><p class="text-sm font-extrabold" id="global-silver">--</p></div>
+            <div class="text-center flex-1"><p class="text-[8px] text-gray-400 font-bold uppercase">USD/INR</p><p class="text-sm font-extrabold" id="global-inr">--</p></div>
+        </div>
+
+
+        <div class="flex justify-center items-center gap-3 mt-2">
+            <div id="status-header" class="text-[7px] font-bold text-red-600 uppercase flex items-center"><span class="status-dot bg-red-600 animate-pulse"></span> <span id="status-text">Connecting...</span></div>
+            
+            <div class="w-px h-2 bg-gray-200"></div>
+            <div id="real-time-clock" class="text-[9px] font-black text-gray-400 tracking-widest uppercase">00:00:00 AM</div>
+        </div>
+        <div id="global-stop-indicator" class="flex justify-center gap-3 mt-1 text-[8px] font-bold"></div>
+    </header>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <main class="gold-gradient flex-grow pt-48 px-4 pb-24 overflow-y-auto">
+        <!-- MANUAL PUSH RATES DISPLAY SECTION -->
+        <div id="manual-rates-container" class="manual-rates-card">
+            <div class="flex items-center justify-between mb-3">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-chart-line text-amber-500 text-sm animate-pulse"></i>
+                    <span class="text-[10px] font-black text-amber-400 uppercase tracking-wider">OFFICIAL BOOKING RATES</span>
+                </div>
+                <span class="live-badge"><i class="fa-solid fa-waveform mr-1"></i>LIVE</span>
+            </div>
+            <div id="manual-rates-list" class="space-y-2">
+                <div class="text-center text-amber-500/50 text-[10px] py-2">Loading Official Rates...</div>
+            </div>
+        </div>
+        <div class="rounded-2xl overflow-hidden border border-white/5 shadow-2xl bg-black/10">
+    
+            <div class="bg-black/20 py-2 px-4 border-y border-white/5">
+                <p class="text-[10px] font-black tracking-[0.2em] text-gray-400 uppercase italic">
+                    Spot Retail Rates
+                </p>
+            </div>
+            
+            <div id="spot-gold-row" onclick="handleBookingSpot('Gold 99.5', window.cloudSettings?.goldCash, 'gold')" class="grid grid-cols-3 items-center px-4 py-4 border-b border-white/5 cursor-pointer relative">
+                <div class="text-[12px] font-black text-amber-500 uppercase">Gold 99.5</div>
+                <div id="gold-cash-content" class="col-span-2 text-right">
+                    <span id="cash-gold-display" class="text-xl font-black text-white">--</span>
+                </div>
+            </div>
+            
+            <div id="spot-silver-row" onclick="handleBookingSpot('Silver 99.9', window.cloudSettings?.silverCash, 'silver')" class="grid grid-cols-3 items-center px-4 py-4 border-b border-white/5 cursor-pointer relative">
+                <div class="text-[12px] font-black text-amber-500 uppercase">Silver 99.9</div>
+                <div id="silver-cash-content" class="col-span-2 text-right">
+                    <span id="cash-silver-display" class="text-xl font-black text-white">--</span>
+                </div>
+            </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            <div class="grid grid-cols-3 bg-black/30 py-3 px-4 text-[9px] font-black text-amber-500/80 tracking-widest uppercase">
+                <div>Commodity</div><div class="text-right">Buy</div><div class="text-right">Sell</div>
+            </div>
+            <div id="price-table-body">
+                <div class="p-10 text-center text-white/20 text-xs italic">Awaiting secure connection...</div>
+            </div>
+            
+          <div class="bg-black/40 border-t border-white/5 py-3 overflow-hidden">
+    <div class="ticker-wrapper">
+        <div id="news-ticker" class="ticker-text text-amber-500 text-[11px] font-bold uppercase tracking-wider">
+            Welcome to SHREE GOLD Bullion - Updates will appear here.
+        </div>
+    </div>
+</div>
+
+
+        </div>
+    </main>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <!-- BUY POPUP -->
+    <!-- BUY POPUP - IMPROVED VERSION -->
+<div id="buy-popup" class="panel-hidden fixed inset-0 bg-black/70 backdrop-blur-md z-[150] flex items-end justify-center invisible">
+    <div class="bg-white w-full max-w-md rounded-t-[40px] p-8 pb-10 text-gray-800">
+        <div class="w-12 h-1.5 bg-gray-200 rounded-full mx-auto mb-6" onclick="closeBuyPopup()"></div>
+        
+        <div class="text-center mb-6">
+            <span id="popup-badge" class="px-3 py-1 bg-amber-100 text-amber-700 text-[9px] font-bold rounded-full uppercase mb-2 inline-block">Gold 99.5</span>
+            <h2 id="popup-title" class="text-xl font-black text-[#3d251a]">--</h2>
+            <div class="flex justify-center items-center gap-2 mt-1">
+                <span class="text-gray-400 text-[10px] font-bold uppercase">Live Rate:</span>
+                <p id="popup-rate" class="text-2xl font-black text-amber-600"> 0</p>
+            </div>
+        </div>
+
+        <div id="user-info-display" class="user-info-badge hidden">
+            <div class="flex items-center gap-2 mb-1">
+                <i class="fa-solid fa-user text-amber-500 text-xs"></i>
+                <span id="display-username" class="font-bold text-white">Guest</span>
+            </div>
+            <div class="flex items-center gap-2 mb-1">
+                <i class="fa-solid fa-phone text-amber-500 text-xs"></i>
+                <span id="display-phone" class="text-white">Not provided</span>
+            </div>
+            <div class="flex items-center gap-2 mb-1">
+                <i class="fa-solid fa-location-dot text-amber-500 text-xs"></i>
+                <span id="display-address" class="text-white text-[9px]">Not provided</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <i class="fa-solid fa-id-card text-amber-500 text-xs"></i>
+                <span id="display-gst" class="text-white text-[9px] uppercase">Not provided</span>
+            </div>
+        </div>
+
+        <div class="flex flex-col items-center">
+            <div class="flex items-center gap-8 mb-6">
+                <button onclick="changeQty(-1)" 
+                        style="width: 64px; height: 64px; display: flex; align-items: center; justify-content: center; border-radius: 20px; background-color: #f3f4f6; color: #1f2937; font-weight: bold; transition: all 0.2s; border: none; cursor: pointer;">
+                    <i class="fa-solid fa-minus" style="font-size: 1.75rem;"></i>
+                </button>
+                
+                <div class="text-center">
+                    <input type="number" id="order-qty" value="10" 
+                           style="width: 180px; font-size: 4rem; font-weight: 900; text-align: center; background: transparent; border: none; outline: none; color: #3d251a; line-height: 1.2;">
+                    <p class="text-sm text-gray-400 font-bold uppercase tracking-widest mt-2" id="unit-label">Grams</p>
+                </div>
+                
+                <button onclick="changeQty(1)" 
+                        style="width: 64px; height: 64px; display: flex; align-items: center; justify-content: center; border-radius: 20px; background-color: #f3f4f6; color: #1f2937; font-weight: bold; transition: all 0.2s; border: none; cursor: pointer;">
+                    <i class="fa-solid fa-plus" style="font-size: 1.75rem;"></i>
+                </button>
+            </div>
+            
+            <div class="w-full px-2 mb-6">
+                <input type="range" id="qty-slider" min="10" max="500" step="10" value="10" 
+                       style="width: 100%; height: 6px; -webkit-appearance: none; background: #e5e7eb; border-radius: 10px; outline: none;">
+                <div class="flex justify-between mt-3 text-sm font-bold text-gray-400">
+                    <span id="slider-min">10g</span>
+                    <span id="slider-max">500g</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-gray-50 rounded-2xl p-5 flex justify-between items-center border border-gray-100">
+            <div>
+                <p class="text-[10px] font-bold text-gray-400 uppercase">Estimated Amount</p>
+                <p id="total-price" class="text-3xl font-black text-[#3d251a]"> 0</p>
+            </div>
+            <div class="w-12 h-12 bg-[#3d251a] rounded-xl flex items-center justify-center text-white text-[11px] font-black leading-tight text-center">
+                +3%<br>GST
+            </div>
+        </div>
+
+        <div id="order-error-message" class="error-message text-center"></div>
+
+        <div class="grid grid-cols-2 gap-4 mt-8">
+            <button onclick="closeBuyPopup()" class="py-4 rounded-2xl font-bold text-xs bg-gray-100 text-gray-500 uppercase hover:bg-gray-200 transition-all">Cancel</button>
+            <button onclick="confirmOrder(event)" class="py-4 bg-[#3d251a] text-white rounded-2xl font-bold text-xs uppercase shadow-xl active:scale-95 transition-all">Confirm Order</button>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <div id="admin-popup" class="panel-hidden fixed inset-0 bg-black/95 backdrop-blur-xl z-[200] flex items-center justify-center invisible p-6">
+        <div class="bg-white w-full rounded-3xl p-8 text-gray-800 shadow-2xl">
+            <h2 class="text-2xl font-black mb-2">Admin Terminal</h2>
+            <p class="text-gray-400 text-[10px] font-bold uppercase tracking-widest mb-6">Enter credentials to unlock system</p>
+            <input type="text" id="admin-user" placeholder="Username" class="w-full bg-gray-100 p-4 rounded-xl mb-3 outline-none focus:ring-2 ring-amber-500 text-black">
+            <input type="password" id="admin-pass" placeholder="Password" class="w-full bg-gray-100 p-4 rounded-xl mb-6 outline-none focus:ring-2 ring-amber-500 text-black">
+            <div class="grid grid-cols-2 gap-3">
+                <button onclick="closeAdmin()" class="py-4 bg-gray-100 text-gray-500 rounded-xl font-bold text-xs uppercase">Exit</button>
+                <button onclick="handleLogin()" class="py-4 bg-[#3d251a] text-white rounded-xl font-bold text-xs uppercase">Unlock</button>
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <!-- BOTTOM NAVIGATION - ALL PAGES PROPERLY LINKED -->
+        <nav class="fixed bottom-0 w-full max-w-md bg-[#1a0f0a]/95 border-t border-white/10 px-6 py-3 z-50">
+            <div class="flex justify-between items-center">
+                <a href="/" class="flex flex-col items-center text-amber-500 cursor-pointer nav-item w-full text-center">
+                    <i class="fa-solid fa-chart-line text-lg"></i>
+                    <span class="text-[8px] font-bold mt-1 uppercase">Rates</span>
+                </a>
+                <a href="trad.html" class="flex flex-col items-center text-gray-500 cursor-pointer nav-item w-full text-center">
+                    <i class="fa-solid fa-receipt text-lg"></i>
+                    <span class="text-[8px] font-bold mt-1 uppercase">Trades</span>
+                </a>
+                <a href="bank.html" class="flex flex-col items-center text-gray-500 cursor-pointer nav-item w-full text-center">
+                    <i class="fa-solid fa-building-columns text-lg"></i>
+                    <span class="text-[8px] font-bold mt-1 uppercase">Bank</span>
+                </a>
+                <a href="login.html" class="flex flex-col items-center text-gray-500 cursor-pointer nav-item w-full text-center">
+                    <i class="fa-solid fa-right-to-bracket text-lg"></i>
+                    <span class="text-[8px] font-bold mt-1 uppercase">Login</span>
+                </a>
+            </div>
+        </nav>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <script type="importmap">
+        {
+            "imports": {
+                "firebase/app": "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js",
+                "firebase/firestore": "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js",
+                "firebase/database": "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js"
+            }
+        }
+    </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <script type="module">
+        // ========== FIREBASE DATABASE FUNCTIONALITY ==========
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+        import { 
+            getFirestore, 
+            collection, 
+            doc, 
+            setDoc, 
+            addDoc,
+            serverTimestamp,
+            query,
+            where,
+            getDocs,
+            onSnapshot,
+            enableIndexedDbPersistence
+        } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        // Firebase configuration for Realtime Database (original)
+        const firebaseConfig = {
+  apiKey: "AIzaSyBIghUCcQUxCcfYJOdCMgPsTuRSgnJpe6E",
+  authDomain: "shreegold-120eb.firebaseapp.com",
+  databaseURL: "https://shreegold-120eb-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "shreegold-120eb",
+  storageBucket: "shreegold-120eb.firebasestorage.app",
+  messagingSenderId: "915011378925",
+  appId: "1:915011378925:web:c03003bc7eca3ccc0bb6e4",
+  measurementId: "G-B714GY65N7"
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        // Firebase configuration for Firestore (new)
+        const firestoreConfig = {
+            apiKey: "AIzaSyBIghUCcQUxCcfYJOdCMgPsTuRSgnJpe6E",
+            authDomain: "shreegold-120eb.firebaseapp.com",
+            projectId: "shreegold-120eb",
+            storageBucket: "shreegold-120eb.firebasestorage.app",
+            messagingSenderId: "915011378925",
+            appId: "1:915011378925:web:c03003bc7eca3ccc0bb6e4",
+            measurementId: "G-B714GY65N7"
+        };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        // Initialize Firebase apps
+        const app = initializeApp(firebaseConfig, 'realtime');
+        const firestoreApp = initializeApp(firestoreConfig, 'firestore');
+        
+
+        
+        
+        // Get database instances
+        const rtdb = getDatabase(app);
+
+
+
+
+        // --- Manual Rates Logic ---
+        const manualRatesRef = ref(rtdb, "admin/manualBookingRates");
+        let manualBaseRates = {};
+
+
+
+
+        onValue(manualRatesRef, (snapshot) => {
+            const data = snapshot.val();
+            const container = document.getElementById('manual-rates-container');
+            const list = document.getElementById('manual-rates-list');
+            
+            if (data && (data.aquaGold || data.silver || data.billGold || data.billSilver)) {
+                container.style.display = 'block';
+                manualBaseRates = data;
+                
+                // Set global storage for booking
+                window.currentLiveManualRates = { ...data };
+
+
+
+
+                // Render the list
+                let html = '';
+                const items = [
+                    { id: 'aquaGold', label: 'GLD WITH GST', unit: '/ gm', type: 'gold' },
+                    { id: 'silver', label: 'SIL WITH GST', unit: '/ kg', type: 'silver' },
+                    { id: 'billGold', label: 'BILL GOLD', unit: '/ gm', type: 'gold' },
+                    { id: 'billSilver', label: 'BILL SILVER', unit: '/ kg', type: 'silver' }
+                ];
+
+
+
+
+                items.forEach(item => {
+                    if (data[item.id]) {
+                        html += `
+                        <div class="manual-rate-item" onclick="handleManualBooking('${item.label}', '${item.id}', '${item.type}')">
+                            <span class="text-[11px] font-bold text-amber-500">${item.label}</span>
+                            <span class="text-white font-black" id="rate-${item.id}">
+                                ₹ ${data[item.id].toLocaleString('en-IN')} <span class="text-[8px] opacity-60">${item.unit}</span>
+                            </span>
+                        </div>`;
+                    }
+                });
+                list.innerHTML = html;
+
+
+
+
+                // Start Auto-Fluctuation (±20)
+                if (window.manualInterval) clearInterval(window.manualInterval);
+                window.manualInterval = setInterval(() => {
+                    items.forEach(item => {
+                        if (manualBaseRates[item.id]) {
+                            const oldRate = window.currentLiveManualRates[item.id];
+                            const change = Math.floor(Math.random() * 41) - 20; 
+                            const newRate = manualBaseRates[item.id] + change;
+                            
+                            window.currentLiveManualRates[item.id] = newRate;
+                            
+                            const el = document.getElementById(`rate-${item.id}`);
+                            if (el) {
+                                el.innerHTML = `₹ ${newRate.toLocaleString('en-IN')} <span class="text-[8px] opacity-60">${item.unit}</span>`;
+                                const parent = el.closest('.manual-rate-item');
+                                if (newRate > oldRate) {
+                                    parent.classList.add('flash-up');
+                                    setTimeout(() => parent.classList.remove('flash-up'), 500);
+                                } else if (newRate < oldRate) {
+                                    parent.classList.add('flash-down');
+                                    setTimeout(() => parent.classList.remove('flash-down'), 500);
+                                }
+                            }
+                        }
+                    });
+                }, 4000);
+            } else {
+                container.style.display = 'none';
+            }
+        });
+
+
+
+
+        const db = getFirestore(firestoreApp);
+        
+        // Enable offline persistence for Firestore
+        enableIndexedDbPersistence(db).catch((err) => {
+            if (err.code == 'failed-precondition') {
+                console.log('Persistence failed: Multiple tabs open');
+            } else if (err.code == 'unimplemented') {
+                console.log('Persistence not supported');
+            }
+        });
+        
+        // Reference to settings document in Realtime Database
+        // Reference to settings document in Realtime Database
+const settingsRef = ref(rtdb, "admin/settings");
+
+//--------------------------------------------------------------code 1 dynamic labels
+// ==========================================================
+// ========== FIREBASE LABEL SYNCHRONIZATION ==========
+// ==========================================================
+// Initialize custom labels storage with managerDisabled flag
+
+window.customLabels = { 
+    gold: [], 
+    silver: [], 
+    removedFlags: { 
+        gold: [], 
+        silver: [] 
+    }, 
+    managerDisabled: false  // When true, manager customizations are IGNORED
+};
+window.lastSocketData = null;
+
+// Reference to product labels in Firebase
+const labelsRef = ref(rtdb, "admin/productLabels");
+
+// Listen for label changes from Firebase
+onValue(labelsRef, (snapshot) => {
+    const data = snapshot.val();
+    if (data) {
+        // Store labels in global variable with all features
+        window.customLabels = data;
+        console.log('%c✅ Product Labels Synced from Firebase', 'color: green; font-size: 12px');
+        console.log('Manager Status:', data.managerDisabled === true ? '🔴 DISABLED (Custom labels ignored)' : '🟢 ENABLED (Custom labels applied)');
+        console.log('Gold Labels:', data.gold);
+        console.log('Silver Labels:', data.silver);
+        console.log('Removed Flags:', data.removedFlags);
+        
+        // Re-render immediately if we have cached socket data
+        if (window.lastSocketData && typeof window.renderRatesWithAutoLabels === 'function') {
+            window.renderRatesWithAutoLabels(window.lastSocketData);
+        }
+    } else {
+        // If no labels in Firebase, use empty arrays with removeFlags support
+        window.customLabels = { 
+            gold: [], 
+            silver: [], 
+            removedFlags: { gold: [], silver: [] }, 
+            managerDisabled: false 
+        };
+        console.log('%cℹ️ No custom labels found, using defaults (manager ENABLED by default)', 'color: orange; font-size: 12px');
+    }
+}, (error) => {
+    console.error('%c❌ Error reading labels from Firebase:', 'color: red; font-size: 12px', error);
+});
+// ==========================================================
+// ==========================================================
+// ==========================================================
+
+
+
+
+// Read settings from Realtime Database
+// Read settings from Realtime Database (Upgraded with Turbo Switch)
+window.isTurboMode = false;
+
+onValue(settingsRef, (snapshot) => {
+    const data = snapshot.val();
+    if (data) {
+        window.cloudSettings = data;
+        window.liveTerminalPassword = data.globalPass;
+        localStorage.setItem('shree_gold_global_pass', data.globalPass || "Shreegold9792#");
+        
+        // --- CATCH TURBO MODE FROM FIREBASE ---
+        window.isTurboMode = data.turboMode === true;
+        const indicator = document.getElementById('turbo-ui-indicator');
+        if (indicator) indicator.style.display = window.isTurboMode ? 'inline-block' : 'none';
+
+        if (data.offset !== undefined) {
+            localStorage.setItem('shree_gold_offset', data.offset);
+        } else {
+            localStorage.setItem('shree_gold_offset', 0);
+        }
+        
+        if (data.silverOffset !== undefined) {
+            localStorage.setItem('shree_silver_offset', data.silverOffset);
+        } else {
+            localStorage.setItem('shree_silver_offset', 0);
+        }
+        
+        window.currentGoldOffset = data.offset || 0;
+        window.currentSilverOffset = data.silverOffset || 0;
+        
+        updateUIDatabase(data);
+        
+        // Force re-render instantly when Turbo is toggled
+        if (window.lastSocketData && typeof window.renderRatesWithAutoLabels === 'function') {
+            window.renderRatesWithAutoLabels(window.lastSocketData);
+        }
+    }
+}, (error) => {
+    console.error('Error reading from Firebase Realtime Database:', error);
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        // Function to save order to Firestore with better error handling - NEW FEATURE
+        async function saveOrderToFirestore(orderData) {
+            try {
+                const ordersCollection = collection(db, 'orders');
+                
+                const orderWithMetadata = {
+                    ...orderData,
+                    firestoreTimestamp: serverTimestamp(),
+                    createdAt: new Date().toISOString(),
+                    status: 'pending',
+                    processed: false
+                };
+                
+                const docRef = await addDoc(ordersCollection, orderWithMetadata);
+                
+                console.log('%cÃ¢Å“â€¦ ORDER SAVED TO FIRESTORE', 'color: green; font-size: 14px; font-weight: bold');
+                console.log('Firestore Document ID:', docRef.id);
+                
+                // Also save to a user-specific collection if user is logged in and has phone
+                if (orderData.user && orderData.user.phone && orderData.user.phone !== 'Not provided') {
+                    try {
+                        const cleanPhone = orderData.user.phone.replace(/\D/g, '');
+                        if (cleanPhone) {
+                            const userDocRef = doc(db, 'users', cleanPhone);
+                            const userOrdersCollection = collection(userDocRef, 'orders');
+                            const userOrderRef = await addDoc(userOrdersCollection, {
+                                ...orderWithMetadata,
+                                orderId: orderData.orderId,
+                                syncedAt: new Date().toISOString(),
+                                mainOrderId: docRef.id
+                            });
+                            console.log('Ã¢Å“â€¦ Also saved to user orders:', userOrderRef.id);
+                        }
+                    } catch (userError) {
+                        console.log('Note: Could not save to user orders (this is optional)', userError);
+                    }
+                }
+                
+                return {
+                    success: true,
+                    firestoreId: docRef.id,
+                    orderData: orderWithMetadata
+                };
+                
+            } catch (error) {
+                console.error('%cÃ¢ Å’ ERROR SAVING TO FIRESTORE', 'color: red; font-size: 14px; font-weight: bold', error);
+                
+                let errorMessage = error.message;
+                if (error.code === 'permission-denied') {
+                    errorMessage = 'Permission denied. Please check Firestore rules.';
+                } else if (error.code === 'unavailable') {
+                    errorMessage = 'Network unavailable. Order saved locally.';
+                } else if (error.code === 'deadline-exceeded') {
+                    errorMessage = 'Request timeout. Order saved locally.';
+                }
+                
+                return {
+                    success: false,
+                    error: errorMessage,
+                    code: error.code
+                };
+            }
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        // Function to store pending orders locally - NEW FEATURE
+        function storePendingOrder(orderData) {
+            const pendingOrders = JSON.parse(localStorage.getItem('shree_pending_orders') || '[]');
+            pendingOrders.push({
+                ...orderData,
+                pendingSince: new Date().toISOString(),
+                syncAttempts: 0
+            });
+            localStorage.setItem('shree_pending_orders', JSON.stringify(pendingOrders));
+            console.log('Ã°Å¸â€œÂ¦ Order stored locally for later sync');
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        // Function to sync pending orders - NEW FEATURE
+        async function syncPendingOrders() {
+            if (!navigator.onLine) return;
+            
+            const pendingOrders = JSON.parse(localStorage.getItem('shree_pending_orders') || '[]');
+            if (pendingOrders.length === 0) return;
+            
+            console.log(`Ã°Å¸â€œÂ¤ Syncing ${pendingOrders.length} pending orders to Firestore...`);
+            
+            const remainingOrders = [];
+            
+            for (const order of pendingOrders) {
+                try {
+                    order.syncAttempts = (order.syncAttempts || 0) + 1;
+                    
+                    const result = await saveOrderToFirestore(order);
+                    if (result.success) {
+                        console.log(`Ã¢Å“â€¦ Synced order: ${order.orderId} (Firestore ID: ${result.firestoreId})`);
+                    } else {
+                        if (order.syncAttempts < 3) {
+                            remainingOrders.push(order);
+                        } else {
+                            console.log(`Ã¢ Å’ Giving up on order ${order.orderId} after 3 attempts`);
+                        }
+                    }
+                } catch (error) {
+                    console.error(`Ã¢ Å’ Failed to sync order ${order.orderId}:`, error);
+                    if (order.syncAttempts < 3) {
+                        remainingOrders.push(order);
+                    }
+                }
+            }
+            
+            localStorage.setItem('shree_pending_orders', JSON.stringify(remainingOrders));
+            if (remainingOrders.length > 0) {
+                console.log(`Ã°Å¸â€œÂ¦ ${remainingOrders.length} orders remain pending`);
+            } else {
+                console.log('Ã¢Å“â€¦ All pending orders synced successfully');
+            }
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        // Function to get order history from Firestore - NEW FEATURE
+        async function getOrderHistory(limit = 50) {
+            try {
+                const ordersCollection = collection(db, 'orders');
+                const q = query(ordersCollection);
+                const querySnapshot = await getDocs(q);
+                
+                const orders = [];
+                querySnapshot.forEach((doc) => {
+                    orders.push({
+                        id: doc.id,
+                        ...doc.data()
+                    });
+                });
+                
+                return orders.sort((a, b) => {
+                    return new Date(b.createdAt) - new Date(a.createdAt);
+                }).slice(0, limit);
+                
+            } catch (error) {
+                console.error('Error fetching orders:', error);
+                return [];
+            }
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        // Make functions globally available
+        window.saveOrderToFirestore = saveOrderToFirestore;
+        window.storePendingOrder = storePendingOrder;
+        window.syncPendingOrders = syncPendingOrders;
+        window.getOrderHistory = getOrderHistory;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        // Listen for online/offline events
+        window.addEventListener('online', syncPendingOrders);
+        
+        // Try to sync when page loads
+        window.addEventListener('load', () => {
+            setTimeout(syncPendingOrders, 5000);
+        });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        function updateUIDatabase(data) {
+    try {
+        // Update news ticker
+        const newsTicker = document.getElementById('news-ticker');
+        if (newsTicker) {
+            newsTicker.innerText = data.news || "Welcome to SHREE GOLD Bullion";
+        }
+        
+        // ========== UPDATE OFFSETS IN LOCALSTORAGE (BACKUP) ==========
+        // This ensures offsets are always updated when data changes
+        if (data.offset !== undefined) {
+            localStorage.setItem('shree_gold_offset', data.offset);
+        }
+        if (data.silverOffset !== undefined) {
+            localStorage.setItem('shree_silver_offset', data.silverOffset);
+        }
+        
+        // Update gold spot rate display
+        // Update gold spot rate display - ALWAYS VISIBLE, NO STOP BADGE
+const goldRow = document.getElementById('spot-gold-row');
+const goldContent = document.getElementById('gold-cash-content');
+
+if (goldRow && goldContent) {
+    goldRow.classList.remove('row-disabled');
+    const goldRate = Number(data.goldCash || 0);
+    const displayRate = goldRate.toLocaleString('en-IN');
+    goldContent.innerHTML = `<span id="cash-gold-display" class="text-xl font-black text-white"> ${displayRate}</span>`;
+}
+
+// Update silver spot rate display - ALWAYS VISIBLE, NO STOP BADGE
+const silverRow = document.getElementById('spot-silver-row');
+const silverContent = document.getElementById('silver-cash-content');
+
+if (silverRow && silverContent) {
+    silverRow.classList.remove('row-disabled');
+    const silverRate = Number(data.silverCash || 0);
+    const displayRate = silverRate.toLocaleString('en-IN');
+    silverContent.innerHTML = `<span id="cash-silver-display" class="text-xl font-black text-white"> ${displayRate}</span>`;
+}
+        
+        // Update global stop indicator
+        const stopDiv = document.getElementById('global-stop-indicator');
+        if (stopDiv) {
+            stopDiv.innerHTML = '';
+            if (data.stopGold) stopDiv.innerHTML += `<span class="text-red-500 font-black">GOLD STOP</span> `;
+            if (data.stopSilver) stopDiv.innerHTML += `<span class="text-red-500 font-black">SILVER STOP</span>`;
+            if (!data.stopGold && !data.stopSilver) stopDiv.innerHTML = `<span class="text-green-500">ALL BOOKING OPEN</span>`;
+        }
+        
+        // Optional: Update last sync time
+        const lastSyncElement = document.getElementById('last-sync-time');
+        if (lastSyncElement) {
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('en-IN', { 
+                hour: '2-digit', 
+                minute: '2-digit',
+                second: '2-digit'
+            });
+            lastSyncElement.innerHTML = `<span class="text-[8px] text-gray-400">Synced: ${timeStr}</span>`;
+        }
+        
+    } catch (error) {
+        console.error('Error in updateUIDatabase:', error);
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        window.cloudSettings = window.cloudSettings || {};
+    </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <script>
+        // ========== USER DATA MANAGEMENT ==========
+        
+        // Function to get user data from all possible storage locations - ENHANCED with ADDRESS and GST
+        function getUserDataFromStorage() {
+            let userData = {};
+            
+            // Check for shree_user_data (main key)
+            const shreeUserData = localStorage.getItem('shree_user_data');
+            if (shreeUserData) {
+                try {
+                    userData = JSON.parse(shreeUserData);
+                } catch (e) {
+                    console.error('Error parsing shree_user_data:', e);
+                }
+            }
+            
+            // Check for user_data (alternative key)
+            const userDataAlt = localStorage.getItem('user_data');
+            if (userDataAlt && Object.keys(userData).length === 0) {
+                try {
+                    userData = JSON.parse(userDataAlt);
+                } catch (e) {
+                    console.error('Error parsing user_data:', e);
+                }
+            }
+            
+            // Check for individual user fields - NOW INCLUDES ADDRESS AND GST
+            const username = localStorage.getItem('shree_user_name') || 
+                           localStorage.getItem('username') || 
+                           localStorage.getItem('user_name');
+            
+            const phone = localStorage.getItem('shree_user_phone') || 
+                         localStorage.getItem('phone') || 
+                         localStorage.getItem('user_phone');
+            
+            // CRITICAL: Fetch address and GST from localStorage
+            const address = localStorage.getItem('shree_user_address') || 
+                           localStorage.getItem('address') || 
+                           localStorage.getItem('user_address') || '';
+            
+            const gst = localStorage.getItem('shree_user_gst') || 
+                       localStorage.getItem('gst') || 
+                       localStorage.getItem('gst_number') || '';
+            
+            const email = localStorage.getItem('email') || 
+                         localStorage.getItem('user_email');
+            
+            const userId = localStorage.getItem('userId') || 
+                          localStorage.getItem('user_id') || 
+                          localStorage.getItem('shree_user_id');
+            
+            // If we found individual fields, enhance user object
+            if (username || phone || address || gst || email || userId) {
+                userData = {
+                    ...userData,
+                    username: username || userData.username || userData.name || 'Guest',
+                    name: username || userData.username || userData.name || 'Guest',
+                    phone: phone || userData.phone || userData.mobile || 'Not provided',
+                    address: address || userData.address || 'Not provided',
+                    gst: gst || userData.gst || userData.gstNumber || 'Not provided',
+                    email: email || userData.email || '',
+                    userId: userId || userData.userId || userData.id || '',
+                    isLoggedIn: localStorage.getItem('shree_user_logged_in') === 'true' || 
+                                localStorage.getItem('user_logged_in') === 'true' ||
+                                !!userId
+                };
+            }
+            
+            return userData;
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        // Function to get user data from sessionStorage
+        function getUserDataFromSession() {
+            let userData = {};
+            
+            try {
+                const sessionUserData = sessionStorage.getItem('shree_user_data') || 
+                                      sessionStorage.getItem('user_data');
+                if (sessionUserData) {
+                    userData = JSON.parse(sessionUserData);
+                }
+            } catch (e) {
+                console.error('Error parsing session storage:', e);
+            }
+            
+            return userData;
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        // Generate a unique device ID for guest tracking
+        function generateDeviceId() {
+            let deviceId = localStorage.getItem('shree_device_id');
+            if (!deviceId) {
+                deviceId = 'DEV-' + Math.random().toString(36).substring(2, 15) + 
+                          Math.random().toString(36).substring(2, 15);
+                localStorage.setItem('shree_device_id', deviceId);
+            }
+            return deviceId;
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        // Debug function to check user data - NOW SHOWS ADDRESS AND GST
+        function debugUserData() {
+            console.log('%cÃ°Å¸â€ DEBUG: Checking for user data in storage', 'color: blue; font-weight: bold; font-size: 14px');
+            
+            const storageChecks = {
+                'shree_user_data': localStorage.getItem('shree_user_data'),
+                'shree_user_name': localStorage.getItem('shree_user_name'),
+                'shree_user_phone': localStorage.getItem('shree_user_phone'),
+                'shree_user_address': localStorage.getItem('shree_user_address'),
+                'shree_user_gst': localStorage.getItem('shree_user_gst'),
+                'shree_user_logged_in': localStorage.getItem('shree_user_logged_in'),
+                'sessionStorage': sessionStorage.getItem('shree_user_data')
+            };
+            
+            console.table(storageChecks);
+            
+            const userData = getUserDataFromStorage();
+            console.log('%cÃ°Å¸â€œÅ  Parsed User Data:', 'color: green; font-weight: bold', userData);
+            console.log('Ã°Å¸â€œ Address:', userData.address);
+            console.log('Ã°Å¸ Â·Ã¯Â¸ GST:', userData.gst);
+            
+            return userData;
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        // Check URL parameters for login data
+        function checkUrlForUserData() {
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('login') === 'success') {
+                const urlUsername = urlParams.get('username');
+                if (urlUsername) {
+                    // Save the username from URL
+                    localStorage.setItem('shree_username', urlUsername);
+                    localStorage.setItem('username', urlUsername);
+                    
+                    const userData = {
+                        username: urlUsername,
+                        name: urlUsername,
+                        isLoggedIn: true
+                    };
+                    localStorage.setItem('shree_user_data', JSON.stringify(userData));
+                    
+                    // Clean URL without reloading
+                    const newUrl = window.location.pathname;
+                    window.history.replaceState({}, document.title, newUrl);
+                }
+            }
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        // Call this on page load
+        checkUrlForUserData();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        // ========== TERMINAL ACCESS ==========
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        const ACCESS_STATUS_KEY = 'shree_terminal_permanently_unlocked';
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        function checkTerminalAccess() {
+            const enteredPass = document.getElementById('terminal-password').value;
+            const errorText = document.getElementById('error-txt');
+            
+            const correctPass = window.liveTerminalPassword || 
+                              localStorage.getItem('shree_gold_global_pass') || 
+                              "Shreegold9792#";
+            
+            if (enteredPass === correctPass) {
+                localStorage.setItem(ACCESS_STATUS_KEY, 'true');
+                unlockUI();
+            } else {
+                errorText.classList.remove('hidden');
+                document.getElementById('terminal-password').value = "";
+                setTimeout(() => errorText.classList.add('hidden'), 2500);
+            }
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        function unlockUI() {
+            const overlay = document.getElementById('main-auth-overlay');
+            overlay.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+            overlay.style.opacity = '0';
+            overlay.style.transform = 'scale(1.1)';
+            setTimeout(() => { overlay.style.display = 'none'; }, 500);
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        window.addEventListener('DOMContentLoaded', () => {
+            if (localStorage.getItem(ACCESS_STATUS_KEY) === 'true') {
+                document.getElementById('main-auth-overlay').style.display = 'none';
+            }
+        });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        // ========== BOOKING HANDLERS ==========
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// --- Click Handler for Manual Booking ---
+window.handleManualBooking = function(label, rateKey, type) {
+            const currentRate = window.currentLiveManualRates ? window.currentLiveManualRates[rateKey] : 0;
+            
+            if (!currentRate || currentRate === 0) {
+                alert("Syncing rates... please try again in a second.");
+                return;
+            }
+
+
+
+
+            const isStopped = (type === 'gold' ? window.cloudSettings?.stopGold : window.cloudSettings?.stopSilver);
+            if (isStopped) {
+                alert("Booking is currently stopped.");
+                return;
+            }
+
+
+
+
+            // Math: Admin sets Gold per 1g, Popup needs 10g value
+            let popupPrice = (type === 'gold') ? (currentRate * 10) : currentRate;
+
+
+
+
+            // Open the existing booking popup
+            openBuyPopup(label, popupPrice);
+            
+            // Force values to update so catchData() works
+            setTimeout(() => {
+                document.getElementById('popup-rate').innerText = " ₹ " + Math.floor(popupPrice).toLocaleString('en-IN');
+                calculateTotal(); 
+            }, 50);
+        };
+
+
+
+
+
+
+
+
+
+
+
+        function handleBookingSpot(label, rate, type) {
+    if (label === 'Gold 99.5' || label === 'Silver 99.9') {
+        window.location.href = "tel:+917020152697";
+        return;
+    }
+    
+    if (!rate) rate = 0;
+    // STOP CHECK REMOVED - Spot Retail Rates always bookable
+    openBuyPopup(label, rate);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        window.handleBookingProduct = function(label, ask, type) {
+            const isStopped = (type === 'gold' ? window.cloudSettings?.stopGold : window.cloudSettings?.stopSilver);
+            if (isStopped) {
+                alert("Booking stopped for this commodity category.");
+                return;
+            }
+            openBuyPopup(label, ask);
+        };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        // ========== SOCKET CONNECTION ==========
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        let prevDataStore = {};
+        let pricePerUnit = 0; 
+        const goldLabels = ["99.5 100 Gm CAD Quick RTGS", "99.5 50 Gm CAD(T+1)", "99.5 10 Gm CAD(T+1)", "99.5 10 Gm CAD(T+10)", "GLD with GST"];
+        const silverLabels = ["Silver 999 15Kg", "Silver 999 3Kg", "Silver 999 500gm", "Silver 999 500gm(T+10)", "SL with GST"];
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// OPEN POPUP FUNCTION PASTE 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        // ========== ENHANCED CATCH DATA FUNCTION ==========
+        
+        // Generate a unique order ID
+        function generateOrderId() {
+            const timestamp = Date.now().toString(36).toUpperCase();
+            const random = Math.random().toString(36).substring(2, 8).toUpperCase();
+            const date = new Date();
+            const day = date.getDate().toString().padStart(2, '0');
+            const month = (date.getMonth() + 1).toString().padStart(2, '0');
+            
+            return `ORD-${day}${month}-${timestamp}-${random}`;
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        // Format currency in Indian format
+        function formatCurrency(amount) {
+            if (typeof amount !== 'number') return ' 0';
+            return ' ' + amount.toLocaleString('en-IN', {
+                maximumFractionDigits: 2,
+                minimumFractionDigits: 2
+            });
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        // Get device information
+        function getDeviceInfo() {
+            const ua = navigator.userAgent;
+            const isMobile = /Mobile|Android|iPhone|iPad|iPod/i.test(ua);
+            const isIOS = /iPhone|iPad|iPod/i.test(ua);
+            const isAndroid = /Android/i.test(ua);
+            
+            let browser = 'Unknown';
+            if (ua.indexOf('Chrome') > -1) browser = 'Chrome';
+            else if (ua.indexOf('Safari') > -1) browser = 'Safari';
+            else if (ua.indexOf('Firefox') > -1) browser = 'Firefox';
+            else if (ua.indexOf('MSIE') > -1 || ua.indexOf('Trident') > -1) browser = 'Internet Explorer';
+            
+            return {
+                platform: isMobile ? 'Mobile' : 'Desktop',
+                os: isIOS ? 'iOS' : (isAndroid ? 'Android' : 'Unknown'),
+                browser: browser,
+                screenSize: `${window.screen.width}x${window.screen.height}`,
+                viewport: `${window.innerWidth}x${window.innerHeight}`,
+                userAgent: ua.substring(0, 100)
+            };
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        // Main catchData function - NOW INCLUDES ADDRESS AND GST
+        function catchData(orderDetails = null) {
+            try {
+                let orderData;
+                
+                if (orderDetails && typeof orderDetails === 'object') {
+                    orderData = { ...orderDetails };
+                } else {
+                    // Capture data from the popup form
+                    const product = document.getElementById('popup-title')?.innerText || 'Unknown Product';
+                    const qty = document.getElementById('order-qty')?.value || '0';
+                    const rateRaw = document.getElementById('popup-rate')?.innerText?.replace(' ', '').replace(/,/g, '') || '0';
+                    const rate = parseFloat(rateRaw) || 0;
+                    const totalRaw = document.getElementById('total-price')?.innerText?.replace(' ', '').replace(/,/g, '') || '0';
+                    const total = parseFloat(totalRaw) || 0;
+                    
+                    const unitLabel = document.getElementById('unit-label')?.innerText || 'Grams';
+                    
+                    // Calculate GST and grand total
+                    const gstRate = 0.03;
+                    const gst = total * gstRate;
+                    const grandTotal = total + gst;
+                    
+                    // Get user data - NOW INCLUDES ADDRESS AND GST
+                    let userData = getUserDataFromStorage();
+                    
+                    if (Object.keys(userData).length === 0) {
+                        userData = getUserDataFromSession();
+                    }
+                    
+                    const urlParams = new URLSearchParams(window.location.search);
+                    if (urlParams.get('login') === 'success' && Object.keys(userData).length === 0) {
+                        const urlUsername = urlParams.get('username');
+                        if (urlUsername) {
+                            userData = {
+                                username: urlUsername,
+                                name: urlUsername,
+                                phone: 'Not provided',
+                                address: 'Not provided',
+                                gst: 'Not provided',
+                                isLoggedIn: true
+                            };
+                        }
+                    }
+                    
+                    if (Object.keys(userData).length === 0) {
+                        userData = {
+                            username: 'Guest',
+                            name: 'Guest',
+                            phone: 'Not provided',
+                            address: 'Not provided',
+                            gst: 'Not provided',
+                            isLoggedIn: false,
+                            deviceId: generateDeviceId()
+                        };
+                    }
+                    
+                    const finalUserData = {
+                        name: userData.name || userData.username || 'Guest',
+                        username: userData.username || userData.name || 'Guest',
+                        phone: userData.phone || userData.mobile || 'Not provided',
+                        // CRITICAL: Include address and GST in order data
+                        address: userData.address || 'Not provided',
+                        gst: userData.gst || 'Not provided',
+                        email: userData.email || '',
+                        userId: userData.userId || userData.id || '',
+                        isLoggedIn: !!(userData.isLoggedIn || localStorage.getItem('shree_user_logged_in') === 'true')
+                    };
+                    
+                    orderData = {
+                        orderId: generateOrderId(),
+                        product: product,
+                        quantity: qty,
+                        unit: unitLabel,
+                        ratePerUnit: rate,
+                        estimatedAmount: total,
+                        gstRate: `${gstRate * 100}%`,
+                        gstAmount: parseFloat(gst.toFixed(2)),
+                        grandTotal: parseFloat(grandTotal.toFixed(2)),
+                        timestamp: new Date().toISOString(),
+                        timestampLocal: new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' }),
+                        user: finalUserData,
+                        metadata: {
+                            device: getDeviceInfo(),
+                            source: 'web_terminal',
+                            appVersion: '1.0.0',
+                            pageUrl: window.location.href,
+                            referrer: document.referrer || 'direct'
+                        }
+                    };
+                }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                // Store in localStorage
+                try {
+                    const existingOrders = JSON.parse(localStorage.getItem('shree_order_history') || '[]');
+                    existingOrders.unshift({
+                        ...orderData,
+                        savedAt: new Date().toISOString()
+                    });
+                    const recentOrders = existingOrders.slice(0, 50);
+                    localStorage.setItem('shree_order_history', JSON.stringify(recentOrders));
+                    localStorage.setItem('shree_last_order', JSON.stringify({
+                        ...orderData,
+                        savedAt: new Date().toISOString()
+                    }));
+                    console.log('Ã¢Å“â€¦ Order saved to localStorage successfully');
+                } catch (storageError) {
+                    console.error('Ã¢ Å’ Failed to save order to localStorage:', storageError);
+                }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                return orderData;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            } catch (error) {
+                console.error('Ã¢ Å’ Error in catchData function:', error);
+                return {
+                    error: true,
+                    message: error.message,
+                    timestamp: new Date().toISOString()
+                };
+            }
+        }
+
+
+        // ==========================================================
+// QUANTITY MANAGER (Encapsulated Pattern)
+// ==========================================================
+const quantityManager = (() => {
+    let currentMinFloor = 0;
+    let currentMaxLimit = 0;
+    let currentStep = 1;
+    let qtyInput, qtySlider;
+
+    const getElements = () => {
+        if (!qtyInput) qtyInput = document.getElementById('order-qty');
+        if (!qtySlider) qtySlider = document.getElementById('qty-slider');
+        return { qtyInput, qtySlider };
+    };
+
+    const enforceFloor = (value) => Math.max(currentMinFloor, value);
+
+    const updateUI = (value) => {
+        const { qtyInput, qtySlider } = getElements();
+        if (!qtyInput || !qtySlider) return;
+        
+        const clampedValue = enforceFloor(value);
+        const finalValue = Math.min(clampedValue, currentMaxLimit);
+        
+        qtyInput.value = finalValue;
+        qtySlider.value = finalValue;
+        calculateTotal();
+        return finalValue;
+    };
+
+    const configure = (minFloor, maxLimit, step) => {
+        currentMinFloor = minFloor;
+        currentMaxLimit = maxLimit;
+        currentStep = step;
+        
+        const { qtyInput, qtySlider } = getElements();
+        if (qtyInput && qtySlider) {
+            qtySlider.min = minFloor;
+            qtySlider.max = maxLimit;
+            qtySlider.step = step;
+            
+            qtyInput.value = minFloor;
+            qtySlider.value = minFloor;
+            
+            const minLabel = document.getElementById('slider-min');
+            const maxLabel = document.getElementById('slider-max');
+            if (minLabel) minLabel.innerText = formatQuantityWithUnit(minFloor);
+            if (maxLabel) maxLabel.innerText = formatQuantityWithUnit(maxLimit);
+            
+            calculateTotal();
+        }
+    };
+
+    const change = (direction) => {
+        const { qtyInput } = getElements();
+        if (!qtyInput) return;
+        
+        let currentVal = parseInt(qtyInput.value) || currentMinFloor;
+        let newVal = currentVal + (direction * currentStep);
+        
+        if (newVal >= currentMinFloor && newVal <= currentMaxLimit) {
+            updateUI(newVal);
+        }
+    };
+
+    const set = (rawValue) => {
+        let newVal = parseInt(rawValue);
+        if (isNaN(newVal)) {
+            updateUI(currentMinFloor);
+            return;
+        }
+        newVal = Math.max(currentMinFloor, Math.min(currentMaxLimit, newVal));
+        updateUI(newVal);
+    };
+
+    const formatQuantityWithUnit = (quantity) => {
+        if (quantity >= 1000) {
+            return (quantity / 1000) + "kg";
+        }
+        return quantity + "g";
+    };
+
+    const reset = () => {
+        currentMinFloor = 0;
+        currentMaxLimit = 0;
+        currentStep = 1;
+    };
+
+    return { configure, change, set, reset, getCurrentMin: () => currentMinFloor, getCurrentMax: () => currentMaxLimit };
+})();
+
+// ==========================================================
+// INTELLIGENT WEIGHT DETECTION
+// ==========================================================
+function parseWeightFromLabel(label) {
+    const lower = label.toLowerCase();
+    const kgMatch = lower.match(/(\d+(?:\.\d+)?)\s*kg/);
+    const gmMatch = lower.match(/(\d+(?:\.\d+)?)\s*g(?:m)?/);
+    
+    if (kgMatch) return Math.round(parseFloat(kgMatch[1]) * 1000);
+    if (gmMatch) return Math.round(parseFloat(gmMatch[1]));
+    return null;
+}
+
+// ==========================================================
+// IMPROVED openBuyPopup FUNCTION
+// ==========================================================
+window.openBuyPopup = function(label, rate) {
+    const lowerLabel = label.toLowerCase().trim();
+    const isSilver = lowerLabel.includes('silver') || lowerLabel.includes('sl') || lowerLabel.includes('sil');
+    const badge = document.getElementById('popup-badge');
+    const unitLabel = document.getElementById('unit-label');
+    
+    quantityManager.reset();
+    
+    document.getElementById('popup-title').innerText = label;
+    document.getElementById('popup-rate').innerText = " " + Math.floor(rate).toLocaleString('en-IN');
+
+    const detectedWeight = parseWeightFromLabel(label);
+    let defaultQty, absoluteMin, maxQty, step;
+
+    if (isSilver) {
+        badge.innerText = "Silver 999";
+        badge.className = "px-3 py-1 bg-gray-100 text-gray-600 text-[9px] font-bold rounded-full uppercase mb-2 inline-block";
+        unitLabel.innerText = "Grams";
+        window.pricePerUnit = rate / 1000; 
+
+        if (lowerLabel.includes("sil with gst")) {
+            defaultQty = 15000;
+            absoluteMin = 15000;
+        } else {
+            defaultQty = detectedWeight || 1000; 
+            absoluteMin = detectedWeight || 100;
+        }
+        
+        maxQty = 30000;
+        step = 100;
+        document.getElementById('slider-max').innerText = "50kg";
+    } else {
+        badge.innerText = "Gold 99.5";
+        badge.className = "px-3 py-1 bg-amber-100 text-amber-700 text-[9px] font-bold rounded-full uppercase mb-2 inline-block";
+        unitLabel.innerText = "Grams";
+        window.pricePerUnit = rate / 10; 
+
+        if (lowerLabel.includes("gld with gst")) {
+            defaultQty = 100;
+            absoluteMin = 100;
+        } else {
+            defaultQty = detectedWeight || 10; 
+            absoluteMin = detectedWeight || 1;
+        }
+        
+        maxQty = 2000;
+        step = 1;
+        document.getElementById('slider-max').innerText = "2kg";
+    }
+
+    quantityManager.configure(absoluteMin, maxQty, step);
+    quantityManager.set(defaultQty);
+    
+    document.getElementById('order-error-message').style.display = 'none';
+    
+    const userData = getUserDataFromStorage();
+    document.getElementById('display-username').innerText = userData.name || userData.username || 'Guest';
+    document.getElementById('display-phone').innerText = userData.phone || 'Not provided';
+    document.getElementById('display-address').innerText = userData.address || 'Not provided';
+    document.getElementById('display-gst').innerText = userData.gst || 'Not provided';
+    
+    const userInfoDisplay = document.getElementById('user-info-display');
+    if (userData.username || userData.phone !== 'Not provided' || userData.address !== 'Not provided') {
+        userInfoDisplay.classList.remove('hidden');
+    } else {
+        userInfoDisplay.classList.add('hidden');
+    }
+    
+    document.getElementById('buy-popup').classList.remove('invisible');
+    document.getElementById('buy-popup').classList.replace('panel-hidden', 'panel-visible');
+};
+
+// ==========================================================
+// IMPROVED closeBuyPopup
+// ==========================================================
+window.closeBuyPopup = function() {
+    quantityManager.reset();
+    document.getElementById('buy-popup').classList.replace('panel-visible', 'panel-hidden');
+    setTimeout(() => document.getElementById('buy-popup').classList.add('invisible'), 300);
+};
+
+// ==========================================================
+// IMPROVED calculateTotal
+// ==========================================================
+function calculateTotal() {
+    const qtyInput = document.getElementById('order-qty');
+    const totalElement = document.getElementById('total-price');
+    
+    if (!qtyInput || !totalElement) return;
+    
+    const quantity = parseFloat(qtyInput.value) || 0;
+    const total = quantity * (window.pricePerUnit || 0);
+    totalElement.innerText = " " + Math.floor(total).toLocaleString('en-IN');
+}
+
+// ==========================================================
+// IMPROVED changeQty
+// ==========================================================
+window.changeQty = function(direction) {
+    quantityManager.change(direction);
+};
+
+// ==========================================================
+// ORDER SUMMARY HELPER
+// ==========================================================
+function getCurrentOrderSummary() {
+    const qtyInput = document.getElementById('order-qty');
+    const productName = document.getElementById('popup-title')?.innerText || '';
+    const rate = window.pricePerUnit || 0;
+    const quantity = parseFloat(qtyInput?.value) || 0;
+    
+    return {
+        product: productName,
+        quantity: quantity,
+        unitRate: rate,
+        total: quantity * rate,
+        formattedTotal: Math.floor(quantity * rate).toLocaleString('en-IN')
+    };
+}
+
+// ==========================================================
+// INPUT EVENT LISTENERS
+// ==========================================================
+document.getElementById('order-qty').oninput = function() {
+    quantityManager.set(this.value);
+};
+
+document.getElementById('qty-slider').oninput = function() {
+    quantityManager.set(this.value);
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        // Enhanced Confirm Order Function with better error handling
+      // ==========================================================
+// ENHANCED CONFIRM ORDER (WITH FIRESTORE SAVING)
+// ==========================================================
+window.confirmOrder = async function(event) {
+    const isLoggedIn = localStorage.getItem('shree_user_logged_in') === 'true';
+    
+    if (!isLoggedIn) {
+        alert("⚠️ You must SIGN UP / LOGIN before placing an order.");
+        window.location.href = 'login.html';
+        return;
+    }
+    
+    const confirmBtn = event?.target || document.querySelector('button[onclick="confirmOrder(event)"]');
+    const originalText = confirmBtn?.innerText || 'Confirm Order';
+    const errorDiv = document.getElementById('order-error-message');
+    
+    if (confirmBtn) {
+        confirmBtn.innerHTML = '<span class="spinner mr-2"></span> Processing...';
+        confirmBtn.disabled = true;
+        confirmBtn.style.opacity = '0.7';
+    }
+    
+    if (errorDiv) errorDiv.style.display = 'none';
+    
+    const order = catchData();
+    
+    if (!order.error) {
+        try {
+            let firestoreResult = { success: false };
+            
+            if (navigator.onLine) {
+                console.log('%c📤 SENDING ORDER TO FIRESTORE...', 'color: blue; font-size: 14px; font-weight: bold');
+                firestoreResult = await saveOrderToFirestore(order);
+            } else {
+                console.log('📴 Offline - storing order locally');
+                storePendingOrder(order);
+                firestoreResult = { success: false, offline: true };
+            }
+            
+            if (firestoreResult.success) {
+                alert("✅ Your order placed successfully! You will receive a WhatsApp message within few working days.");
+                closeBuyPopup();
+            } else if (firestoreResult.offline) {
+                alert("⚠️ Please check internet connection! Your order has been saved locally.");
+                closeBuyPopup();
+            } else {
+                storePendingOrder(order);
+                alert(`⚠️ ORDER CONFIRMED LOCALLY\n\nOrder ID: ${order.orderId}\n\nFailed to save to Firestore. Your order will sync when connection is restored.`);
+                closeBuyPopup();
+            }
+        } catch (error) {
+            console.error('Error in order confirmation:', error);
+            storePendingOrder(order);
+            alert(`✅ ORDER CONFIRMED LOCALLY\n\nOrder ID: ${order.orderId}\n\nSaved locally and will sync automatically.`);
+            closeBuyPopup();
+        }
+    } else {
+        if (errorDiv) {
+            errorDiv.innerHTML = '❌ Failed to capture order data. Please try again.';
+            errorDiv.style.display = 'block';
+        }
+    }
+    
+    if (confirmBtn) {
+        confirmBtn.innerHTML = originalText;
+        confirmBtn.disabled = false;
+        confirmBtn.style.opacity = '1';
+    }
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        // Order History Viewer
+        function viewOrderHistory() {
+            const orders = JSON.parse(localStorage.getItem('shree_order_history') || '[]');
+            
+            if (orders.length === 0) {
+                console.log('%cÃ°Å¸â€œÂ­ No orders found', 'color: #666; font-style: italic; font-size: 14px');
+                return;
+            }
+            
+            console.log('%cÃ¢â€¢ Ã¢â€¢ Ã¢â€¢ Ã¢â€¢ Ã¢â€¢ Ã¢â€¢ Ã¢â€¢ Ã¢â€¢ Ã¢â€¢ Ã¢â€¢ Ã¢â€¢ Ã¢â€¢ Ã¢â€¢ Ã¢â€¢ Ã¢â€¢ Ã¢â€¢ Ã¢â€¢ Ã¢â€¢ Ã¢â€¢ Ã¢â€¢ Ã¢â€¢ Ã¢â€¢ Ã¢â€¢ Ã¢â€¢ Ã¢â€¢ Ã¢â€¢ Ã¢â€¢ Ã¢â€¢ Ã¢â€¢ Ã¢â€¢ Ã¢â€¢ Ã¢â€¢ Ã¢â€¢ Ã¢â€¢ Ã¢â€¢ Ã¢â€¢ Ã¢â€¢ Ã¢â€¢ Ã¢â€¢ ', 'color: #3d251a; font-weight: bold; font-size: 14px');
+            console.log('%c         ORDER HISTORY                  ', 'color: #ffffff; background: #3d251a; font-weight: bold; padding: 4px; font-size: 14px');
+            console.log('%cÃ¢â€¢ Ã¢â€¢ Ã¢â€¢ Ã¢â€¢ Ã¢â€¢ Ã¢â€¢ Ã¢â€¢ Ã¢â€¢ Ã¢â€¢ Ã¢â€¢ Ã¢â€¢ Ã¢â€¢ Ã¢â€¢ Ã¢â€¢ Ã¢â€¢ Ã¢â€¢ Ã¢â€¢ Ã¢â€¢ Ã¢â€¢ Ã¢â€¢ Ã¢â€¢ Ã¢â€¢ Ã¢â€¢ Ã¢â€¢ Ã¢â€¢ Ã¢â€¢ Ã¢â€¢ Ã¢â€¢ Ã¢â€¢ Ã¢â€¢ Ã¢â€¢ Ã¢â€¢ Ã¢â€¢ Ã¢â€¢ Ã¢â€¢ Ã¢â€¢ Ã¢â€¢ Ã¢â€¢ Ã¢â€¢ ', 'color: #3d251a; font-weight: bold; font-size: 14px');
+            console.log(`Total Orders: ${orders.length}`);
+            
+            orders.forEach((order, index) => {
+                console.log(`\nÃ°Å¸â€œâ€¹ Order #${index + 1}: ${order.orderId || 'No ID'}`);
+                console.log(`   ${order.product} - ${order.quantity}${order.unit || 'g'}`);
+                console.log(`   Customer: ${order.user?.name || 'Guest'}`);
+                console.log(`   Phone: ${order.user?.phone || 'N/A'}`);
+                console.log(`   Address: ${order.user?.address || 'N/A'}`);
+                console.log(`   GST: ${order.user?.gst || 'N/A'}`);
+                console.log(`   Total: ${formatCurrency(order.grandTotal)}`);
+                console.log(`   ${new Date(order.timestamp).toLocaleString('en-IN')}`);
+            });
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        // Function to check pending orders
+        function checkPendingOrders() {
+            const pending = JSON.parse(localStorage.getItem('shree_pending_orders') || '[]');
+            if (pending.length > 0) {
+                console.log(`Ã°Å¸â€œÂ¦ ${pending.length} pending order(s) waiting to sync to Firestore`);
+            }
+            return pending.length;
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        // Make functions globally available
+        window.catchData = catchData;
+        window.confirmOrder = confirmOrder;
+        window.viewOrderHistory = viewOrderHistory;
+        window.debugUserData = debugUserData;
+        window.formatCurrency = formatCurrency;
+        window.checkPendingOrders = checkPendingOrders;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        // ========== RENDER RATES FUNCTION ==========
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        function renderRates(data) {
+    const container = document.getElementById('price-table-body');
+    let html = `<div class="bg-amber-600/20 py-2 px-4 border-b border-white/5"><p class="text-[10px] font-black tracking-[0.2em] text-amber-500 uppercase italic">Gold Products</p></div>`;
+    const currentTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    
+    let offset = window.cloudSettings?.offset || 0;
+    if (offset === 0) {
+        let rawOffset = localStorage.getItem('shree_gold_offset');
+        offset = (rawOffset === null || rawOffset === "" || isNaN(parseFloat(rawOffset))) ? 0 : parseFloat(rawOffset);
+    }
+
+
+
+
+    const isGoldStopped = window.cloudSettings?.stopGold === true;
+    const isSilverStopped = window.cloudSettings?.stopSilver === true;
+
+
+
+
+    // Track to determine when to insert silver header
+    let hasGoldStarted = false;
+    let silverHeaderAdded = false;
+
+
+
+
+    data.forEach((item, index) => {
+        // 🔥 FIX: Extract label directly from the data instead of using hardcoded arrays
+        let label = item.Symbol || item.symbol || item.ProductName || 
+                    item.Description || item.Name || item.name || 
+                    item.product_name || item.title || `Product ${index + 1}`;
+        
+        // Determine type based on label content
+        const isGoldProduct = label.toLowerCase().includes('gold') || 
+                              label.toLowerCase().includes('gld') || 
+                              label.includes('99.5') || 
+                              label.includes('24k') ||
+                              label.includes('995') ||
+                              label.includes('999');
+        
+        const type = isGoldProduct ? 'gold' : 'silver';
+        const isStopped = (type === 'gold') ? isGoldStopped : isSilverStopped;
+
+
+
+
+        const bidVal = parseFloat(item.bid || item.Bid || item.rate || item.Rate || 0);
+        const askVal = parseFloat(item.ask || item.Ask || item.rate || item.Rate || 0);
+        const lowVal = (item.low && parseFloat(item.low) !== 0) ? parseFloat(item.low) : 
+                       (item.Low ? parseFloat(item.Low) : bidVal);
+        const highVal = (item.high && parseFloat(item.high) !== 0) ? parseFloat(item.high) : 
+                        (item.High ? parseFloat(item.High) : askVal);
+
+
+
+
+        const displayBid = bidVal + offset;
+        const displayAsk = askVal + offset;
+        const displayLow = lowVal + offset;
+        const displayHigh = highVal + offset;
+
+
+
+
+        const prev = prevDataStore[index] || { bid: displayBid, ask: displayAsk };
+        let bCls = displayBid > prev.bid ? "price-up" : (displayBid < prev.bid ? "price-down" : "");
+        let aCls = displayAsk > prev.ask ? "price-up" : (displayAsk < prev.ask ? "price-down" : "");
+        prevDataStore[index] = { bid: displayBid, ask: displayAsk };
+
+
+
+
+        // Add silver header when transitioning from gold to silver
+        if (type === 'silver' && !silverHeaderAdded && hasGoldStarted) {
+            html += `<div class="bg-amber-900/40 py-2 px-4 border-y border-white/5"><p class="text-[10px] font-black tracking-[0.2em] text-amber-400 uppercase italic">Silver Products</p></div>`;
+            silverHeaderAdded = true;
+        }
+        
+        if (type === 'gold') hasGoldStarted = true;
+
+
+
+
+        if (isStopped) {
+            html += `
+            <div class="grid grid-cols-3 items-center px-4 py-2 border-b border-white/5 row-disabled relative">
+                <div class="text-[11px] font-bold text-gray-300">
+                    <span class="text-amber-500 text-[9px] font-black block mb-1">${currentTime}</span>
+                    ${label}
+                </div>
+                <div class="col-span-2 text-right">
+                    <span class="closed-pill">Booking Not Available</span>
+                </div>
+            </div>`;
+        } else {
+            // Escape single quotes in label to prevent JavaScript errors
+            const escapedLabel = label.replace(/'/g, "\\'");
+            html += `
+            <div onclick='handleBookingProduct("${escapedLabel}", ${displayAsk}, "${type}")' class="grid grid-cols-3 items-center px-4 py-2 border-b border-white/5 cursor-pointer active:bg-white/5">
+                <div class="text-[11px] font-bold text-gray-300">
+                    <span class="text-amber-500 text-[9px] font-black block mb-1">${currentTime}</span>
+                    ${label}
+                </div>
+                <div class="text-right pr-2 price-cell ${bCls}">
+                    <span class="block text-lg font-bold">${Math.floor(displayBid).toLocaleString('en-IN')}</span>
+                    <span class="text-[9px] text-amber-500/70">L ${Math.floor(displayLow).toLocaleString('en-IN')}</span>
+                </div>
+                <div class="text-right price-cell ${aCls}">
+                    <span class="block text-lg font-bold">${Math.floor(displayAsk).toLocaleString('en-IN')}</span>
+                    <span class="text-[9px] text-amber-500/70">H ${Math.floor(displayHigh).toLocaleString('en-IN')}</span>
+                </div>
+            </div>`;
+        }
+    });
+
+
+
+
+    container.innerHTML = html;
+    setTimeout(() => { document.querySelectorAll('.price-cell').forEach(el => el.classList.remove('price-up', 'price-down')); }, 500);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+socket.on('mainProduct', (data) => {
+    if (!data) return;
+    const cleanData = Array.isArray(data) ? data : (data.products || data.data || []);
+    window.lastSocketData = cleanData;  // ← ADD THIS LINE
+    renderRatesWithAutoLabels(cleanData);
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        socket.on('connect', () => {
+            const sh = document.getElementById('status-header');
+            sh.querySelector('.status-dot').className = "status-dot bg-green-600";
+            sh.className = "text-[7px] font-bold text-green-600 uppercase flex items-center";
+            document.getElementById('status-text').innerText = "Live";
+            socket.emit('client', "");
+        });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        socket.on('disconnect', () => {
+            const sh = document.getElementById('status-header');
+            sh.querySelector('.status-dot').className = "status-dot bg-red-600 animate-pulse";
+            sh.className = "text-[7px] font-bold text-red-600 uppercase flex items-center";
+            document.getElementById('status-text').innerText = "Offline";
+        });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        // ========== GLOBAL PRICES ==========
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        async function fetchGlobal() {
+            try {
+                const responses = await Promise.all([
+                    fetch("https://api.gold-api.com/price/XAU"),
+                    fetch("https://api.gold-api.com/price/XAG"),
+                    fetch("https://api.exchangerate-api.com/v4/latest/USD")
+                ]);
+                const gd = await responses[0].json();
+                const sd = await responses[1].json();
+                const inr = await responses[2].json();
+                document.getElementById('global-gold').innerText = gd.price.toFixed(2);
+                document.getElementById('global-silver').innerText = sd.price.toFixed(2);
+                document.getElementById('global-inr').innerText = inr.rates.INR.toFixed(2);
+            } catch (e) { console.error("API update failed"); }
+        }
+        
+        setInterval(fetchGlobal, 30000);
+        fetchGlobal();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        // ========== CLOCK ==========
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        function updateClock() {
+            const now = new Date();
+            document.getElementById('real-time-clock').innerText = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
+        }
+        setInterval(updateClock, 1000);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        // ========== NAVIGATION ==========
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        window.setActiveNav = function(activeId) {
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => {
+                item.classList.remove('text-amber-500');
+                item.classList.add('text-gray-500');
+            });
+            const activeItem = document.getElementById(activeId);
+            if (activeItem) {
+                activeItem.classList.remove('text-gray-500');
+                activeItem.classList.add('text-amber-500');
+            }
+        };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const ratesItem = document.getElementById('nav-rates');
+            if (ratesItem) {
+                ratesItem.classList.remove('text-gray-500');
+                ratesItem.classList.add('text-amber-500');
+            }
+        });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        window.onload = () => {
+            const savedNews = window.cloudSettings?.news || localStorage.getItem('shree_gold_news');
+            if(savedNews) document.getElementById('news-ticker').innerText = savedNews;
+            
+            // Auto-run debug on load to show user data status
+            setTimeout(() => {
+                console.log('%cÃ°Å¸â€ SHREE GOLD TERMINAL LOADED', 'color: #b45309; font-size: 16px; font-weight: bold');
+                debugUserData();
+                
+                // Check for pending orders
+                const pendingCount = checkPendingOrders();
+                if (pendingCount > 0 && navigator.onLine) {
+                    console.log(`Ã°Å¸â€ â€ž Attempting to sync ${pendingCount} pending orders to Firestore...`);
+                    syncPendingOrders();
+                }
+            }, 1000);
+        };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        // Admin popup functions
+        window.closeAdmin = function() {
+            document.getElementById('admin-popup').classList.replace('panel-visible', 'panel-hidden');
+            setTimeout(() => document.getElementById('admin-popup').classList.add('invisible'), 300);
+        };
+        
+        window.handleLogin = function() {
+            alert('Admin login not implemented in this demo');
+        };
+    </script>
+    <script>
+       
+
+
+
+
+// Detect silver products (includes 999 and SIL WITH GST)
+
+
+
+
+
+// Get product type
+
+
+
+
+
+// Extract product name from data
+
+
+
+
+// Main render function with auto labels - SAME COLOR for both gold and silver
+// Main render function with auto labels - SAME COLOR for both gold and silver
+
+
+
+
+
+
+// Setup socket listener
+
+
+
+
+
+// =========================================================================
+        // ⚡ DUAL-MODE RENDER ENGINE (NORMAL VS TURBO) ⚡
+        // =========================================================================
+        function getProductType(productName) {
+            const name = String(productName).toLowerCase();
+            if (name.includes('silver') || name.includes('slv') || name.includes('sil') || name.includes('ag')) return 'silver';
+            return 'gold';
+        }
+
+        function extractProductName(item) {
+            const fields = ['Symbol', 'symbol', 'ProductName', 'productName', 'Name', 'name', 'Description', 'description', 'Title', 'title'];
+            for (const field of fields) { if (item[field] && typeof item[field] === 'string') return item[field].trim(); }
+            return null;
+        }
+
+        function renderRatesWithAutoLabels(data) {
+            window.lastSocketData = data;
+            const container = document.getElementById('price-table-body');
+            if (!container) return;
+            if (!data || data.length === 0) { container.innerHTML = '<div class="p-10 text-center text-white/20 text-xs italic">Awaiting market data...</div>'; return; }
+
+            let goldOffset = window.cloudSettings?.offset || parseFloat(localStorage.getItem('shree_gold_offset')) || 0;
+            let silverOffset = window.cloudSettings?.silverOffset || parseFloat(localStorage.getItem('shree_silver_offset')) || 0;
+            
+            let goldProducts = [];
+            let silverProducts = [];
+
+            // -------------------------------------------------------------
+            // PHASE 1: DATA PREPARATION (TURBO vs NORMAL)
+            // -------------------------------------------------------------
+            if (window.isTurboMode) {
+                // --- TURBO LOGIC ---
+                let rawGold = null, rawSilver = null;
+                data.forEach(item => {
+                    let pn = extractProductName(item) || "";
+                    const askVal = parseFloat(item.ask || item.Ask || item.rate || 0);
+                    if (pn.toLowerCase().includes('gold') && askVal > 0 && !rawGold) rawGold = item;
+                    if ((pn.toLowerCase().includes('silver') || pn.toLowerCase().includes('sil') || pn.toLowerCase().includes('slv')) && askVal > 0 && !rawSilver) rawSilver = item;
+                });
+
+               if (rawGold) {
+                    const ask = parseFloat(rawGold.ask || rawGold.Ask || 0) + goldOffset; const bid = parseFloat(rawGold.bid || rawGold.Bid || 0) + goldOffset;
+                    const low = parseFloat(rawGold.low || rawGold.Low || rawGold.bid || 0) + goldOffset; const high = parseFloat(rawGold.high || rawGold.High || rawGold.ask || 0) + goldOffset;
+                    const addG = (name, b, a, l, h) => goldProducts.push({ name, type: 'gold', bid: b, ask: a, low: l, high: h });
+                    addG("Gold 50GM", bid, ask, low, high);
+                    addG("Gold 100GM", bid - 100, ask + 100, low + 100, high + 100);
+                    addG("Gold 10GM", bid - 200, ask + 200, low + 100, high + 100);
+                    addG("Gold 10GM T10", bid + 1100, ask + 200, low + 1100, high + 1100);
+                    addG("GLD WITH GST", (bid + 0) * 1.03, (ask + 0) * 1.03, (low - 100) * 1.03, (high - 100) * 1.03);
+                }
+                if (rawSilver) {
+                    const ask = parseFloat(rawSilver.ask || rawSilver.Ask || 0) + silverOffset; const bid = parseFloat(rawSilver.bid || rawSilver.Bid || 0) + silverOffset;
+                    const low = parseFloat(rawSilver.low || rawSilver.Low || rawSilver.bid || 0) + silverOffset; const high = parseFloat(rawSilver.high || rawSilver.High || rawSilver.ask || 0) + silverOffset;
+                    const addS = (name, b, a, l, h) => silverProducts.push({ name, type: 'silver', bid: b, ask: a, low: l, high: h });
+                    addS("Silver 15 KG", bid, ask - 0, low, high - 250);
+                    addS("Silver 3 KG", bid - 250, ask + 250, low - 250, high - 250);
+                    addS("Silver 500 GM", bid - 300, ask + 500, low - 400, high + 250);
+                    addS("Silver RTL", bid + 7454, ask + 7454, low + 7231, high + 7231);
+                    addS("SIL WITH GST", bid * 1.03, (ask - 0) * 1.03, low * 1.03, (high - 250) * 1.03);
+                }
+
+            } else {
+                // --- NORMAL LOGIC ---
+                data.forEach((item, index) => {
+                    let productName = extractProductName(item) || `Product ${index + 1}`;
+                    let type = getProductType(productName);
+                    const productItem = {
+                        ...item, name: productName, type: type,
+                        bid: parseFloat(item.bid || item.Bid || item.rate || 0), ask: parseFloat(item.ask || item.Ask || item.rate || 0),
+                        low: parseFloat(item.low || item.Low || item.bid || 0), high: parseFloat(item.high || item.High || item.ask || 0)
+                    };
+                    if (type === 'gold') goldProducts.push(productItem); else silverProducts.push(productItem);
+                });
+                if (goldProducts.length > 0) goldProducts.pop(); 
+                if (silverProducts.length > 0) silverProducts.pop();
+            }
+
+            // -------------------------------------------------------------
+            // PHASE 2: UI RENDERING LOGIC (Shared)
+            // -------------------------------------------------------------
+            const currentTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            const isGoldStopped = window.cloudSettings?.stopGold === true;
+            const isSilverStopped = window.cloudSettings?.stopSilver === true;
+            const managerDisabled = window.customLabels && window.customLabels.managerDisabled === true;
+
+            if (!window.prevDataStore) window.prevDataStore = {};
+            let html = '';
+            
+            // RENDER GOLD
+            if (goldProducts.length > 0) {
+                html += `<div class="bg-amber-600/20 py-2 px-4 border-b border-white/5"><p class="text-[10px] font-black tracking-[0.2em] text-amber-500 uppercase italic">Gold Products</p></div>`;
+                goldProducts.forEach((product, idx) => {
+                    if (!managerDisabled && window.customLabels?.removedFlags?.gold?.[idx] === true) return;
+                    let displayName = product.name;
+                    if (!managerDisabled && window.customLabels?.gold?.[idx]) displayName = window.customLabels.gold[idx];
+
+                    // Apply offset ONLY if normal mode (Turbo already added offsets during math)
+                    const offsetToUse = window.isTurboMode ? 0 : goldOffset;
+                    const displayBid = product.bid + offsetToUse; const displayAsk = product.ask + offsetToUse; 
+                    const displayLow = product.low + offsetToUse; const displayHigh = product.high + offsetToUse;
+                    
+                    const prev = window.prevDataStore[`gold_${idx}`] || { bid: displayBid, ask: displayAsk };
+                    let bCls = displayBid > prev.bid ? "price-up" : (displayBid < prev.bid ? "price-down" : "");
+                    let aCls = displayAsk > prev.ask ? "price-up" : (displayAsk < prev.ask ? "price-down" : "");
+                    window.prevDataStore[`gold_${idx}`] = { bid: displayBid, ask: displayAsk };
+                    const escapedName = displayName.replace(/'/g, "\\'");
+                    
+                    if (isGoldStopped) {
+                        html += `<div class="grid grid-cols-3 items-center px-4 py-4 border-b border-white/5">
+                            <div class="text-[11px] font-bold text-gray-300"><span class="text-amber-500 text-[9px] font-black block mb-1">${currentTime}</span>${displayName}</div>
+                            <div class="text-right pr-2 price-cell"><div class="flex items-center justify-end gap-1 flex-wrap"><span class="text-md font-bold text-gray-500 line-through">${Math.floor(displayBid).toLocaleString('en-IN')}</span><span class="closed-pill">STOP</span></div><span class="text-[9px] text-amber-500/70">L ${Math.floor(displayLow).toLocaleString('en-IN')}</span></div>
+                            <div onclick='handleBookingProduct("${escapedName}", ${displayAsk}, "gold")' class="text-right price-cell ${aCls} cursor-pointer hover:bg-white/5"><span class="block text-lg font-bold">${Math.floor(displayAsk).toLocaleString('en-IN')}</span><span class="text-[9px] text-amber-500/70">H ${Math.floor(displayHigh).toLocaleString('en-IN')}</span></div>
+                        </div>`;
+                    } else {
+                        html += `<div class="grid grid-cols-3 items-center px-4 py-4 border-b border-white/5 cursor-pointer hover:bg-white/5">
+                            <div class="text-[11px] font-bold text-gray-300" onclick='handleBookingProduct("${escapedName}", ${displayBid}, "gold")'><span class="text-amber-500 text-[9px] font-black block mb-1">${currentTime}</span>${displayName}</div>
+                            <div class="text-right pr-2 price-cell ${bCls}" onclick='handleBookingProduct("${escapedName}", ${displayBid}, "gold")'><span class="block text-lg font-bold">${Math.floor(displayBid).toLocaleString('en-IN')}</span><span class="text-[9px] text-amber-500/70">L ${Math.floor(displayLow).toLocaleString('en-IN')}</span></div>
+                            <div class="text-right price-cell ${aCls}" onclick='handleBookingProduct("${escapedName}", ${displayAsk}, "gold")'><span class="block text-lg font-bold">${Math.floor(displayAsk).toLocaleString('en-IN')}</span><span class="text-[9px] text-amber-500/70">H ${Math.floor(displayHigh).toLocaleString('en-IN')}</span></div>
+                        </div>`;
+                    }
+                });
+            }
+            
+            // RENDER SILVER
+            if (silverProducts.length > 0) {
+                html += `<div class="bg-amber-600/20 py-2 px-4 border-b border-white/5 mt-1"><p class="text-[10px] font-black tracking-[0.2em] text-amber-500 uppercase italic">Silver Products</p></div>`;
+                silverProducts.forEach((product, idx) => {
+                    if (!managerDisabled && window.customLabels?.removedFlags?.silver?.[idx] === true) return;
+                    let displayName = product.name;
+                    if (!managerDisabled && window.customLabels?.silver?.[idx]) displayName = window.customLabels.silver[idx];
+
+                    const offsetToUse = window.isTurboMode ? 0 : silverOffset;
+                    const displayBid = product.bid + offsetToUse; const displayAsk = product.ask + offsetToUse;
+                    const displayLow = product.low + offsetToUse; const displayHigh = product.high + offsetToUse;
+                    
+                    const prev = window.prevDataStore[`silver_${idx}`] || { bid: displayBid, ask: displayAsk };
+                    let bCls = displayBid > prev.bid ? "price-up" : (displayBid < prev.bid ? "price-down" : "");
+                    let aCls = displayAsk > prev.ask ? "price-up" : (displayAsk < prev.ask ? "price-down" : "");
+                    window.prevDataStore[`silver_${idx}`] = { bid: displayBid, ask: displayAsk };
+                    const escapedName = displayName.replace(/'/g, "\\'");
+                    
+                    if (isSilverStopped) {
+                        html += `<div class="grid grid-cols-3 items-center px-4 py-4 border-b border-white/5">
+                            <div class="text-[11px] font-bold text-gray-300"><span class="text-amber-500 text-[9px] font-black block mb-1">${currentTime}</span>${displayName}</div>
+                            <div class="text-right pr-2 price-cell"><div class="flex items-center justify-end gap-1 flex-wrap"><span class="text-md font-bold text-gray-500 line-through">${Math.floor(displayBid).toLocaleString('en-IN')}</span><span class="closed-pill">STOP</span></div><span class="text-[9px] text-amber-500/70">L ${Math.floor(displayLow).toLocaleString('en-IN')}</span></div>
+                            <div onclick='handleBookingProduct("${escapedName}", ${displayAsk}, "silver")' class="text-right price-cell ${aCls} cursor-pointer hover:bg-white/5"><span class="block text-lg font-bold">${Math.floor(displayAsk).toLocaleString('en-IN')}</span><span class="text-[9px] text-amber-500/70">H ${Math.floor(displayHigh).toLocaleString('en-IN')}</span></div>
+                        </div>`;
+                    } else {
+                        html += `<div class="grid grid-cols-3 items-center px-4 py-4 border-b border-white/5 cursor-pointer hover:bg-white/5">
+                            <div class="text-[11px] font-bold text-gray-300" onclick='handleBookingProduct("${escapedName}", ${displayBid}, "silver")'><span class="text-amber-500 text-[9px] font-black block mb-1">${currentTime}</span>${displayName}</div>
+                            <div class="text-right pr-2 price-cell ${bCls}" onclick='handleBookingProduct("${escapedName}", ${displayBid}, "silver")'><span class="block text-lg font-bold">${Math.floor(displayBid).toLocaleString('en-IN')}</span><span class="text-[9px] text-amber-500/70">L ${Math.floor(displayLow).toLocaleString('en-IN')}</span></div>
+                            <div class="text-right price-cell ${aCls}" onclick='handleBookingProduct("${escapedName}", ${displayAsk}, "silver")'><span class="block text-lg font-bold">${Math.floor(displayAsk).toLocaleString('en-IN')}</span><span class="text-[9px] text-amber-500/70">H ${Math.floor(displayHigh).toLocaleString('en-IN')}</span></div>
+                        </div>`;
+                    }
+                });
+            }
+            container.innerHTML = html;
+            setTimeout(() => { document.querySelectorAll('.price-cell').forEach(el => el.classList.remove('price-up', 'price-down')); }, 500);
+        }
+
+        // Setup socket listener
+        function setupAutoLabels() {
+            if (typeof socket !== 'undefined') {
+                socket.off('mainProduct'); // Clear old listeners
+                socket.on('mainProduct', (data) => {
+                    if (!data) return;
+                    let products = Array.isArray(data) ? data : (data.products || data.data || [data]);
+                    window.lastSocketData = products;
+                    renderRatesWithAutoLabels(products);
+                });
+            }
+        }
+
+        if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', setupAutoLabels); } else { setupAutoLabels(); }
+        window.renderRatesWithAutoLabels = renderRatesWithAutoLabels;
+        window.setupAutoLabels = setupAutoLabels;
+    </script>
+    
+
+
+<script>
+(function() {
+    let initAttempts = 0;
+    const maxAttempts = 20;
+
+
+    function initializeSecureConnection() {
+        initAttempts++;
+
+
+        if (!window.__SG) {
+            if (initAttempts < maxAttempts) {
+                setTimeout(initializeSecureConnection, 100);
+            }
+            return;
+        }
+
+
+        console.log('Secure connection ready');
+
+
+        window.__SG.connect();
+
+
+        window.__SG.on('connect', function() {
+            console.log('Connected');
+            const statusText = document.getElementById('status-text');
+            if (statusText) statusText.innerText = "Live";
+        });
+
+
+        window.__SG.on('data', function(data) {
+            if (!data) return;
+
+
+            const cleanData = Array.isArray(data) 
+                ? data 
+                : (data.products || data.data || []);
+
+
+            if (typeof renderRatesWithAutoLabels === 'function') {
+                renderRatesWithAutoLabels(cleanData);
+            } else if (typeof renderRates === 'function') {
+                renderRates(cleanData);
+            }
+        });
+
+
+        window.__SG.on('disconnect', function() {
+            console.log('Disconnected');
+            const statusText = document.getElementById('status-text');
+            if (statusText) statusText.innerText = "Offline";
+        });
+
+
+        window.__SG.on('error', function(err) {
+            console.warn('Error:', err);
+        });
+    }
+
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initializeSecureConnection);
+    } else {
+        initializeSecureConnection();
+    }
+})();
+</script>
+<script>
+    // ========== FIX FOR GLOBAL RATES DISPLAY ==========
+    (function() {
+        // Ensure fetchGlobal function exists and works properly
+        if (typeof window.fetchGlobal !== 'function') {
+            window.fetchGlobal = async function() {
+                try {
+                    console.log('🔄 Fetching global rates...');
+                    const responses = await Promise.all([
+                        fetch("https://api.gold-api.com/price/XAU"),
+                        fetch("https://api.gold-api.com/price/XAG"),
+                        fetch("https://api.exchangerate-api.com/v4/latest/USD")
+                    ]);
+                    const gd = await responses[0].json();
+                    const sd = await responses[1].json();
+                    const inr = await responses[2].json();
+                    
+                    const goldEl = document.getElementById('global-gold');
+                    const silverEl = document.getElementById('global-silver');
+                    const inrEl = document.getElementById('global-inr');
+                    
+                    if (goldEl && gd.price) goldEl.innerText = gd.price.toFixed(2);
+                    if (silverEl && sd.price) silverEl.innerText = sd.price.toFixed(2);
+                    if (inrEl && inr.rates && inr.rates.INR) inrEl.innerText = inr.rates.INR.toFixed(2);
+                    
+                    console.log('✅ Global rates updated - Gold:', gd.price, 'Silver:', sd.price, 'USD/INR:', inr.rates.INR);
+                } catch (e) { 
+                    console.error("API fetch failed:", e);
+                    // Set fallback values so UI never shows "--"
+                    const goldEl = document.getElementById('global-gold');
+                    const silverEl = document.getElementById('global-silver');
+                    const inrEl = document.getElementById('global-inr');
+                    if (goldEl && goldEl.innerText === '--') goldEl.innerText = '2,350';
+                    if (silverEl && silverEl.innerText === '--') silverEl.innerText = '28.50';
+                    if (inrEl && inrEl.innerText === '--') inrEl.innerText = '86.50';
+                }
+            };
+        }
+        
+        // Run fetchGlobal immediately and set interval
+        setTimeout(() => {
+            if (typeof window.fetchGlobal === 'function') {
+                window.fetchGlobal();
+                if (!window.globalRateInterval) {
+                    window.globalRateInterval = setInterval(window.fetchGlobal, 30000);
+                }
+            }
+        }, 500);
+        
+        // Fix clock display to show AM/PM correctly
+        if (typeof updateClock === 'function') {
+            const originalClock = updateClock;
+            window.updateClock = function() {
+                const now = new Date();
+                const clockEl = document.getElementById('real-time-clock');
+                if (clockEl) {
+                    clockEl.innerText = now.toLocaleTimeString('en-US', { 
+                        hour: '2-digit', 
+                        minute: '2-digit', 
+                        second: '2-digit', 
+                        hour12: true 
+                    });
+                }
+            };
+            window.updateClock();
+            if (!window.clockInterval) {
+                window.clockInterval = setInterval(window.updateClock, 1000);
+            }
+        }
+    })();
+    </script>
+
+
+<script>
+    // ========== FIX: ENSURE GREEN LIVE STATUS & RATES WORK ==========
+    (function() {
+        // Fix socket connection to show GREEN "Live" status
+        if (typeof socket !== 'undefined') {
+            // Override the existing socket connect handler to ensure green color
+            const originalOnConnect = socket.on;
+            socket.on('connect', () => {
+                const sh = document.getElementById('status-header');
+                const statusDot = sh?.querySelector('.status-dot');
+                const statusText = document.getElementById('status-text');
+                
+                if (sh) {
+                    sh.className = "text-[7px] font-bold text-green-600 uppercase flex items-center";
+                    if (statusDot) statusDot.className = "status-dot bg-green-600";
+                    if (statusText) statusText.innerText = "Live";
+                }
+                socket.emit('client', "");
+            });
+        }
+        
+        // Fix fetchGlobal to ensure rates display
+        if (typeof window.fetchGlobal !== 'function') {
+            window.fetchGlobal = async function() {
+                try {
+                    const responses = await Promise.all([
+                        fetch("https://api.gold-api.com/price/XAU"),
+                        fetch("https://api.gold-api.com/price/XAG"),
+                        fetch("https://api.exchangerate-api.com/v4/latest/USD")
+                    ]);
+                    const gd = await responses[0].json();
+                    const sd = await responses[1].json();
+                    const inr = await responses[2].json();
+                    
+                    const goldEl = document.getElementById('global-gold');
+                    const silverEl = document.getElementById('global-silver');
+                    const inrEl = document.getElementById('global-inr');
+                    
+                    if (goldEl && gd.price) goldEl.innerText = gd.price.toFixed(2);
+                    if (silverEl && sd.price) silverEl.innerText = sd.price.toFixed(2);
+                    if (inrEl && inr.rates && inr.rates.INR) inrEl.innerText = inr.rates.INR.toFixed(2);
+                } catch (e) { 
+                    console.error("API failed:", e);
+                    // Set fallback values
+                    const goldEl = document.getElementById('global-gold');
+                    const silverEl = document.getElementById('global-silver');
+                    const inrEl = document.getElementById('global-inr');
+                    if (goldEl && goldEl.innerText === '--') goldEl.innerText = '2,350';
+                    if (silverEl && silverEl.innerText === '--') silverEl.innerText = '28.50';
+                    if (inrEl && inrEl.innerText === '--') inrEl.innerText = '86.50';
+                }
+            };
+        }
+        
+        // Run fetchGlobal immediately
+        setTimeout(() => {
+            if (typeof window.fetchGlobal === 'function') {
+                window.fetchGlobal();
+                if (!window.globalRateInterval) {
+                    window.globalRateInterval = setInterval(window.fetchGlobal, 30000);
+                }
+            }
+        }, 1000);
+        
+        // Ensure clock shows AM/PM
+        if (typeof updateClock !== 'function') {
+            window.updateClock = function() {
+                const now = new Date();
+                const clockEl = document.getElementById('real-time-clock');
+                if (clockEl) {
+                    clockEl.innerText = now.toLocaleTimeString('en-US', { 
+                        hour: '2-digit', 
+                        minute: '2-digit', 
+                        second: '2-digit', 
+                        hour12: true 
+                    });
+                }
+            };
+            window.updateClock();
+            setInterval(window.updateClock, 1000);
+        }
+    })();
+    </script>
+
+
+<script>
+/**       NEW CODE FOR MAKING INDIPENDENT OFFICIAL BOOKING RATES 
+ * OVERRIDE: REMOVE CONNECTION OF STOP BOOKING FOR OFFICIAL BOOKING RATES
+ * This function ensures that clicking on Official Booking Rates (Manual Rates) 
+ * always opens the booking popup, regardless of the 'stopGold' or 'stopSilver' 
+ * status in the admin settings.
+ */
+(function() {
+    // We redefine handleManualBooking to bypass stop-booking checks
+    window.handleManualBooking = function(label, id, type) {
+        // Retrieve the current live manual rate from global storage
+        const currentRate = window.currentLiveManualRates ? window.currentLiveManualRates[id] : null;
+        
+        if (!currentRate) {
+            console.error("Rate not found for:", id);
+            return;
+        }
+
+
+        // Determine unit and limits based on type
+        const isGold = type.toLowerCase() === 'gold';
+        const unit = isGold ? 'Grams' : 'Kg';
+        const minQty = isGold ? 10 : 1;
+        const maxQty = isGold ? 500 : 100;
+        const step = isGold ? 10 : 1;
+
+
+        // Populate the Buy Popup directly
+        const popup = document.getElementById('buy-popup');
+        const badge = document.getElementById('popup-badge');
+        const title = document.getElementById('popup-title');
+        const rateEl = document.getElementById('popup-rate');
+        const qtyInput = document.getElementById('order-qty');
+        const unitLabel = document.getElementById('unit-label');
+        const slider = document.getElementById('qty-slider');
+        const sliderMin = document.getElementById('slider-min');
+        const sliderMax = document.getElementById('slider-max');
+
+
+        if (popup) {
+            // Set UI elements
+            if (badge) badge.innerText = label;
+            if (title) title.innerText = label;
+            if (rateEl) rateEl.innerText = currentRate.toLocaleString('en-IN');
+            if (unitLabel) unitLabel.innerText = unit;
+            
+            // Set Input and Slider properties
+            if (qtyInput) {
+                qtyInput.value = minQty;
+                qtyInput.min = minQty;
+            }
+            if (slider) {
+                slider.min = minQty;
+                slider.max = maxQty;
+                slider.step = step;
+                slider.value = minQty;
+            }
+            if (sliderMin) sliderMin.innerText = minQty + (isGold ? 'g' : 'kg');
+            if (sliderMax) sliderMax.innerText = maxQty + (isGold ? 'g' : 'kg');
+
+
+            // Store metadata for the order confirmation
+            window.currentBookingType = 'manual';
+            window.currentBookingProduct = label;
+            window.currentBookingRate = currentRate;
+            window.currentBookingCategory = type;
+
+
+            // Show the popup
+            popup.classList.remove('panel-hidden', 'invisible');
+            popup.classList.add('panel-visible');
+            
+            // Update total price immediately
+            if (typeof updateTotalPrice === 'function') {
+                updateTotalPrice();
+            }
+            
+            console.log(`%c🔓 Manual Booking Opened: ${label} (Bypassing Stop Status)`, "color: #4ade80; font-weight: bold;");
+        }
+    };
+})();
+</script>
+
+
+<style>
+    /* IMPROVED BOTTOM BAR BUTTON GAP MANAGEMENT */
+    nav.fixed.bottom-0 {
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
+        padding-bottom: calc(env(safe-area-inset-bottom) + 12px); /* Adds padding for iPhone notch */
+        height: 70px;
+        display: flex;
+        align-items: center;
+    }
+
+
+    nav.fixed.bottom-0 .flex.justify-between {
+        display: flex;
+        justify-content: space-around; /* Distributes items with equal space around them */
+        align-items: center;
+        width: 100%;
+        gap: 4px; /* Minimum gap to prevent touching */
+    }
+
+
+    .nav-item {
+        flex: 1; /* Ensures each button takes up equal width */
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s ease;
+        padding: 8px 0;
+        border-radius: 12px;
+        min-width: 0; /* Prevents flex items from overflowing */
+    }
+
+
+    /* Active State Highlight */
+    .nav-item.text-amber-500 {
+        background: rgba(245, 158, 11, 0.05); /* Subtle glow for the active button */
+    }
+
+
+    /* Icon and Text Scaling for better fit */
+    .nav-item i {
+        font-size: 1.25rem !important;
+        margin-bottom: 4px;
+    }
+
+
+    .nav-item span {
+        font-size: 7px !important; /* Slightly smaller to ensure no text wrapping */
+        letter-spacing: 0.05em;
+        white-space: nowrap;
+    }
+</style>
+
+
+
+<script>
+(function() {
+    // Ensure clicking on BUY rate (bid column or product name) opens popup with SELL rate
+    function enforceSellRateForBuyClicks() {
+        const container = document.getElementById('price-table-body');
+        if (!container) return;
+
+        // Use capture phase to intercept before inline handlers fire
+        container.addEventListener('click', function(e) {
+            // Find the clicked row
+            const row = e.target.closest('.grid-cols-3');
+            if (!row) return;
+
+            // Get the three cells inside the row
+            const cells = Array.from(row.children);
+            if (cells.length < 3) return;
+
+            const productCell = cells[0];
+            const bidCell = cells[1];
+            const askCell = cells[2];
+
+            // Determine which cell was clicked (or its child)
+            let clickedCell = null;
+            if (productCell.contains(e.target)) clickedCell = productCell;
+            else if (bidCell.contains(e.target)) clickedCell = bidCell;
+            else if (askCell.contains(e.target)) clickedCell = askCell;
+
+            // If user clicked on ask cell, let original handler work (already uses sell rate)
+            if (clickedCell === askCell) return;
+
+            // For clicks on product name or bid cell -> intercept and open popup with ask rate
+            if (clickedCell === productCell || clickedCell === bidCell) {
+                e.preventDefault();
+                e.stopImmediatePropagation();  // Block inline onclick handlers
+
+                // Extract product name (remove the timestamp span if present)
+                let productName = productCell.innerText.trim();
+                const timeSpan = productCell.querySelector('.text-amber-500');
+                if (timeSpan) {
+                    productName = productName.replace(timeSpan.innerText, '').trim();
+                }
+
+                // Extract ask (sell) rate from askCell
+                const askSpan = askCell.querySelector('.block.text-lg.font-bold');
+                if (!askSpan) return;
+                let askRate = parseFloat(askSpan.innerText.replace(/,/g, ''));
+                if (isNaN(askRate)) return;
+
+                // Determine type (gold/silver) from product name or context
+                let type = 'gold';
+                const lowerName = productName.toLowerCase();
+                if (lowerName.includes('silver') || lowerName.includes('slv')) {
+                    type = 'silver';
+                }
+
+                // Open popup with the SELL rate
+                if (typeof window.handleBookingProduct === 'function') {
+                    window.handleBookingProduct(productName, askRate, type);
+                } else if (typeof window.openBuyPopup === 'function') {
+                    window.openBuyPopup(productName, askRate);
+                }
+            }
+        }, true); // capture phase to run before inline onclick
+    }
+
+    // Initialize after DOM ready
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', enforceSellRateForBuyClicks);
+    } else {
+        enforceSellRateForBuyClicks();
+    }
+})();
+</script>
+
+
+
+
+
+</body>
+</html>

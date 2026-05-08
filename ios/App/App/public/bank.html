@@ -1,0 +1,176 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bank Details - SHREE GOLD</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: #1a0f0a; 
+            color: white; 
+            min-height: 100vh; 
+            display: flex; 
+            flex-direction: column; 
+            margin: 0;
+        }
+        .gold-gradient { background: linear-gradient(180deg, #3d251a 0%, #23140e 100%); }
+        .bank-card { 
+            background: rgba(255, 255, 255, 0.03); 
+            border: 1px solid rgba(255, 255, 255, 0.1); 
+            backdrop-filter: blur(10px); 
+        }
+        ::-webkit-scrollbar { display: none; }
+        .copy-btn:active { transform: scale(0.92); background-color: #d97706; }
+    </style>
+</head>
+<body class="max-w-md mx-auto relative overflow-hidden">
+
+
+    <header class="fixed top-0 w-full max-w-md bg-white pt-6 pb-4 px-6 rounded-b-[30px] shadow-2xl z-50 text-[#3d251a]">
+        <div class="flex justify-between items-center">
+            <button onclick="goBack()" class="w-10 h-10 bg-gray-50 border border-gray-100 rounded-full flex items-center justify-center active:scale-90 transition-transform shadow-sm">
+                <i class="fa-solid fa-arrow-left"></i>
+            </button>
+            <div class="text-center">
+                <h1 class="text-xl font-black">BANK DETAILS</h1>
+                <p class="text-[9px] font-bold text-amber-700 tracking-widest uppercase">Live Database Sync</p>
+            </div>
+            <div class="w-10 h-10 bg-amber-50 rounded-full flex items-center justify-center">
+                <i class="fa-solid fa-university text-amber-700"></i>
+            </div>
+        </div>
+    </header>
+
+
+    <main class="gold-gradient flex-grow pt-32 px-6 pb-12 min-h-screen overflow-y-auto">
+        <div id="loading" class="text-center text-amber-500 py-10">
+            <i class="fa-solid fa-spinner fa-spin text-2xl mb-2"></i>
+            <p class="text-xs font-bold tracking-widest">FETCHING LIVE DATA...</p>
+        </div>
+        
+        <div id="content" class="bank-card rounded-[32px] p-6 space-y-6 hidden">
+            <div class="border-b border-white/5 pb-4 flex justify-between items-end">
+                <div>
+                    <p class="text-[10px] text-amber-600 font-black uppercase tracking-widest mb-1">Account Name</p>
+                    <p id="acc-name" class="text-lg font-bold uppercase">--</p>
+                </div>
+                <button onclick="copy('acc-name')" class="copy-btn w-8 h-8 bg-white/5 rounded-lg flex items-center justify-center transition-all">
+                    <i class="fa-regular fa-copy text-gray-400 text-xs"></i>
+                </button>
+            </div>
+
+
+            <div class="border-b border-white/5 pb-4 flex justify-between items-end">
+                <div>
+                    <p class="text-[10px] text-amber-600 font-black uppercase tracking-widest mb-1">GST Number</p>
+                    <p id="gst-no" class="text-lg font-bold tracking-widest uppercase">--</p>
+                </div>
+                <button onclick="copy('gst-no')" class="copy-btn w-8 h-8 bg-white/5 rounded-lg flex items-center justify-center transition-all">
+                    <i class="fa-regular fa-copy text-gray-400 text-xs"></i>
+                </button>
+            </div>
+
+
+            <div class="border-b border-white/5 pb-4 flex justify-between items-end">
+                <div>
+                    <p class="text-[10px] text-amber-600 font-black uppercase tracking-widest mb-1">A/c Number</p>
+                    <p id="acc-no" class="text-xl font-black tracking-wider">--</p>
+                </div>
+                <button onclick="copy('acc-no')" class="copy-btn w-8 h-8 bg-white/5 rounded-lg flex items-center justify-center transition-all">
+                    <i class="fa-regular fa-copy text-gray-400 text-xs"></i>
+                </button>
+            </div>
+
+
+            <div class="border-b border-white/5 pb-4 flex justify-between items-end">
+                <div>
+                    <p class="text-[10px] text-amber-600 font-black uppercase tracking-widest mb-1">IFSC Code</p>
+                    <p id="ifsc" class="text-lg font-bold tracking-widest">--</p>
+                </div>
+                <button onclick="copy('ifsc')" class="copy-btn w-8 h-8 bg-white/5 rounded-lg flex items-center justify-center transition-all">
+                    <i class="fa-regular fa-copy text-gray-400 text-xs"></i>
+                </button>
+            </div>
+
+
+            <div class="pt-2">
+                <p class="text-[10px] text-amber-600 font-black uppercase tracking-widest mb-1">Bank & Branch</p>
+                <p id="bank-name" class="text-sm font-bold uppercase">--</p>
+                <p id="branch-name" class="text-xs text-gray-400 uppercase">--</p>
+            </div>
+        </div>
+    </main>
+
+
+    <script>
+        // SHREE GOLD CONFIGURATION
+        const firebaseConfig = {
+            apiKey: "AIzaSyBIghUCcQUxCcfYJOdCMgPsTuRSgnJpe6E",
+            authDomain: "shreegold-120eb.firebaseapp.com",
+            projectId: "shreegold-120eb",
+            storageBucket: "shreegold-120eb.firebasestorage.app",
+            messagingSenderId: "915011378925",
+            appId: "1:915011378925:web:c03003bc7eca3ccc0bb6e4",
+            measurementId: "G-B714GY65N7"
+        };
+        
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+
+        function goBack() {
+            window.history.length > 1 ? window.history.back() : window.location.href = 'index.html';
+        }
+
+
+        function syncData() {
+            // Live listener to 'bank_settings/primary'
+            db.collection("bank_settings").doc("primary").onSnapshot((doc) => {
+                if (doc.exists) {
+                    const data = doc.data();
+                    document.getElementById('acc-name').innerText = data.name || '--';
+                    document.getElementById('gst-no').innerText = data.gstNo || '--';
+                    document.getElementById('acc-no').innerText = data.accNo || '--';
+                    document.getElementById('ifsc').innerText = data.ifsc || '--';
+                    document.getElementById('bank-name').innerText = data.bankName || '--';
+                    document.getElementById('branch-name').innerText = data.branch || '--';
+                    
+                    document.getElementById('loading').classList.add('hidden');
+                    document.getElementById('content').classList.remove('hidden');
+                } else {
+                    document.getElementById('loading').innerHTML = '<p class="text-sm font-bold text-red-400">Database Empty.</p>';
+                }
+            }, (error) => {
+                console.error("Firebase Error: ", error);
+                document.getElementById('loading').innerHTML = '<p class="text-sm font-bold text-red-400">Connection Error.</p>';
+            });
+        }
+
+
+        function copy(id) {
+            const text = document.getElementById(id).innerText;
+            if(text === '--') return;
+            
+            navigator.clipboard.writeText(text).then(() => {
+                // Flash the text gold briefly to show it was copied
+                const el = document.getElementById(id);
+                const originalColor = el.style.color;
+                el.style.color = "#fbbf24";
+                setTimeout(() => { el.style.color = originalColor; }, 300);
+            });
+        }
+
+
+        window.onload = syncData;
+    </script>
+</body>
+</html>
