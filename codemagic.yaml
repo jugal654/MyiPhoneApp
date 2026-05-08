@@ -3,10 +3,6 @@ workflows:
     name: iOS Workflow
 
     environment:
-      vars:
-        XCODE_WORKSPACE: "App.xcworkspace"
-        XCODE_SCHEME: "App"
-
       xcode: latest
       cocoapods: default
 
@@ -19,19 +15,14 @@ workflows:
         script: |
           npx cap sync ios
 
-      - name: Install CocoaPods
+      - name: Build iOS App
         script: |
           cd ios/App
-          pod install
-
-      - name: Build IPA
-        script: |
-          cd ios/App
-          xcodebuild -workspace App.xcworkspace \
+          xcodebuild -project App.xcodeproj \
           -scheme App \
           -sdk iphoneos \
           -configuration Release \
-          archive -archivePath build/App.xcarchive
+          build
 
     artifacts:
-      - ios/App/build/**/*.xcarchive
+      - ios/App/build/**/*.app
