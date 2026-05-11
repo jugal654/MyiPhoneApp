@@ -73,6 +73,15 @@
             75% { transform: translateX(-2px); }
             100% { transform: translateX(0px); }
         }
+        /* Fix for proper text wrapping */
+        .trade-card .grid div {
+            word-break: keep-all;
+            white-space: normal;
+        }
+        .rate-text, .gst-text, .total-text {
+            display: block;
+            line-height: 1.3;
+        }
     </style>
 </head>
 <body class="max-w-md mx-auto relative shadow-2xl">
@@ -124,13 +133,22 @@
             const clearBtn = document.getElementById('clearHistoryBtn');
             const toastMsgDiv = document.getElementById('toastMsg');
             
-            // Check if product is SL/GLD (GST pre-applied)
+            const GST_PERCENT = 3;
+            
             function isGstPreAppliedProduct(productName) {
                 if (!productName) return false;
                 const upper = productName.toUpperCase();
-                return upper.includes('SL') || upper.includes('GLD');
+                return upper.includes('GLD WITH GST') || 
+                       upper.includes('SIL WITH GST') || 
+                       upper.includes('SILVER WITH GST') || 
+                       upper.includes('SL') || 
+                       upper.includes('GLD');
             }
 
+            function formatNumber(num) {
+                if (num === undefined || num === null || isNaN(num)) return '0';
+                return Math.round(num).toLocaleString('en-IN');
+            }
 
             function showToast(message) {
                 if (!toastMsgDiv) return;
@@ -141,6 +159,52 @@
                 }, 2200);
             }
 
+            function calculateCorrectValues(order) {
+                const product = order.product || '';
+                const isSlGld = isGstPreAppliedProduct(product);
+                let qty = Number(order.quantity) || 0;
+                let ratePerUnit = Number(order.ratePerUnit) || 0;
+                
+                const isSilver = product.toUpperCase().includes('SILVER') || 
+                                 product.toUpperCase().includes('SLVR') || 
+                                 product.toUpperCase().includes('AG');
+                
+                let baseAmount = 0;
+                
+                if (isSilver) {
+                    const perGramRate = ratePerUnit / 1000;
+                    baseAmount = qty * perGramRate;
+                } else {
+                    const perGramRate = ratePerUnit / 10;
+                    baseAmount = qty * perGramRate;
+                }
+                
+                let gstAmount = 0;
+                let finalTotal = 0;
+                
+                if (isSlGld) {
+                    gstAmount = 0;
+                    finalTotal = Math.round(baseAmount);
+                } else {
+                    gstAmount = Math.round(baseAmount * GST_PERCENT / 100);
+                    finalTotal = Math.round(baseAmount + gstAmount);
+                }
+                
+                let displayRate = ratePerUnit;
+                let rateUnitLabel = isSilver ? "/KG" : "/10GM";
+                
+                return {
+                    baseAmount: Math.round(baseAmount),
+                    gstAmount: gstAmount,
+                    finalTotal: finalTotal,
+                    displayRate: displayRate,
+                    rateUnitLabel: rateUnitLabel,
+                    isSlGld: isSlGld,
+                    isSilver: isSilver,
+                    quantity: qty,
+                    unit: order.unit || 'GM'
+                };
+            }
 
             function renderTrades() {
                 const ordersRaw = localStorage.getItem("shree_order_history");
@@ -174,22 +238,20 @@
                     const userId = order.user?.phone ? order.user.phone.slice(-4) : (order.user?.name || 'GUEST');
                     const shortId = order.timestamp ? order.timestamp.toString().slice(-6) : (idx+1000).toString();
                     
-                    const quantity = order.quantity || 0;
-                    const unit = order.unit || 'Gm';
-                    const rate = order.ratePerUnit ? `₹${order.ratePerUnit.toLocaleString('en-IN')}` : '—';
-                    const grandTotal = order.grandTotal !== undefined && order.grandTotal !== null ? `₹${order.grandTotal.toLocaleString('en-IN')}` : '—';
+                    const correct = calculateCorrectValues(order);
                     
-                    const isSlOrGld = isGstPreAppliedProduct(product);
+                    const rateDisplay = `₹${formatNumber(correct.displayRate)}`;
+                    const gstDisplayValue = formatNumber(correct.gstAmount);
+                    const finalTotalDisplay = `₹${formatNumber(correct.finalTotal)}`;
                     
-                    let gstDisplay = '';
+                    let gstHtml = '';
                     let gstBadgeExtra = '';
                     
-                    if (isSlOrGld) {
-                        gstDisplay = `<p class="font-bold text-white flex items-center gap-1">₹0 <span class="text-[9px] text-amber-400">(inclusive)</span></p>`;
+                    if (correct.isSlGld) {
+                        gstHtml = `<span class="font-bold text-white">₹0 <span class="text-[9px] text-amber-400">(inclusive)</span></span>`;
                         gstBadgeExtra = `<div class="mt-2 text-[8px] text-emerald-600/70 bg-emerald-900/20 rounded-full px-2 py-0.5 inline-block w-auto"><i class="fa-regular fa-rectangle-ad"></i> GST already applied at source • no extra tax</div>`;
                     } else {
-                        const gstAmount = (order.gstAmount !== undefined && order.gstAmount !== null) ? order.gstAmount : 0;
-                        gstDisplay = `<p class="font-bold text-white">₹${gstAmount.toLocaleString('en-IN')}</p>`;
+                        gstHtml = `<span class="font-bold text-white">₹${gstDisplayValue}</span>`;
                         gstBadgeExtra = '';
                     }
                     
@@ -201,11 +263,11 @@
                                     <p class="text-[9px] font-black text-amber-500 uppercase tracking-widest mb-1">
                                         <i class="fa-regular fa-clock mr-1"></i>${timeString}
                                     </p>
-                                    ${isSlOrGld ? `<span class="gst-exempt-badge"><i class="fa-regular fa-gem"></i> GST locked</span>` : ''}
+                                    ${correct.isSlGld ? `<span class="gst-exempt-badge"><i class="fa-regular fa-gem"></i> GST locked</span>` : ''}
                                 </div>
                                 <h3 class="text-sm font-extrabold text-white flex items-center gap-1">
                                     ${escapeHtml(product)}
-                                    ${isSlOrGld ? `<i class="fa-regular fa-circle-check text-[10px] text-emerald-400"></i>` : ''}
+                                    ${correct.isSlGld ? `<i class="fa-regular fa-circle-check text-[10px] text-emerald-400"></i>` : ''}
                                 </h3>
                                 <div class="flex gap-2 mt-1 items-center flex-wrap">
                                     <span class="text-[8px] bg-white/10 px-1.5 py-0.5 rounded text-gray-300 font-bold"><i class="fa-regular fa-user mr-1"></i>${escapeHtml(userId)}</span>
@@ -223,29 +285,31 @@
                             </div>
                         </div>
                         
-                        <div class="grid grid-cols-3 gap-2 mt-2 text-xs">
+                        <!-- Grid for Qty, Rate, GST - properly aligned -->
+                        <div class="grid grid-cols-3 gap-2 mt-2 text-center">
                             <div>
                                 <p class="text-[8px] text-gray-500 font-bold uppercase">Qty</p>
-                                <p class="font-bold text-white">${quantity} ${unit}</p>
+                                <p class="font-bold text-white text-sm">${correct.quantity} ${correct.unit}</p>
                             </div>
                             <div>
                                 <p class="text-[8px] text-gray-500 font-bold uppercase">Rate</p>
-                                <p class="font-bold text-white">${rate}</p>
+                                <p class="font-bold text-white text-sm">${rateDisplay}<span class="text-[9px] text-gray-400">${correct.rateUnitLabel}</span></p>
                             </div>
                             <div>
                                 <p class="text-[8px] text-gray-500 font-bold uppercase">GST</p>
-                                ${gstDisplay}
+                                <p class="font-bold text-white text-sm">${gstHtml}</p>
                             </div>
                         </div>
-                        ${isSlOrGld ? `<div class="mt-1"><span class="gst-exempt-badge text-[7px]"><i class="fa-regular fa-check-circle"></i> GST inclusive rate</span></div>` : ''}
+                        
+                        ${correct.isSlGld ? `<div class="mt-1 text-center"><span class="gst-exempt-badge text-[7px]"><i class="fa-regular fa-check-circle"></i> GST inclusive rate</span></div>` : ''}
                         
                         <div class="glass-divider my-3"></div>
                         
                         <div class="flex justify-between items-center">
                             <div>
                                 <p class="text-[8px] text-gray-500 font-bold uppercase">Final total</p>
-                                <p class="text-sm font-bold text-white">${grandTotal}</p>
-                                ${isSlOrGld ? `<p class="text-[7px] text-amber-500/70 mt-0.5">✓ rate inclusive of GST</p>` : ''}
+                                <p class="text-base font-bold text-white">${finalTotalDisplay}</p>
+                                ${!correct.isSlGld ? `<p class="text-[7px] text-amber-500/70 mt-0.5">✓ +${GST_PERCENT}% GST added</p>` : `<p class="text-[7px] text-amber-500/70 mt-0.5">✓ rate inclusive of GST</p>`}
                             </div>
                             <div class="text-right">
                                 <p class="text-[8px] text-gray-500 font-bold uppercase">Phone</p>
@@ -269,14 +333,11 @@
                 });
             }
             
-            // PERMANENT DELETE - clears everything
             function permanentlyClearAllHistory() {
                 const userConfirmed = confirm('⚠️ PERMANENT ACTION: This will delete ALL trade records permanently. This action cannot be undone. Are you sure?');
                 if (!userConfirmed) return;
                 
-                // Clear the main history
                 localStorage.removeItem('shree_order_history');
-                
                 renderTrades();
                 
                 clearBtn.classList.add('clear-shake');
@@ -287,8 +348,7 @@
                 showToast('🗑️ All trade logs permanently deleted');
             }
             
-            // Enforce GST rule on existing data (ensures SL/GLD have correct GST=0)
-            function enforceGSTRuleGlobally() {
+            function fixAllData() {
                 let ordersRaw = localStorage.getItem("shree_order_history");
                 if (!ordersRaw) return;
                 let orders = [];
@@ -298,88 +358,77 @@
                 } catch(e) { return; }
                 
                 let modified = false;
-                const updatedOrders = orders.map(order => {
-                    const product = order.product || '';
-                    const isSlGld = isGstPreAppliedProduct(product);
-                    const qty = Number(order.quantity) || 0;
-                    const rate = Number(order.ratePerUnit) || 0;
+                const fixedOrders = orders.map(order => {
+                    const correct = calculateCorrectValues(order);
                     
-                    if (isSlGld) {
-                        // SL/GLD must have zero GST and total = qty * rate
-                        const correctTotal = qty * rate;
-                        const correctGst = 0;
-                        if (order.grandTotal !== correctTotal || order.gstAmount !== correctGst) {
-                            modified = true;
-                            return { ...order, grandTotal: correctTotal, gstAmount: correctGst, ruleEnforced: true };
-                        }
-                    } else {
-                        // For non-SL/GLD, ensure GST is calculated if missing
-                        if (order.gstAmount === undefined || order.gstAmount === null) {
-                            const computedGst = Math.round(qty * rate * 0.03);
-                            const computedTotal = (qty * rate) + computedGst;
-                            modified = true;
-                            return { ...order, gstAmount: computedGst, grandTotal: computedTotal, ruleUpdated: true };
-                        }
-                        const expectedTotal = (qty * rate) + (order.gstAmount || 0);
-                        if (Math.abs((order.grandTotal || 0) - expectedTotal) > 0.01) {
-                            modified = true;
-                            return { ...order, grandTotal: expectedTotal };
-                        }
+                    if (order.grandTotal !== correct.finalTotal || order.gstAmount !== correct.gstAmount) {
+                        modified = true;
+                        return { 
+                            ...order, 
+                            grandTotal: correct.finalTotal, 
+                            gstAmount: correct.gstAmount,
+                            _fixed: true 
+                        };
                     }
                     return order;
                 });
                 
                 if (modified) {
-                    localStorage.setItem('shree_order_history', JSON.stringify(updatedOrders));
+                    localStorage.setItem('shree_order_history', JSON.stringify(fixedOrders));
+                    console.log('✅ Fixed corrupted data');
                 }
             }
             
-            // Add new trade (called from POS system when order is confirmed)
-            // This is the ONLY way data enters the system - NO DEMO DATA EVER
             window.addTradeToHistory = function(orderDetails) {
-                // Expected orderDetails structure:
-                // {
-                //   product: string,
-                //   quantity: number,
-                //   unit: string (default 'Gm'),
-                //   ratePerUnit: number,
-                //   type: 'BUY' or 'SELL',
-                //   user: { phone: string, name: string }
-                // }
-                
                 if (!orderDetails || !orderDetails.product || !orderDetails.quantity || !orderDetails.ratePerUnit) {
                     console.error('Invalid order details', orderDetails);
                     return false;
                 }
                 
-                const isSlGld = isGstPreAppliedProduct(orderDetails.product);
+                const product = orderDetails.product;
+                const isSlGld = isGstPreAppliedProduct(product);
+                let qty = Number(orderDetails.quantity);
+                let ratePerUnit = Number(orderDetails.ratePerUnit);
+                
+                const isSilver = product.toUpperCase().includes('SILVER') || 
+                                 product.toUpperCase().includes('SLVR') || 
+                                 product.toUpperCase().includes('AG');
+                
+                let baseAmount = 0;
+                
+                if (isSilver) {
+                    const perGramRate = ratePerUnit / 1000;
+                    baseAmount = qty * perGramRate;
+                } else {
+                    const perGramRate = ratePerUnit / 10;
+                    baseAmount = qty * perGramRate;
+                }
+                
                 let gstAmount = 0;
-                let grandTotal = 0;
+                let finalTotal = 0;
                 
                 if (isSlGld) {
-                    // GST already included in rate
                     gstAmount = 0;
-                    grandTotal = orderDetails.quantity * orderDetails.ratePerUnit;
+                    finalTotal = Math.round(baseAmount);
                 } else {
-                    // Apply 3% GST
-                    gstAmount = Math.round(orderDetails.quantity * orderDetails.ratePerUnit * 0.03);
-                    grandTotal = (orderDetails.quantity * orderDetails.ratePerUnit) + gstAmount;
+                    gstAmount = Math.round(baseAmount * GST_PERCENT / 100);
+                    finalTotal = Math.round(baseAmount + gstAmount);
                 }
                 
                 const newOrder = {
                     timestamp: Date.now(),
-                    product: orderDetails.product,
-                    quantity: orderDetails.quantity,
-                    unit: orderDetails.unit || 'Gm',
-                    ratePerUnit: orderDetails.ratePerUnit,
-                    grandTotal: grandTotal,
+                    product: product,
+                    quantity: qty,
+                    unit: orderDetails.unit || 'GM',
+                    ratePerUnit: ratePerUnit,
+                    grandTotal: finalTotal,
                     gstAmount: gstAmount,
                     type: orderDetails.type || 'BUY',
                     user: {
                         phone: orderDetails.user?.phone || '___________',
                         name: orderDetails.user?.name || 'Customer'
                     },
-                    note: isSlGld ? "GST inclusive rate - no extra tax" : "GST 3% applied"
+                    note: isSlGld ? "GST inclusive rate - no extra tax" : `GST ${GST_PERCENT}% applied`
                 };
                 
                 const existingOrders = JSON.parse(localStorage.getItem("shree_order_history") || "[]");
@@ -387,49 +436,43 @@
                 localStorage.setItem('shree_order_history', JSON.stringify(existingOrders));
                 
                 renderTrades();
-                showToast(`✅ ${orderDetails.product} order added to history`);
+                showToast(`✅ ${product} order added to history`);
                 return newOrder;
             };
             
-            // Alternative simple method for quick testing (only if needed, but no auto data)
             window.addSimpleTrade = function(product, qty, rate, phone, name) {
                 return window.addTradeToHistory({
                     product: product,
                     quantity: qty,
                     ratePerUnit: rate,
-                    unit: 'Gm',
+                    unit: 'GM',
                     type: 'BUY',
                     user: { phone: phone || '9999999999', name: name || 'Walk-in Customer' }
                 });
             };
             
-            // EVENT LISTENER for delete button
             clearBtn.addEventListener('click', (e) => {
                 e.preventDefault();
                 permanentlyClearAllHistory();
             });
             
-            // INITIALIZATION - NO SEEDING, NO DEMO DATA
-            // Just load existing data (if any) and apply GST rules
-            enforceGSTRuleGlobally();
+            fixAllData();
             renderTrades();
             
-            // Cross-tab sync
             window.addEventListener('storage', (e) => {
                 if (e.key === 'shree_order_history') {
-                    enforceGSTRuleGlobally();
+                    fixAllData();
                     renderTrades();
                 }
             });
             
             window.refreshTradeLogs = function() {
-                enforceGSTRuleGlobally();
+                fixAllData();
                 renderTrades();
-                showToast("Trade logs refreshed");
+                showToast("Trade logs refreshed & fixed");
             };
             
-            console.log('✅ Trade Logs Ready | NO DEMO DATA | History starts completely empty');
-            console.log('📝 Use window.addTradeToHistory(orderDetails) to add real orders');
+            console.log('✅ Trade Logs Ready | Display formatting fixed');
         })();
     </script>
 </body>
