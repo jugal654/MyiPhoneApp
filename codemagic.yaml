@@ -17,18 +17,42 @@ workflows:
         script: |
           npx cap sync ios
 
-      - name: Set up code signing
+      - name: Build iOS archive
         script: |
           cd ios/App
-          xcode-project use-profiles
 
-      - name: Build IPA
+          xcodebuild \
+            -project App.xcodeproj \
+            -scheme App \
+            -configuration Release \
+            -archivePath build/App.xcarchive \
+            -allowProvisioningUpdates \
+            DEVELOPMENT_TEAM="Chaitanya Sonar" \
+            CODE_SIGN_STYLE=Automatic \
+            archive
+
+      - name: Export IPA
         script: |
           cd ios/App
-          xcode-project build-ipa \
-            --project App.xcodeproj \
-            --scheme App
+
+          cat > ExportOptions.plist <<EOF
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
+          "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+              <key>method</key>
+              <string>development</string>
+              <key>signingStyle</key>
+              <string>automatic</string>
+          </dict>
+          </plist>
+          EOF
+
+          xcodebuild -exportArchive \
+            -archivePath build/App.xcarchive \
+            -exportOptionsPlist ExportOptions.plist \
+            -exportPath build/ios/ipa
 
     artifacts:
-      - build/ios/ipa/*.ipa
-      - build/ios/ipa/*.ipa
+      - ios/App/build/ios/ipa/*.ipa
