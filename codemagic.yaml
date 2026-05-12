@@ -8,10 +8,6 @@ workflows:
     environment:
       xcode: latest
 
-    ios_signing:
-      distribution_type: development
-      bundle_identifier: com.gotam.myapp
-
     scripts:
       - name: Install dependencies
         script: |
@@ -21,8 +17,9 @@ workflows:
         script: |
           npx cap sync ios
 
-      - name: Set up code signing
+      - name: Set up signing
         script: |
+          cd ios/App
           xcode-project use-profiles
 
       - name: Build IPA
