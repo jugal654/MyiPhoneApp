@@ -2,27 +2,35 @@ workflows:
   ios-workflow:
     name: iOS Workflow
 
+    integrations:
+      app_store_connect: Personal
+
     environment:
       xcode: latest
-      cocoapods: default
+
+    ios_signing:
+      distribution_type: development
+      bundle_identifier: com.gotam.myapp
 
     scripts:
-      - name: Install npm dependencies
+      - name: Install dependencies
         script: |
           npm install
 
-      - name: Sync Capacitor
+      - name: Capacitor sync
         script: |
           npx cap sync ios
 
-      - name: Build iOS App
+      - name: Set up code signing
+        script: |
+          xcode-project use-profiles
+
+      - name: Build IPA
         script: |
           cd ios/App
-          xcodebuild -project App.xcodeproj \
-          -scheme App \
-          -sdk iphoneos \
-          -configuration Release \
-          build
+          xcode-project build-ipa \
+            --project App.xcodeproj \
+            --scheme App
 
     artifacts:
-      - ios/App/build/**/*.app
+      - build/ios/ipa/*.ipa
