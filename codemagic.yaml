@@ -17,12 +17,18 @@ workflows:
         script: |
           npx cap sync ios
 
+      - name: Set up code signing
+        script: |
+          cd ios/App
+          xcode-project use-profiles
+
       - name: Build IPA
         script: |
           cd ios/App
           xcode-project build-ipa \
-            --workspace App.xcworkspace \
+            --project App.xcodeproj \
             --scheme App
 
     artifacts:
+      - build/ios/ipa/*.ipa
       - build/ios/ipa/*.ipa
