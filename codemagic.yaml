@@ -8,6 +8,10 @@ workflows:
     environment:
       xcode: latest
 
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: com.gotam.myapp
+
     scripts:
       - name: Install dependencies
         script: |
@@ -19,7 +23,6 @@ workflows:
 
       - name: Set up code signing
         script: |
-          cd ios/App
           xcode-project use-profiles
 
       - name: Build IPA
@@ -30,4 +33,4 @@ workflows:
             --scheme App
 
     artifacts:
-      - build/ios/ipa/*.ipa
+      - ios/App/build/ios/ipa/*.ipa
