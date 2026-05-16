@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -76,9 +76,6 @@
         }
         .animate-slide { animation: slideUp 0.5s ease-out forwards; }
 
-
-
-
         /* back button style */
         .back-btn {
             position: absolute;
@@ -104,9 +101,6 @@
             background: rgba(180, 83, 9, 0.2);
             transform: scale(1.05);
         }
-
-
-
 
         /* delete account button positioned top-right */
         .delete-account-btn {
@@ -134,9 +128,6 @@
             background: rgba(185, 28, 28, 0.6);
             transform: scale(1.05);
         }
-
-
-
 
         /* modal overlay styles */
         .modal-overlay {
@@ -288,27 +279,18 @@
 </head>
 <body class="gold-gradient w-full relative">
 
-
-
-
     <!-- BACK BUTTON (always visible, returns to main.html) -->
     <div onclick="goBack()" class="back-btn" title="Back to main page">
         <i class="fa-solid fa-arrow-left"></i>
     </div>
 
-
-
-
-  
-
-
-
+    <!-- DELETE ACCOUNT BUTTON (top-right, launches verification modal) -->
+    <div onclick="openDeleteAccountModal()" class="delete-account-btn" title="Delete account permanently">
+        <i class="fa-solid fa-trash-can"></i>
+    </div>
 
     <!-- Toast notification container -->
     <div id="toastMsg" class="toast-notification"></div>
-
-
-
 
     <div class="premium-glass w-full max-w-md rounded-[3rem] p-8 md:p-9 shadow-2xl animate-slide">
         <div class="text-center mb-8">
@@ -317,9 +299,6 @@
                 <span class="text-[0.6rem] font-bold tracking-[0.35em] text-amber-500/80 uppercase">secure vault access</span>
             </div>
         </div>
-
-
-
 
         <!-- LOGIN PANEL (visible by default) -->
         <div id="login-panel" class="space-y-5">
@@ -339,16 +318,10 @@
             <button onclick="handleAuth('login', event)" id="login-btn" class="btn-gold w-full py-5 rounded-2xl uppercase text-sm tracking-[0.2em] text-white">
                 Login
             </button>
-            <button onclick="openDeleteAccountModal('login', event)" id="login-btn" class="btn-gold w-full py-5 rounded-2xl uppercase text-sm tracking-[0.2em] text-white">
-                Delete Account
-            </button>
             <p class="text-center text-[0.65rem] text-stone-400 uppercase tracking-wider">
                 new client? <span class="text-amber-500 cursor-pointer hover:text-amber-400 transition" onclick="togglePanels()">open account</span>
             </p>
         </div>
-
-
-
 
         <!-- SIGNUP PANEL (hidden by default) -->
         <div id="signup-panel" class="space-y-5 hidden">
@@ -371,16 +344,10 @@
         </div>
     </div>
 
-
-
-
     <script type="module">
         // 🔥 FIREBASE — FIRESTORE DATABASE (full integration)
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, doc, setDoc, getDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-
-
-
 
         // ✅ CORRECT Firestore configuration
         const firebaseConfig = {
@@ -393,14 +360,8 @@
             measurementId: "G-B714GY65N7"
         };
 
-
-
-
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
-
-
-
 
         // Show toast notification
         function showToast(message, isError = false) {
@@ -415,9 +376,6 @@
             }, 3200);
         }
 
-
-
-
         // toggle login / signup panels
         window.togglePanels = () => {
             const loginPanel = document.getElementById('login-panel');
@@ -427,9 +385,6 @@
                 signupPanel.classList.toggle('hidden');
             }
         };
-
-
-
 
         // Store user data in localStorage
         function storeUserDataLocally(userData) {
@@ -447,17 +402,11 @@
             console.log("✅ User data stored in localStorage");
         }
 
-
-
-
         // catchData function for console logging and storage
         function catchData(userData) {
             console.log("=== User data from Firestore ===");
             console.log(JSON.stringify(userData, null, 2));
             console.log("===============================");
-
-
-
 
             localStorage.setItem('shree_user_data', JSON.stringify({
                 username: userData.username || '',
@@ -467,18 +416,12 @@
                 userId: userData.userId || 'USR_' + Date.now()
             }));
 
-
-
-
             localStorage.setItem('shree_user_logged_in', 'true');
             localStorage.setItem('shree_user_name', userData.username || '');
             localStorage.setItem('shree_user_phone', userData.phone || '');
             localStorage.setItem('shree_user_address', userData.address || '');
             localStorage.setItem('shree_user_gst', userData.gst || '');
         }
-
-
-
 
         // Clear all stored user data from localStorage
         function clearLocalUserData() {
@@ -491,18 +434,12 @@
             console.log("🗑️ Local user data cleared");
         }
 
-
-
-
         // Handle Authentication (LOGIN / SIGNUP)
         window.handleAuth = async (action, event) => {
             const btn = event.currentTarget;
             btn.disabled = true;
             const originalText = btn.innerHTML;
             btn.innerHTML = '<i class="fa-solid fa-spinner fa-pulse mr-2"></i> Processing...';
-
-
-
 
             try {
                 if (action === 'signup') {
@@ -512,9 +449,6 @@
                     const address = document.getElementById('reg-address').value.trim();
                     const gst = document.getElementById('reg-gst').value.trim().toUpperCase();
                     const password = document.getElementById('reg-pass').value;
-
-
-
 
                     if (!username || !phone || !password || !address) {
                         showToast("Please fill all required fields", true);
@@ -530,15 +464,9 @@
                         return;
                     }
 
-
-
-
                     // Check if username already exists
                     const userRef = doc(db, 'users', username);
                     const snapshot = await getDoc(userRef);
-
-
-
 
                     if (snapshot.exists()) {
                         showToast("Username already taken", true);
@@ -572,9 +500,6 @@
                     const username = document.getElementById('login-user').value.trim().toLowerCase();
                     const password = document.getElementById('login-pass').value;
 
-
-
-
                     if (!username || !password) {
                         showToast("Enter both username and password", true);
                         btn.disabled = false;
@@ -582,14 +507,8 @@
                         return;
                     }
 
-
-
-
                     const userRef = doc(db, 'users', username);
                     const snapshot = await getDoc(userRef);
-
-
-
 
                     if (snapshot.exists()) {
                         const fullUserData = snapshot.data();
@@ -602,9 +521,6 @@
                             // Clear login fields
                             document.getElementById('login-user').value = '';
                             document.getElementById('login-pass').value = '';
-
-
-
 
                             // Redirect to main.html after successful login
                             setTimeout(() => {
@@ -626,10 +542,7 @@
             }
         };
 
-
-
-
-        // ========== DELETE ACCOUNT WITH VERIFICATION & REDIRECT TO INDEX.HTML ==========
+        // ========== DELETE ACCOUNT WITH VERIFICATION & REDIRECT TO MAIN.HTML ==========
         window.openDeleteAccountModal = () => {
             // Check if modal already exists
             if (document.getElementById('delete-account-modal')) return;
@@ -727,7 +640,7 @@
                         // Show success message
                         showToast(`✅ Account "${username}" has been permanently deleted. Redirecting...`);
                         
-                        // ✅ REDIRECT TO INDEX.HTML AFTER ACCOUNT DELETION
+                        // ✅ REDIRECT TO MAIN.HTML AFTER ACCOUNT DELETION
                         setTimeout(() => {
                             window.location.href = 'main.html';
                         }, 1500);
