@@ -1,146 +1,16 @@
-﻿
+
 ﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SHREE GOLD</title>
+    <title>SHREE GOLD Ã¢â‚¬Â¢ PROFESSIONAL TERMINAL</title>
     <script src="js/tailwindcss.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
-        
-        /* ========== FULL SCREEN WIDTH FIX ========== */
-        * {
-            box-sizing: border-box;
-        }
-        
-        body { 
-            font-family: 'Inter', sans-serif; 
-            background-color: #1a0f0a; 
-            margin: 0; 
-            display: flex; 
-            flex-direction: column; 
-            min-height: 100vh;
-            color: white; 
-            overflow-x: hidden;
-        }
-        
-        /* REMOVE THE MAX-WIDTH RESTRICTION - MAKE IT FULL WIDTH */
-        .max-w-md {
-            max-width: 100% !important;
-            width: 100%;
-            margin: 0 !important;
-        }
-        
-        /* Make header full width on all screens */
-        header.fixed {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            width: 100%;
-            z-index: 50;
-            border-radius: 0 !important;
-        }
-        
-        /* Make main content full width */
-        main {
-            width: 100%;
-            padding-top: 180px;
-            padding-bottom: 80px;
-            padding-left: 16px;
-            padding-right: 16px;
-        }
-        
-        /* Make bottom navigation full width */
-        nav.fixed.bottom-0 {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            width: 100%;
-            background: rgba(26, 15, 10, 0.95);
-            backdrop-filter: blur(10px);
-            padding-top: 8px;
-            padding-bottom: calc(env(safe-area-inset-bottom) + 8px);
-            z-index: 50;
-            border-radius: 0 !important;
-        }
-        
-        /* Popup full width on mobile, centered on desktop */
-        #buy-popup {
-            left: 0;
-            right: 0;
-        }
-        
-        #buy-popup .bg-white {
-            width: 100%;
-            max-width: 100%;
-            border-radius: 32px 32px 0 0;
-        }
-        
-        @media (min-width: 768px) {
-            #buy-popup .bg-white {
-                max-width: 500px;
-                margin: 0 auto;
-                border-radius: 32px;
-            }
-            
-            #buy-popup {
-                display: flex;
-                justify-content: center;
-                align-items: flex-end;
-            }
-        }
-        
-        /* Responsive padding for different screen sizes */
-        @media (min-width: 1200px) {
-            main {
-                padding-left: 24px;
-                padding-right: 24px;
-            }
-            
-            .px-4 {
-                padding-left: 24px !important;
-                padding-right: 24px !important;
-            }
-        }
-        
-        @media (max-width: 768px) {
-            main {
-                padding-left: 12px;
-                padding-right: 12px;
-            }
-        }
-        
-        /* Better touch targets for mobile */
-        button, 
-        .manual-rate-item,
-        [onclick] {
-            cursor: pointer;
-        }
-        
-        /* Responsive quantity buttons */
-        @media (max-width: 480px) {
-            .qty-btn {
-                width: 44px;
-                height: 44px;
-            }
-            #order-qty {
-                width: 80px;
-            }
-        }
-        
-        /* Responsive grid gaps */
-        @media (max-width: 768px) {
-            .grid-cols-3 {
-                gap: 8px;
-            }
-        }
-        
-        /* ========== YOUR ORIGINAL STYLES BELOW (KEEP EVERYTHING AS IS) ========== */
+        body { font-family: 'Inter', sans-serif; background-color: #1a0f0a; margin: 0; display: flex; flex-direction: column; height: 100vh; color: white; overflow: hidden; }
         .gold-gradient { background: linear-gradient(180deg, #3d251a 0%, #23140e 100%); }
         .price-up { background-color: #008c00 !important; color: white !important; }
         .price-down { background-color: #d10000 !important; color: white !important; }
@@ -173,7 +43,38 @@
             justify-content: center;
             padding: 20px;
         }
-        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         .auth-card {
             background: #ffffff;
             width: 100%;
@@ -184,7 +85,38 @@
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
             border: 1px solid #f1f5f9;
         }
-        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         .input-field {
             width: 100%;
             background: #f1f5f9;
@@ -197,14 +129,76 @@
             margin-bottom: 16px;
             transition: all 0.3s;
         }
-        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         .input-field:focus {
             background: #ffffff;
             border-color: #b45309;
             outline: none;
             box-shadow: 0 0 0 4px rgba(180, 83, 9, 0.1);
         }
-        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         .login-btn {
             width: 100%;
             background: #1e293b;
@@ -216,11 +210,73 @@
             letter-spacing: 1px;
             transition: all 0.2s;
         }
-        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         .login-btn:active { transform: scale(0.98); background: #0f172a; }
-        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         /* STOP BOOKING INDICATORS */
-        .row-disabled { filter: grayscale(1); opacity: 0.6; cursor: not-allowed !important; }
+        
         .closed-pill {
             background: #ef4444;
             color: white;
@@ -238,7 +294,38 @@
             50% { transform: scale(0.95); opacity: 0.8; }
             100% { transform: scale(1); opacity: 1; }
         }
-        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         .stop-badge {
             background: #ef4444;
             color: white;
@@ -249,7 +336,38 @@
             margin-left: 6px;
             vertical-align: middle;
         }
-        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         /* Loading Spinner */
         .spinner {
             border: 3px solid rgba(255,255,255,0.3);
@@ -264,7 +382,38 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
-        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         /* Error Message */
         .error-message {
             background: #ef4444;
@@ -276,7 +425,38 @@
             font-weight: bold;
             display: none;
         }
-        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         /* User info display */
         .user-info-badge {
             background: rgba(180, 83, 9, 0.2);
@@ -287,7 +467,10 @@
             color: #fbbf24;
             margin-bottom: 10px;
         }
-        
+
+
+
+
         /* --- Manual Rates Styles --- */
         .manual-rates-card {
             background: linear-gradient(135deg, #2d1e14 0%, #1f140e 100%);
@@ -319,96 +502,8 @@
             border-radius: 20px;
             animation: pulse 1.5s infinite;
         }
-        
-        /* Container that hides the text when it's outside the box */
-        .ticker-wrapper {
-            width: 100%;
-            overflow: hidden;
-            white-space: nowrap;
-        }
-        
-        /* The actual scrolling text */
-        .ticker-text {
-            display: inline-block;
-            padding-left: 100%;
-            animation: ticker-move 15s linear infinite;
-        }
-        
-        /* The animation logic */
-        @keyframes ticker-move {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(-100%); }
-        }
 
-
-
-
-
-
-
-        /* ========== CORNER CURVED TOP BAR (BOTTOM CORNERS ROUNDED) ========== */
-/* Replace the existing header styling with this curved design */
-
-/* Override the previous header.fixed styles to allow curved corners */
-header.fixed {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    width: 100%;
-    z-index: 50;
-    /* CRUCIAL: This creates the curved bottom corners */
-    border-radius: 0 0 42px 42px !important;
-    background: #ffffff;
-    padding: 18px 20px 20px 20px;
-    box-shadow: 0 20px 35px -12px rgba(0,0,0,0.25);
-}
-
-/* Alternative - if you want a more pronounced curve */
-.curved-header {
-    border-radius: 0 0 56px 56px !important;
-}
-
-/* For an even more dramatic curve (like the second file) */
-.dramatic-curve-header {
-    border-radius: 0 0 64px 64px !important;
-}
-
-/* Optional: Add a subtle inner glow to enhance the curve effect */
-header.fixed::after {
-    content: '';
-    position: absolute;
-    bottom: -2px;
-    left: 0;
-    right: 0;
-    height: 4px;
-    background: linear-gradient(90deg, transparent, rgba(180, 83, 9, 0.3), transparent);
-    border-radius: 0 0 42px 42px;
-    pointer-events: none;
-}
-
-/* Ensure the header content stays properly aligned */
-header.fixed .flex.justify-between {
-    position: relative;
-    z-index: 2;
-}
-
-/* For responsive behavior on smaller screens */
-@media (max-width: 768px) {
-    header.fixed {
-        border-radius: 0 0 36px 36px !important;
-        padding: 14px 16px 18px 16px;
-    }
-}
-
-/* For very large screens, keep the curve proportional */
-@media (min-width: 1200px) {
-    header.fixed {
-        border-radius: 0 0 48px 48px !important;
-    }
-}
-
-/* Custom slider thumb styling */
+        /* Custom slider thumb styling */
 input[type=range]::-webkit-slider-thumb {
     -webkit-appearance: none;
     height: 28px;
@@ -452,13 +547,7 @@ input[type=range]::-webkit-slider-runnable-track {
         font-size: 1.3rem !important;
     }
 }
-
-#turbo-ui-indicator { display: none; background: rgba(234, 88, 12, 0.2); color: #fdba74; font-size: 8px; font-weight: 800; padding: 2px 6px; border-radius: 10px; margin-left: 5px; animation: pulse 1.5s infinite; }
     </style>
-
-
-<script src="config.js"></script>
-<script src="connection.js"></script>
 </head>
 <body class="max-w-md mx-auto relative shadow-2xl">
 
@@ -547,7 +636,8 @@ input[type=range]::-webkit-slider-runnable-track {
 
 
     <header class="fixed top-0 w-full max-w-md bg-white pt-4 pb-4 px-6 rounded-b-[30px] shadow-xl z-50 text-gray-800">
-        <div><br><br>
+        <div>
+            <br><br>
         </div>
         <div class="flex justify-between items-center mb-4">
             <a href="tel:+917020152697" class="w-9 h-9 bg-gray-50 border border-gray-100 rounded-full flex items-center justify-center active:scale-90 transition-transform"><i class="fa-solid fa-phone text-[#3d251a] text-xs"></i></a>
@@ -568,9 +658,38 @@ input[type=range]::-webkit-slider-runnable-track {
         </div>
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         <div class="flex justify-center items-center gap-3 mt-2">
             <div id="status-header" class="text-[7px] font-bold text-red-600 uppercase flex items-center"><span class="status-dot bg-red-600 animate-pulse"></span> <span id="status-text">Connecting...</span></div>
-            
             <div class="w-px h-2 bg-gray-200"></div>
             <div id="real-time-clock" class="text-[9px] font-black text-gray-400 tracking-widest uppercase">00:00:00 AM</div>
         </div>
@@ -682,15 +801,13 @@ input[type=range]::-webkit-slider-runnable-track {
                 <div class="p-10 text-center text-white/20 text-xs italic">Awaiting secure connection...</div>
             </div>
             
-          <div class="bg-black/40 border-t border-white/5 py-3 overflow-hidden">
-    <div class="ticker-wrapper">
-        <div id="news-ticker" class="ticker-text text-amber-500 text-[11px] font-bold uppercase tracking-wider">
-            Welcome to SHREE GOLD Bullion - Updates will appear here.
-        </div>
-    </div>
-</div>
-
-
+            <div class="bg-black/40 border-t border-white/5 py-3 overflow-hidden">
+                <marquee id="news-ticker" direction="left" scrollamount="5" class="text-amber-500 text-[11px] font-bold uppercase tracking-wider">
+                    Welcome to SHREE GOLD Bullion - Updates will appear here.
+                </marquee>
+            </div>
+            <br>
+            <br>
         </div>
     </main>
 
@@ -839,9 +956,6 @@ input[type=range]::-webkit-slider-runnable-track {
 
 
 
-
-
-
     <div id="admin-popup" class="panel-hidden fixed inset-0 bg-black/95 backdrop-blur-xl z-[200] flex items-center justify-center invisible p-6">
         <div class="bg-white w-full rounded-3xl p-8 text-gray-800 shadow-2xl">
             <h2 class="text-2xl font-black mb-2">Admin Terminal</h2>
@@ -886,27 +1000,31 @@ input[type=range]::-webkit-slider-runnable-track {
 
 
 
-        <!-- BOTTOM NAVIGATION - ALL PAGES PROPERLY LINKED -->
-        <nav class="fixed bottom-0 w-full max-w-md bg-[#1a0f0a]/95 border-t border-white/10 px-6 py-3 z-50">
-            <div class="flex justify-between items-center">
-                <a href="/" class="flex flex-col items-center text-amber-500 cursor-pointer nav-item w-full text-center">
-                    <i class="fa-solid fa-chart-line text-lg"></i>
-                    <span class="text-[8px] font-bold mt-1 uppercase">Rates</span>
-                </a>
-                <a href="trad.html" class="flex flex-col items-center text-gray-500 cursor-pointer nav-item w-full text-center">
-                    <i class="fa-solid fa-receipt text-lg"></i>
-                    <span class="text-[8px] font-bold mt-1 uppercase">Trades</span>
-                </a>
-                <a href="bank.html" class="flex flex-col items-center text-gray-500 cursor-pointer nav-item w-full text-center">
-                    <i class="fa-solid fa-building-columns text-lg"></i>
-                    <span class="text-[8px] font-bold mt-1 uppercase">Bank</span>
-                </a>
-                <a href="login.html" class="flex flex-col items-center text-gray-500 cursor-pointer nav-item w-full text-center">
-                    <i class="fa-solid fa-right-to-bracket text-lg"></i>
-                    <span class="text-[8px] font-bold mt-1 uppercase">Login</span>
-                </a>
+    <!-- BOTTOM NAVIGATION -->
+    <nav class="fixed bottom-0 w-full max-w-md bg-[#1a0f0a]/95 border-t border-white/10 px-6 py-3 z-50">
+        <div class="flex justify-between items-center">
+            <div id="nav-rates" class="flex flex-col items-center text-amber-500 cursor-pointer nav-item" onclick="setActiveNav('nav-rates'); window.location.href=window.location.pathname;">
+                <i class="fa-solid fa-chart-line text-lg"></i>
+                <span class="text-[8px] font-bold mt-1 uppercase">Rates</span>
             </div>
-        </nav>
+            <div id="nav-trades" class="flex flex-col items-center text-gray-500 cursor-pointer nav-item" onclick="setActiveNav('nav-trades'); window.location.href='trad.html';">
+                <i class="fa-solid fa-receipt text-lg"></i>
+                <span class="text-[8px] font-bold mt-1 uppercase">Trades</span>
+            </div>
+            <div id="nav-bank" class="flex flex-col items-center text-gray-500 cursor-pointer nav-item" onclick="setActiveNav('nav-bank'); window.location.href='bank.html';">
+                <i class="fa-solid fa-building-columns text-lg"></i>
+                <span class="text-[8px] font-bold mt-1 uppercase">Bank</span>
+            </div>
+            <div id="nav-login" class="flex flex-col items-center text-gray-500 cursor-pointer nav-item" onclick="setActiveNav('nav-login'); window.location.href='login.html';">
+                <i class="fa-solid fa-right-to-bracket text-lg"></i>
+                <span class="text-[8px] font-bold mt-1 uppercase">Login</span>
+            </div>
+        </div>
+    </nav>
+
+
+
+
 
 
 
@@ -1114,9 +1232,6 @@ input[type=range]::-webkit-slider-runnable-track {
         const app = initializeApp(firebaseConfig, 'realtime');
         const firestoreApp = initializeApp(firestoreConfig, 'firestore');
         
-
-        
-        
         // Get database instances
         const rtdb = getDatabase(app);
 
@@ -1222,7 +1337,6 @@ input[type=range]::-webkit-slider-runnable-track {
         // Reference to settings document in Realtime Database
 const settingsRef = ref(rtdb, "admin/settings");
 
-//--------------------------------------------------------------code 1 dynamic labels
 // ==========================================================
 // ========== FIREBASE LABEL SYNCHRONIZATION ==========
 // ==========================================================
@@ -1271,7 +1385,7 @@ onValue(labelsRef, (snapshot) => {
 }, (error) => {
     console.error('%c❌ Error reading labels from Firebase:', 'color: red; font-size: 12px', error);
 });
-// ==========================================================
+
 // ==========================================================
 // ==========================================================
 
@@ -1320,7 +1434,7 @@ onValue(settingsRef, (snapshot) => {
     console.error('Error reading from Firebase Realtime Database:', error);
 });
 
-
+// Function to save order to Firestore with better error handling - NEW FEATURE
 
 
 
@@ -1711,7 +1825,7 @@ onValue(settingsRef, (snapshot) => {
         }
         
         // Update gold spot rate display
-        // Update gold spot rate display - ALWAYS VISIBLE, NO STOP BADGE
+       // Update gold spot rate display - ALWAYS VISIBLE, NO STOP BADGE
 const goldRow = document.getElementById('spot-gold-row');
 const goldContent = document.getElementById('gold-cash-content');
 
@@ -1732,15 +1846,8 @@ if (silverRow && silverContent) {
     const displayRate = silverRate.toLocaleString('en-IN');
     silverContent.innerHTML = `<span id="cash-silver-display" class="text-xl font-black text-white"> ${displayRate}</span>`;
 }
-        
         // Update global stop indicator
-        const stopDiv = document.getElementById('global-stop-indicator');
-        if (stopDiv) {
-            stopDiv.innerHTML = '';
-            if (data.stopGold) stopDiv.innerHTML += `<span class="text-red-500 font-black">GOLD STOP</span> `;
-            if (data.stopSilver) stopDiv.innerHTML += `<span class="text-red-500 font-black">SILVER STOP</span>`;
-            if (!data.stopGold && !data.stopSilver) stopDiv.innerHTML = `<span class="text-green-500">ALL BOOKING OPEN</span>`;
-        }
+    
         
         // Optional: Update last sync time
         const lastSyncElement = document.getElementById('last-sync-time');
@@ -1752,6 +1859,11 @@ if (silverRow && silverContent) {
                 second: '2-digit'
             });
             lastSyncElement.innerHTML = `<span class="text-[8px] text-gray-400">Synced: ${timeStr}</span>`;
+        }
+
+                // Re-render if we have cached data with new offsets
+                if (window.lastSocketData && typeof renderRatesWithAutoLabels === 'function') {
+            renderRatesWithAutoLabels(window.lastSocketData);
         }
         
     } catch (error) {
@@ -2416,6 +2528,7 @@ window.handleManualBooking = function(label, rateKey, type) {
 
 
 
+
         function handleBookingSpot(label, rate, type) {
     if (label === 'Gold 99.5' || label === 'Silver 99.9') {
         window.location.href = "tel:+917020152697";
@@ -2530,12 +2643,51 @@ window.handleManualBooking = function(label, rateKey, type) {
 
 
 
-        
 
 
+let socket;
+let reconnectInterval = 3000;
 
+function connectSocket() {
+  socket = io("https://proxy-server-2fwq.onrender.com", {
+    transports: ["websocket"],
+    reconnection: true,
+    reconnectionAttempts: Infinity,
+    reconnectionDelay: 2000,
+    timeout: 10000
+  });
 
+  socket.on("connect", () => {
+    console.log("✅ Connected to proxy");
+    updateStatus("Connected");
+  });
 
+  socket.on("disconnect", () => {
+    console.log("❌ Disconnected");
+    updateStatus("Reconnecting...");
+  });
+
+  socket.on("connect_error", (err) => {
+    console.log("⚠️ Connection error:", err.message);
+    updateStatus("Retrying...");
+  });
+}
+
+function updateStatus(msg) {
+  const el = document.getElementById("connectionStatus");
+  if (el) el.innerText = msg;
+}
+
+// Auto-reconnect safety loop
+setInterval(() => {
+  if (!socket || !socket.connected) {
+    console.log("🔁 Reconnecting manually...");
+    connectSocket();
+  }
+}, reconnectInterval);
+
+// Start
+connectSocket();
 
 
 
@@ -2593,7 +2745,6 @@ window.handleManualBooking = function(label, rateKey, type) {
 
 
 
-      
 
 
 
@@ -2623,6 +2774,7 @@ window.handleManualBooking = function(label, rateKey, type) {
 
 
 
+       
 
 
 
@@ -2655,6 +2807,7 @@ window.handleManualBooking = function(label, rateKey, type) {
 
 
 
+    
 
 
 
@@ -2684,7 +2837,8 @@ window.handleManualBooking = function(label, rateKey, type) {
 
 
 
-// OPEN POPUP FUNCTION PASTE 
+
+
 
 
 
@@ -3102,7 +3256,8 @@ window.handleManualBooking = function(label, rateKey, type) {
         }
 
 
-        // ==========================================================
+
+// ==========================================================
 // QUANTITY MANAGER (Encapsulated Pattern)
 // ==========================================================
 const quantityManager = (() => {
@@ -3367,12 +3522,7 @@ document.getElementById('qty-slider').oninput = function() {
 
 
 
-
-
-
-
-        // Enhanced Confirm Order Function with better error handling
-      // ==========================================================
+        // ==========================================================
 // ENHANCED CONFIRM ORDER (WITH FIRESTORE SAVING)
 // ==========================================================
 window.confirmOrder = async function(event) {
@@ -3638,202 +3788,45 @@ window.confirmOrder = async function(event) {
 
 
 
-        function renderRates(data) {
-    const container = document.getElementById('price-table-body');
-    let html = `<div class="bg-amber-600/20 py-2 px-4 border-b border-white/5"><p class="text-[10px] font-black tracking-[0.2em] text-amber-500 uppercase italic">Gold Products</p></div>`;
-    const currentTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+socket.on('connect', () => {
+    const sh = document.getElementById('status-header');
+    sh.querySelector('.status-dot').className = "status-dot bg-green-600";
+    sh.className = "text-[7px] font-bold text-green-600 uppercase flex items-center";
+    document.getElementById('status-text').innerText = "Live";
     
-    let offset = window.cloudSettings?.offset || 0;
-    if (offset === 0) {
-        let rawOffset = localStorage.getItem('shree_gold_offset');
-        offset = (rawOffset === null || rawOffset === "" || isNaN(parseFloat(rawOffset))) ? 0 : parseFloat(rawOffset);
-    }
-
-
-
-
-    const isGoldStopped = window.cloudSettings?.stopGold === true;
-    const isSilverStopped = window.cloudSettings?.stopSilver === true;
-
-
-
-
-    // Track to determine when to insert silver header
-    let hasGoldStarted = false;
-    let silverHeaderAdded = false;
-
-
-
-
-    data.forEach((item, index) => {
-        // 🔥 FIX: Extract label directly from the data instead of using hardcoded arrays
-        let label = item.Symbol || item.symbol || item.ProductName || 
-                    item.Description || item.Name || item.name || 
-                    item.product_name || item.title || `Product ${index + 1}`;
-        
-        // Determine type based on label content
-        const isGoldProduct = label.toLowerCase().includes('gold') || 
-                              label.toLowerCase().includes('gld') || 
-                              label.includes('99.5') || 
-                              label.includes('24k') ||
-                              label.includes('995') ||
-                              label.includes('999');
-        
-        const type = isGoldProduct ? 'gold' : 'silver';
-        const isStopped = (type === 'gold') ? isGoldStopped : isSilverStopped;
-
-
-
-
-        const bidVal = parseFloat(item.bid || item.Bid || item.rate || item.Rate || 0);
-        const askVal = parseFloat(item.ask || item.Ask || item.rate || item.Rate || 0);
-        const lowVal = (item.low && parseFloat(item.low) !== 0) ? parseFloat(item.low) : 
-                       (item.Low ? parseFloat(item.Low) : bidVal);
-        const highVal = (item.high && parseFloat(item.high) !== 0) ? parseFloat(item.high) : 
-                        (item.High ? parseFloat(item.High) : askVal);
-
-
-
-
-        const displayBid = bidVal + offset;
-        const displayAsk = askVal + offset;
-        const displayLow = lowVal + offset;
-        const displayHigh = highVal + offset;
-
-
-
-
-        const prev = prevDataStore[index] || { bid: displayBid, ask: displayAsk };
-        let bCls = displayBid > prev.bid ? "price-up" : (displayBid < prev.bid ? "price-down" : "");
-        let aCls = displayAsk > prev.ask ? "price-up" : (displayAsk < prev.ask ? "price-down" : "");
-        prevDataStore[index] = { bid: displayBid, ask: displayAsk };
-
-
-
-
-        // Add silver header when transitioning from gold to silver
-        if (type === 'silver' && !silverHeaderAdded && hasGoldStarted) {
-            html += `<div class="bg-amber-900/40 py-2 px-4 border-y border-white/5"><p class="text-[10px] font-black tracking-[0.2em] text-amber-400 uppercase italic">Silver Products</p></div>`;
-            silverHeaderAdded = true;
-        }
-        
-        if (type === 'gold') hasGoldStarted = true;
-
-
-
-
-        if (isStopped) {
-            html += `
-            <div class="grid grid-cols-3 items-center px-4 py-2 border-b border-white/5 row-disabled relative">
-                <div class="text-[11px] font-bold text-gray-300">
-                    <span class="text-amber-500 text-[9px] font-black block mb-1">${currentTime}</span>
-                    ${label}
-                </div>
-                <div class="col-span-2 text-right">
-                    <span class="closed-pill">Booking Not Available</span>
-                </div>
-            </div>`;
-        } else {
-            // Escape single quotes in label to prevent JavaScript errors
-            const escapedLabel = label.replace(/'/g, "\\'");
-            html += `
-            <div onclick='handleBookingProduct("${escapedLabel}", ${displayAsk}, "${type}")' class="grid grid-cols-3 items-center px-4 py-2 border-b border-white/5 cursor-pointer active:bg-white/5">
-                <div class="text-[11px] font-bold text-gray-300">
-                    <span class="text-amber-500 text-[9px] font-black block mb-1">${currentTime}</span>
-                    ${label}
-                </div>
-                <div class="text-right pr-2 price-cell ${bCls}">
-                    <span class="block text-lg font-bold">${Math.floor(displayBid).toLocaleString('en-IN')}</span>
-                    <span class="text-[9px] text-amber-500/70">L ${Math.floor(displayLow).toLocaleString('en-IN')}</span>
-                </div>
-                <div class="text-right price-cell ${aCls}">
-                    <span class="block text-lg font-bold">${Math.floor(displayAsk).toLocaleString('en-IN')}</span>
-                    <span class="text-[9px] text-amber-500/70">H ${Math.floor(displayHigh).toLocaleString('en-IN')}</span>
-                </div>
-            </div>`;
-        }
-    });
-
-
-
-
-    container.innerHTML = html;
-    setTimeout(() => { document.querySelectorAll('.price-cell').forEach(el => el.classList.remove('price-up', 'price-down')); }, 500);
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-socket.on('mainProduct', (data) => {
-    if (!data) return;
-    const cleanData = Array.isArray(data) ? data : (data.products || data.data || []);
-    window.lastSocketData = cleanData;  // ← ADD THIS LINE
-    renderRatesWithAutoLabels(cleanData);
+    
+    const hiddenValue = "\x73\x6c\x6b"; 
+    socket.emit('client', hiddenValue);
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        socket.on('connect', () => {
-            const sh = document.getElementById('status-header');
-            sh.querySelector('.status-dot').className = "status-dot bg-green-600";
-            sh.className = "text-[7px] font-bold text-green-600 uppercase flex items-center";
-            document.getElementById('status-text').innerText = "Live";
-            socket.emit('client', "");
-        });
 
 
 
@@ -4233,43 +4226,7 @@ socket.on('mainProduct', (data) => {
         };
     </script>
     <script>
-       
-
-
-
-
-// Detect silver products (includes 999 and SIL WITH GST)
-
-
-
-
-
-// Get product type
-
-
-
-
-
-// Extract product name from data
-
-
-
-
-// Main render function with auto labels - SAME COLOR for both gold and silver
-// Main render function with auto labels - SAME COLOR for both gold and silver
-
-
-
-
-
-
-// Setup socket listener
-
-
-
-
-
-// =========================================================================
+       // =========================================================================
         // ⚡ DUAL-MODE RENDER ENGINE (NORMAL VS TURBO) ⚡
         // =========================================================================
         function getProductType(productName) {
@@ -4446,372 +4403,147 @@ socket.on('mainProduct', (data) => {
         window.renderRatesWithAutoLabels = renderRatesWithAutoLabels;
         window.setupAutoLabels = setupAutoLabels;
     </script>
-    
 
 
 <script>
-(function() {
-    let initAttempts = 0;
-    const maxAttempts = 20;
-
-
-    function initializeSecureConnection() {
-        initAttempts++;
-
-
-        if (!window.__SG) {
-            if (initAttempts < maxAttempts) {
-                setTimeout(initializeSecureConnection, 100);
-            }
-            return;
-        }
-
-
-        console.log('Secure connection ready');
-
-
-        window.__SG.connect();
-
-
-        window.__SG.on('connect', function() {
-            console.log('Connected');
-            const statusText = document.getElementById('status-text');
-            if (statusText) statusText.innerText = "Live";
-        });
-
-
-        window.__SG.on('data', function(data) {
-            if (!data) return;
-
-
-            const cleanData = Array.isArray(data) 
-                ? data 
-                : (data.products || data.data || []);
-
-
-            if (typeof renderRatesWithAutoLabels === 'function') {
-                renderRatesWithAutoLabels(cleanData);
-            } else if (typeof renderRates === 'function') {
-                renderRates(cleanData);
-            }
-        });
-
-
-        window.__SG.on('disconnect', function() {
-            console.log('Disconnected');
-            const statusText = document.getElementById('status-text');
-            if (statusText) statusText.innerText = "Offline";
-        });
-
-
-        window.__SG.on('error', function(err) {
-            console.warn('Error:', err);
-        });
-    }
-
-
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', initializeSecureConnection);
-    } else {
-        initializeSecureConnection();
-    }
-})();
-</script>
-<script>
-    // ========== FIX FOR GLOBAL RATES DISPLAY ==========
     (function() {
-        // Ensure fetchGlobal function exists and works properly
-        if (typeof window.fetchGlobal !== 'function') {
-            window.fetchGlobal = async function() {
-                try {
-                    console.log('🔄 Fetching global rates...');
-                    const responses = await Promise.all([
-                        fetch("https://api.gold-api.com/price/XAU"),
-                        fetch("https://api.gold-api.com/price/XAG"),
-                        fetch("https://api.exchangerate-api.com/v4/latest/USD")
-                    ]);
-                    const gd = await responses[0].json();
-                    const sd = await responses[1].json();
-                    const inr = await responses[2].json();
-                    
-                    const goldEl = document.getElementById('global-gold');
-                    const silverEl = document.getElementById('global-silver');
-                    const inrEl = document.getElementById('global-inr');
-                    
-                    if (goldEl && gd.price) goldEl.innerText = gd.price.toFixed(2);
-                    if (silverEl && sd.price) silverEl.innerText = sd.price.toFixed(2);
-                    if (inrEl && inr.rates && inr.rates.INR) inrEl.innerText = inr.rates.INR.toFixed(2);
-                    
-                    console.log('✅ Global rates updated - Gold:', gd.price, 'Silver:', sd.price, 'USD/INR:', inr.rates.INR);
-                } catch (e) { 
-                    console.error("API fetch failed:", e);
-                    // Set fallback values so UI never shows "--"
-                    const goldEl = document.getElementById('global-gold');
-                    const silverEl = document.getElementById('global-silver');
-                    const inrEl = document.getElementById('global-inr');
-                    if (goldEl && goldEl.innerText === '--') goldEl.innerText = '2,350';
-                    if (silverEl && silverEl.innerText === '--') silverEl.innerText = '28.50';
-                    if (inrEl && inrEl.innerText === '--') inrEl.innerText = '86.50';
-                }
-            };
-        }
-        
-        // Run fetchGlobal immediately and set interval
-        setTimeout(() => {
-            if (typeof window.fetchGlobal === 'function') {
-                window.fetchGlobal();
-                if (!window.globalRateInterval) {
-                    window.globalRateInterval = setInterval(window.fetchGlobal, 30000);
-                }
-            }
-        }, 500);
-        
-        // Fix clock display to show AM/PM correctly
-        if (typeof updateClock === 'function') {
-            const originalClock = updateClock;
-            window.updateClock = function() {
-                const now = new Date();
-                const clockEl = document.getElementById('real-time-clock');
-                if (clockEl) {
-                    clockEl.innerText = now.toLocaleTimeString('en-US', { 
-                        hour: '2-digit', 
-                        minute: '2-digit', 
-                        second: '2-digit', 
-                        hour12: true 
-                    });
-                }
-            };
-            window.updateClock();
-            if (!window.clockInterval) {
-                window.clockInterval = setInterval(window.updateClock, 1000);
-            }
-        }
-    })();
-    </script>
-
-
-<script>
-    // ========== FIX: ENSURE GREEN LIVE STATUS & RATES WORK ==========
-    (function() {
-        // Fix socket connection to show GREEN "Live" status
-        if (typeof socket !== 'undefined') {
-            // Override the existing socket connect handler to ensure green color
-            const originalOnConnect = socket.on;
-            socket.on('connect', () => {
-                const sh = document.getElementById('status-header');
-                const statusDot = sh?.querySelector('.status-dot');
-                const statusText = document.getElementById('status-text');
+        /**
+         * This function monitors the socket connection. 
+         * When 'Live' status is achieved, it refreshes the FULL page once.
+         */
+        function initLiveStatusRefresh() {
+            // Check if the socket object from your main script is initialized
+            if (typeof socket !== 'undefined') {
                 
-                if (sh) {
-                    sh.className = "text-[7px] font-bold text-green-600 uppercase flex items-center";
-                    if (statusDot) statusDot.className = "status-dot bg-green-600";
-                    if (statusText) statusText.innerText = "Live";
-                }
-                socket.emit('client', "");
-            });
-        }
-        
-        // Fix fetchGlobal to ensure rates display
-        if (typeof window.fetchGlobal !== 'function') {
-            window.fetchGlobal = async function() {
-                try {
-                    const responses = await Promise.all([
-                        fetch("https://api.gold-api.com/price/XAU"),
-                        fetch("https://api.gold-api.com/price/XAG"),
-                        fetch("https://api.exchangerate-api.com/v4/latest/USD")
-                    ]);
-                    const gd = await responses[0].json();
-                    const sd = await responses[1].json();
-                    const inr = await responses[2].json();
+                socket.on('connect', () => {
+                    // 1. Update the Top Bar UI to 'LIVE' manually before refresh
+                    // Note: Your file uses the '.fa-circle' class for the status dot
+                    const statusIcon = document.querySelector('.fa-circle');
+                    const statusText = document.getElementById('status-text');
                     
-                    const goldEl = document.getElementById('global-gold');
-                    const silverEl = document.getElementById('global-silver');
-                    const inrEl = document.getElementById('global-inr');
+                    if (statusIcon) {
+                        statusIcon.classList.remove('text-red-500', 'bg-red-600');
+                        statusIcon.classList.add('text-green-500', 'bg-green-600', 'animate-pulse');
+                    }
                     
-                    if (goldEl && gd.price) goldEl.innerText = gd.price.toFixed(2);
-                    if (silverEl && sd.price) silverEl.innerText = sd.price.toFixed(2);
-                    if (inrEl && inr.rates && inr.rates.INR) inrEl.innerText = inr.rates.INR.toFixed(2);
-                } catch (e) { 
-                    console.error("API failed:", e);
-                    // Set fallback values
-                    const goldEl = document.getElementById('global-gold');
-                    const silverEl = document.getElementById('global-silver');
-                    const inrEl = document.getElementById('global-inr');
-                    if (goldEl && goldEl.innerText === '--') goldEl.innerText = '2,350';
-                    if (silverEl && silverEl.innerText === '--') silverEl.innerText = '28.50';
-                    if (inrEl && inrEl.innerText === '--') inrEl.innerText = '86.50';
-                }
-            };
-        }
-        
-        // Run fetchGlobal immediately
-        setTimeout(() => {
-            if (typeof window.fetchGlobal === 'function') {
-                window.fetchGlobal();
-                if (!window.globalRateInterval) {
-                    window.globalRateInterval = setInterval(window.fetchGlobal, 30000);
-                }
+                    if (statusText) {
+                        statusText.innerText = 'Live';
+                    }
+
+                    // 2. Perform the FULL PAGE REFRESH
+                    // We use sessionStorage to ensure the refresh only happens ONCE per session
+                    // This prevents an infinite reloading loop.
+                    if (!sessionStorage.getItem('terminal_auto_reload_done')) {
+                        sessionStorage.setItem('terminal_auto_reload_done', 'true');
+                        
+                        console.log('📡 Terminal Connected: Refreshing full page...');
+                        
+                        // 500ms delay to let the user see the "Live" status change before the blink
+                        setTimeout(() => {
+                            window.location.reload(); 
+                        }, 500);
+                    }
+                });
+
+                // Optional: Reset the flag on disconnect so it can refresh again if connection is lost and recovered
+                socket.on('disconnect', () => {
+                    sessionStorage.removeItem('terminal_auto_reload_done');
+                });
+
+            } else {
+                // If socket isn't ready yet, check again in 500ms
+                setTimeout(initLiveStatusRefresh, 500);
             }
-        }, 1000);
-        
-        // Ensure clock shows AM/PM
-        if (typeof updateClock !== 'function') {
-            window.updateClock = function() {
-                const now = new Date();
-                const clockEl = document.getElementById('real-time-clock');
-                if (clockEl) {
-                    clockEl.innerText = now.toLocaleTimeString('en-US', { 
-                        hour: '2-digit', 
-                        minute: '2-digit', 
-                        second: '2-digit', 
-                        hour12: true 
-                    });
-                }
-            };
-            window.updateClock();
-            setInterval(window.updateClock, 1000);
         }
+
+        // Start the monitor
+        initLiveStatusRefresh();
     })();
-    </script>
-
-
-<script>
-/**       NEW CODE FOR MAKING INDIPENDENT OFFICIAL BOOKING RATES 
- * OVERRIDE: REMOVE CONNECTION OF STOP BOOKING FOR OFFICIAL BOOKING RATES
- * This function ensures that clicking on Official Booking Rates (Manual Rates) 
- * always opens the booking popup, regardless of the 'stopGold' or 'stopSilver' 
- * status in the admin settings.
- */
-(function() {
-    // We redefine handleManualBooking to bypass stop-booking checks
-    window.handleManualBooking = function(label, id, type) {
-        // Retrieve the current live manual rate from global storage
-        const currentRate = window.currentLiveManualRates ? window.currentLiveManualRates[id] : null;
-        
-        if (!currentRate) {
-            console.error("Rate not found for:", id);
-            return;
-        }
-
-
-        // Determine unit and limits based on type
-        const isGold = type.toLowerCase() === 'gold';
-        const unit = isGold ? 'Grams' : 'Kg';
-        const minQty = isGold ? 10 : 1;
-        const maxQty = isGold ? 500 : 100;
-        const step = isGold ? 10 : 1;
-
-
-        // Populate the Buy Popup directly
-        const popup = document.getElementById('buy-popup');
-        const badge = document.getElementById('popup-badge');
-        const title = document.getElementById('popup-title');
-        const rateEl = document.getElementById('popup-rate');
-        const qtyInput = document.getElementById('order-qty');
-        const unitLabel = document.getElementById('unit-label');
-        const slider = document.getElementById('qty-slider');
-        const sliderMin = document.getElementById('slider-min');
-        const sliderMax = document.getElementById('slider-max');
-
-
-        if (popup) {
-            // Set UI elements
-            if (badge) badge.innerText = label;
-            if (title) title.innerText = label;
-            if (rateEl) rateEl.innerText = currentRate.toLocaleString('en-IN');
-            if (unitLabel) unitLabel.innerText = unit;
-            
-            // Set Input and Slider properties
-            if (qtyInput) {
-                qtyInput.value = minQty;
-                qtyInput.min = minQty;
-            }
-            if (slider) {
-                slider.min = minQty;
-                slider.max = maxQty;
-                slider.step = step;
-                slider.value = minQty;
-            }
-            if (sliderMin) sliderMin.innerText = minQty + (isGold ? 'g' : 'kg');
-            if (sliderMax) sliderMax.innerText = maxQty + (isGold ? 'g' : 'kg');
-
-
-            // Store metadata for the order confirmation
-            window.currentBookingType = 'manual';
-            window.currentBookingProduct = label;
-            window.currentBookingRate = currentRate;
-            window.currentBookingCategory = type;
-
-
-            // Show the popup
-            popup.classList.remove('panel-hidden', 'invisible');
-            popup.classList.add('panel-visible');
-            
-            // Update total price immediately
-            if (typeof updateTotalPrice === 'function') {
-                updateTotalPrice();
-            }
-            
-            console.log(`%c🔓 Manual Booking Opened: ${label} (Bypassing Stop Status)`, "color: #4ade80; font-weight: bold;");
-        }
-    };
-})();
 </script>
 
 
-<style>
-    /* IMPROVED BOTTOM BAR BUTTON GAP MANAGEMENT */
-    nav.fixed.bottom-0 {
-        padding-left: 0.5rem;
-        padding-right: 0.5rem;
-        padding-bottom: calc(env(safe-area-inset-bottom) + 12px); /* Adds padding for iPhone notch */
-        height: 70px;
-        display: flex;
-        align-items: center;
-    }
-
-
-    nav.fixed.bottom-0 .flex.justify-between {
-        display: flex;
-        justify-content: space-around; /* Distributes items with equal space around them */
-        align-items: center;
-        width: 100%;
-        gap: 4px; /* Minimum gap to prevent touching */
-    }
-
-
-    .nav-item {
-        flex: 1; /* Ensures each button takes up equal width */
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        transition: all 0.2s ease;
-        padding: 8px 0;
-        border-radius: 12px;
-        min-width: 0; /* Prevents flex items from overflowing */
-    }
-
-
-    /* Active State Highlight */
-    .nav-item.text-amber-500 {
-        background: rgba(245, 158, 11, 0.05); /* Subtle glow for the active button */
-    }
-
-
-    /* Icon and Text Scaling for better fit */
-    .nav-item i {
-        font-size: 1.25rem !important;
-        margin-bottom: 4px;
-    }
-
-
-    .nav-item span {
-        font-size: 7px !important; /* Slightly smaller to ensure no text wrapping */
-        letter-spacing: 0.05em;
-        white-space: nowrap;
-    }
-</style>
+<script>
+    /**       NEW CODE FOR MAKING INDIPENDENT OFFICIAL BOOKING RATES 
+     * OVERRIDE: REMOVE CONNECTION OF STOP BOOKING FOR OFFICIAL BOOKING RATES
+     * This function ensures that clicking on Official Booking Rates (Manual Rates) 
+     * always opens the booking popup, regardless of the 'stopGold' or 'stopSilver' 
+     * status in the admin settings.
+     */
+    (function() {
+        // We redefine handleManualBooking to bypass stop-booking checks
+        window.handleManualBooking = function(label, id, type) {
+            // Retrieve the current live manual rate from global storage
+            const currentRate = window.currentLiveManualRates ? window.currentLiveManualRates[id] : null;
+            
+            if (!currentRate) {
+                console.error("Rate not found for:", id);
+                return;
+            }
+    
+    
+            // Determine unit and limits based on type
+            const isGold = type.toLowerCase() === 'gold';
+            const unit = isGold ? 'Grams' : 'Kg';
+            const minQty = isGold ? 10 : 1;
+            const maxQty = isGold ? 500 : 100;
+            const step = isGold ? 10 : 1;
+    
+    
+            // Populate the Buy Popup directly
+            const popup = document.getElementById('buy-popup');
+            const badge = document.getElementById('popup-badge');
+            const title = document.getElementById('popup-title');
+            const rateEl = document.getElementById('popup-rate');
+            const qtyInput = document.getElementById('order-qty');
+            const unitLabel = document.getElementById('unit-label');
+            const slider = document.getElementById('qty-slider');
+            const sliderMin = document.getElementById('slider-min');
+            const sliderMax = document.getElementById('slider-max');
+    
+    
+            if (popup) {
+                // Set UI elements
+                if (badge) badge.innerText = label;
+                if (title) title.innerText = label;
+                if (rateEl) rateEl.innerText = currentRate.toLocaleString('en-IN');
+                if (unitLabel) unitLabel.innerText = unit;
+                
+                // Set Input and Slider properties
+                if (qtyInput) {
+                    qtyInput.value = minQty;
+                    qtyInput.min = minQty;
+                }
+                if (slider) {
+                    slider.min = minQty;
+                    slider.max = maxQty;
+                    slider.step = step;
+                    slider.value = minQty;
+                }
+                if (sliderMin) sliderMin.innerText = minQty + (isGold ? 'g' : 'kg');
+                if (sliderMax) sliderMax.innerText = maxQty + (isGold ? 'g' : 'kg');
+    
+    
+                // Store metadata for the order confirmation
+                window.currentBookingType = 'manual';
+                window.currentBookingProduct = label;
+                window.currentBookingRate = currentRate;
+                window.currentBookingCategory = type;
+    
+    
+                // Show the popup
+                popup.classList.remove('panel-hidden', 'invisible');
+                popup.classList.add('panel-visible');
+                
+                // Update total price immediately
+                if (typeof updateTotalPrice === 'function') {
+                    updateTotalPrice();
+                }
+                
+                console.log(`%c🔓 Manual Booking Opened: ${label} (Bypassing Stop Status)`, "color: #4ade80; font-weight: bold;");
+            }
+        };
+    })();
+    </script>
 
 
 
@@ -4890,8 +4622,6 @@ socket.on('mainProduct', (data) => {
 </script>
 
 
-
-
-
+    
 </body>
 </html>
