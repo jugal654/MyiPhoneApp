@@ -1,10 +1,10 @@
-
+﻿
 ﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SHREE GOLD Ã¢â‚¬Â¢ PROFESSIONAL TERMINAL</title>
+    <title>SHREE GOLD PROFESSIONAL TERMINAL</title>
     <script src="js/tailwindcss.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
@@ -547,6 +547,12 @@ input[type=range]::-webkit-slider-runnable-track {
         font-size: 1.3rem !important;
     }
 }
+
+        /* Slider progress bar styling */
+#qty-slider {
+            background: linear-gradient(to right, #b45309 0%, #b45309 0%, #e5e7eb 0%, #e5e7eb 100%);
+            transition: background 0.1s ease;
+        }
     </style>
 </head>
 <body class="max-w-md mx-auto relative shadow-2xl">
@@ -1323,6 +1329,112 @@ input[type=range]::-webkit-slider-runnable-track {
 
 
         const db = getFirestore(firestoreApp);
+
+                // ==========================================
+        // USER LIMITS & PROFILE SYNCHRONIZATION
+        // ==========================================
+        
+        window.currentUserLimits = {
+            goldLimitEnabled: true,
+            goldMaxGrams: 300,
+            silverLimitEnabled: true,
+            silverMaxGrams: 15000
+        };
+        window.currentUserProfile = null;
+
+        window.syncUserLimits = function() {
+            if (typeof window.getUserDataFromStorage !== 'function') return;
+            const userData = window.getUserDataFromStorage();
+            
+            if (userData && userData.isLoggedIn) {
+                let docId = userData.userId || localStorage.getItem('shree_user_id') || localStorage.getItem('userId') || localStorage.getItem('user_id');
+                let rawPhone = userData.phone || '';
+                let cleanPhone = rawPhone.replace(/\D/g, '');
+                
+                if (!docId && cleanPhone) {
+                    docId = cleanPhone;
+                }
+
+                if (window.userLimitsUnsubscribe) {
+                    window.userLimitsUnsubscribe();
+                }
+
+                const handleUserData = (data) => {
+                    if (!data) return;
+                    
+                    window.currentUserProfile = {
+                        username: data.username || userData.username || 'Guest',
+                        name: data.username || userData.name || 'Guest',
+                        phone: data.phone || userData.phone || 'Not provided',
+                        address: data.address || userData.address || 'Not provided',
+                        gst: data.gst || userData.gst || 'Not provided',
+                        email: data.email || userData.email || '',
+                        userId: docId,
+                        isLoggedIn: true
+                    };
+
+                    if (data.bookingLimits) {
+                        window.currentUserLimits = {
+                            goldLimitEnabled: data.bookingLimits.goldLimitEnabled !== false,
+                            goldMaxGrams: data.bookingLimits.goldMaxGrams ?? 300,
+                            silverLimitEnabled: data.bookingLimits.silverLimitEnabled !== false,
+                            silverMaxGrams: data.bookingLimits.silverMaxGrams ?? 15000
+                        };
+                        console.log('%c✅ Profile & Limits live updated from Firestore', 'color: #10b981; font-weight: bold;');
+                        
+                        const buyPopup = document.getElementById('buy-popup');
+                        if (buyPopup && !buyPopup.classList.contains('invisible')) {
+                            const activeTitle = document.getElementById('popup-title')?.innerText || '';
+                            const activeRateRaw = document.getElementById('popup-rate')?.innerText || '0';
+                            const activeRate = parseFloat(activeRateRaw.replace(/[^\d.]/g, '')) || 0;
+                            
+                            if (activeTitle && activeRate > 0 && typeof window.updatePopupLimitsAndInfo === 'function') {
+                                window.updatePopupLimitsAndInfo(activeTitle, activeRate);
+                            }
+                        }
+                    }
+                };
+
+                if (cleanPhone) {
+                    const usersColl = collection(db, 'users');
+                    const q = query(usersColl, where('phone', 'in', [rawPhone, cleanPhone, `+91${cleanPhone}`, `91${cleanPhone}`]));
+                    
+                    window.userLimitsUnsubscribe = onSnapshot(q, (querySnap) => {
+                        if (!querySnap.empty) {
+                            handleUserData(querySnap.docs[0].data());
+                        } else if (docId) {
+                            const userRef = doc(db, 'users', docId);
+                            onSnapshot(userRef, (docSnap) => {
+                                if (docSnap.exists()) {
+                                    handleUserData(docSnap.data());
+                                }
+                            });
+                        }
+                    }, (err) => {
+                        console.error("Firestore limit synchronization error:", err);
+                    });
+                } else if (docId) {
+                    const userRef = doc(db, 'users', docId);
+                    window.userLimitsUnsubscribe = onSnapshot(userRef, (docSnap) => {
+                        if (docSnap.exists()) {
+                            handleUserData(docSnap.data());
+                        }
+                    }, (err) => {
+                        console.error("Firestore direct lookup error:", err);
+                    });
+                }
+            }
+        };
+
+        window.addEventListener('load', () => {
+            setTimeout(window.syncUserLimits, 1500);
+        });
+        
+        window.addEventListener('storage', (e) => {
+            if (e.key === 'shree_user_logged_in' || e.key === 'shree_user_data') {
+                window.syncUserLimits();
+            }
+        });
         
         // Enable offline persistence for Firestore
         enableIndexedDbPersistence(db).catch((err) => {
@@ -3345,6 +3457,15 @@ const quantityManager = (() => {
         currentStep = 1;
     };
 
+
+    const updateSliderProgress = (value) => {
+                const { qtySlider } = getElements();
+                if (!qtySlider) return;
+                const min = parseFloat(qtySlider.min) || 0;
+                const max = parseFloat(qtySlider.max) || 100;
+                const percentage = max > min ? ((value - min) / (max - min)) * 100 : 0;
+                qtySlider.style.background = `linear-gradient(to right, #b45309 0%, #b45309 ${percentage}%, #e5e7eb ${percentage}%, #e5e7eb 100%)`;
+            };
     return { configure, change, set, reset, getCurrentMin: () => currentMinFloor, getCurrentMax: () => currentMaxLimit };
 })();
 
@@ -3361,80 +3482,128 @@ function parseWeightFromLabel(label) {
     return null;
 }
 
+
+        // ==========================================================
+        // UPDATE POPUP LIMITS AND INFO (with user limits)
+        // ==========================================================
+        window.updatePopupLimitsAndInfo = function(label, rate) {
+            const lowerLabel = label.toLowerCase().trim();
+            const isSilver = lowerLabel.includes('silver') || lowerLabel.includes('sl') || lowerLabel.includes('sil');
+            const badge = document.getElementById('popup-badge');
+            const unitLabel = document.getElementById('unit-label');
+            
+            document.getElementById('popup-title').innerText = label;
+            document.getElementById('popup-rate').innerText = " " + Math.floor(rate).toLocaleString('en-IN');
+
+            const detectedWeight = parseWeightFromLabel(label);
+            
+            const limits = window.currentUserLimits || {
+                goldLimitEnabled: true, goldMaxGrams: 300, 
+                silverLimitEnabled: true, silverMaxGrams: 15000
+            };
+
+            let defaultQty, absoluteMin, maxQty, step;
+
+            if (isSilver) {
+                badge.innerText = "Silver 999";
+                badge.className = "px-3 py-1 bg-gray-100 text-gray-600 text-[9px] font-bold rounded-full uppercase mb-2 inline-block";
+                unitLabel.innerText = "Grams";
+                window.pricePerUnit = rate / 1000; 
+
+                if (lowerLabel.includes("sil with gst")) {
+                    defaultQty = 15000;
+                    absoluteMin = 15000;
+                } else {
+                    defaultQty = detectedWeight || 1000; 
+                    absoluteMin = detectedWeight || 100;
+                }
+                
+                maxQty = limits.silverLimitEnabled ? limits.silverMaxGrams : 50000;
+                step = 100;
+            } else {
+                badge.innerText = "Gold 99.5";
+                badge.className = "px-3 py-1 bg-amber-100 text-amber-700 text-[9px] font-bold rounded-full uppercase mb-2 inline-block";
+                unitLabel.innerText = "Grams";
+                window.pricePerUnit = rate / 10; 
+
+                if (lowerLabel.includes("gld with gst")) {
+                    defaultQty = 100;
+                    absoluteMin = 100;
+                } else {
+                    defaultQty = detectedWeight || 10; 
+                    absoluteMin = detectedWeight || 1;
+                }
+                
+                maxQty = limits.goldLimitEnabled ? limits.goldMaxGrams : 2000;
+                step = 1;
+            }
+
+            if (absoluteMin > maxQty && maxQty > 0) {
+                absoluteMin = maxQty;
+                defaultQty = maxQty;
+            }
+
+            document.getElementById('slider-max').innerText = maxQty >= 1000 ? (maxQty / 1000) + "kg" : maxQty + "g";
+            
+            quantityManager.configure(absoluteMin, maxQty, step);
+            
+            const confirmBtn = document.getElementById('confirm-order-btn');
+            const errorMsg = document.getElementById('order-error-message');
+            
+            if (maxQty <= 0) {
+                if (errorMsg) {
+                    errorMsg.innerHTML = "Booking restricted by Admin (Limit Reached)";
+                    errorMsg.style.display = 'block';
+                }
+                if (confirmBtn) {
+                    confirmBtn.disabled = true;
+                    confirmBtn.style.opacity = '0.5';
+                }
+            } else {
+                if (errorMsg) errorMsg.style.display = 'none';
+                if (confirmBtn) {
+                    confirmBtn.disabled = false;
+                    confirmBtn.style.opacity = '1';
+                }
+            }
+            
+            const profile = window.currentUserProfile || getUserDataFromStorage();
+            document.getElementById('display-username').innerText = profile.username || 'Guest';
+            document.getElementById('display-phone').innerText = profile.phone || 'Not provided';
+            document.getElementById('display-address').innerText = profile.address || 'Not provided';
+            document.getElementById('display-gst').innerText = profile.gst || 'Not provided';
+            
+            const userInfoDisplay = document.getElementById('user-info-display');
+            if (profile.username || (profile.phone && profile.phone !== 'Not provided')) {
+                userInfoDisplay.classList.remove('hidden');
+            } else {
+                userInfoDisplay.classList.add('hidden');
+            }
+        };
 // ==========================================================
 // IMPROVED openBuyPopup FUNCTION
 // ==========================================================
 window.openBuyPopup = function(label, rate) {
-    const lowerLabel = label.toLowerCase().trim();
-    const isSilver = lowerLabel.includes('silver') || lowerLabel.includes('sl') || lowerLabel.includes('sil');
-    const badge = document.getElementById('popup-badge');
-    const unitLabel = document.getElementById('unit-label');
-    
-    quantityManager.reset();
-    
-    document.getElementById('popup-title').innerText = label;
-    document.getElementById('popup-rate').innerText = " " + Math.floor(rate).toLocaleString('en-IN');
-
-    const detectedWeight = parseWeightFromLabel(label);
-    let defaultQty, absoluteMin, maxQty, step;
-
-    if (isSilver) {
-        badge.innerText = "Silver 999";
-        badge.className = "px-3 py-1 bg-gray-100 text-gray-600 text-[9px] font-bold rounded-full uppercase mb-2 inline-block";
-        unitLabel.innerText = "Grams";
-        window.pricePerUnit = rate / 1000; 
-
-        if (lowerLabel.includes("sil with gst")) {
-            defaultQty = 15000;
-            absoluteMin = 15000;
-        } else {
-            defaultQty = detectedWeight || 1000; 
-            absoluteMin = detectedWeight || 100;
-        }
-        
-        maxQty = 30000;
-        step = 100;
-        document.getElementById('slider-max').innerText = "50kg";
-    } else {
-        badge.innerText = "Gold 99.5";
-        badge.className = "px-3 py-1 bg-amber-100 text-amber-700 text-[9px] font-bold rounded-full uppercase mb-2 inline-block";
-        unitLabel.innerText = "Grams";
-        window.pricePerUnit = rate / 10; 
-
-        if (lowerLabel.includes("gld with gst")) {
-            defaultQty = 100;
-            absoluteMin = 100;
-        } else {
-            defaultQty = detectedWeight || 10; 
-            absoluteMin = detectedWeight || 1;
-        }
-        
-        maxQty = 2000;
-        step = 1;
-        document.getElementById('slider-max').innerText = "2kg";
-    }
-
-    quantityManager.configure(absoluteMin, maxQty, step);
-    quantityManager.set(defaultQty);
-    
-    document.getElementById('order-error-message').style.display = 'none';
-    
-    const userData = getUserDataFromStorage();
-    document.getElementById('display-username').innerText = userData.name || userData.username || 'Guest';
-    document.getElementById('display-phone').innerText = userData.phone || 'Not provided';
-    document.getElementById('display-address').innerText = userData.address || 'Not provided';
-    document.getElementById('display-gst').innerText = userData.gst || 'Not provided';
-    
-    const userInfoDisplay = document.getElementById('user-info-display');
-    if (userData.username || userData.phone !== 'Not provided' || userData.address !== 'Not provided') {
-        userInfoDisplay.classList.remove('hidden');
-    } else {
-        userInfoDisplay.classList.add('hidden');
-    }
-    
-    document.getElementById('buy-popup').classList.remove('invisible');
-    document.getElementById('buy-popup').classList.replace('panel-hidden', 'panel-visible');
-};
+            window.updatePopupLimitsAndInfo(label, rate);
+            
+            const lowerLabel = label.toLowerCase().trim();
+            const isSilver = lowerLabel.includes('silver') || lowerLabel.includes('sl') || lowerLabel.includes('sil');
+            const limits = window.currentUserLimits || { goldLimitEnabled: true, goldMaxGrams: 300, silverLimitEnabled: true, silverMaxGrams: 15000 };
+            const maxQty = isSilver ? (limits.silverLimitEnabled ? limits.silverMaxGrams : 50000) : (limits.goldLimitEnabled ? limits.goldMaxGrams : 2000);
+            const detectedWeight = parseWeightFromLabel(label);
+            
+            let initialVal;
+            if (isSilver) {
+                initialVal = lowerLabel.includes("sil with gst") ? 15000 : (detectedWeight || 1000);
+            } else {
+                initialVal = lowerLabel.includes("gld with gst") ? 100 : (detectedWeight || 10);
+            }
+            
+            quantityManager.set(Math.min(initialVal, maxQty));
+            
+            document.getElementById('buy-popup').classList.remove('invisible');
+            document.getElementById('buy-popup').classList.replace('panel-hidden', 'panel-visible');
+        };
 
 // ==========================================================
 // IMPROVED closeBuyPopup
@@ -3533,6 +3702,35 @@ window.confirmOrder = async function(event) {
         window.location.href = 'login.html';
         return;
     }
+
+                // ========== ADD LIMIT CHECKS HERE ==========
+                const limits = window.currentUserLimits || { goldLimitEnabled: true, goldMaxGrams: 300, silverLimitEnabled: true, silverMaxGrams: 15000 };
+            const qty = parseFloat(document.getElementById('order-qty')?.value) || 0;
+            const productTitle = document.getElementById('popup-title')?.innerText?.toLowerCase() || '';
+            const isSilver = productTitle.includes('silver') || productTitle.includes('sl') || productTitle.includes('sil');
+
+            if (isSilver && limits.silverLimitEnabled && qty > limits.silverMaxGrams) {
+                alert(`⚠️ Admin has restricted your Silver booking to maximum ${limits.silverMaxGrams}g per order.`);
+                quantityManager.set(limits.silverMaxGrams);
+                if (confirmBtn) {
+                    confirmBtn.innerHTML = originalText;
+                    confirmBtn.disabled = false;
+                    confirmBtn.style.opacity = '1';
+                }
+                return;
+            }
+            
+            if (!isSilver && limits.goldLimitEnabled && qty > limits.goldMaxGrams) {
+                alert(`⚠️ Admin has restricted your Gold booking to maximum ${limits.goldMaxGrams}g per order.`);
+                quantityManager.set(limits.goldMaxGrams);
+                if (confirmBtn) {
+                    confirmBtn.innerHTML = originalText;
+                    confirmBtn.disabled = false;
+                    confirmBtn.style.opacity = '1';
+                }
+                return;
+            }
+            // ========== END LIMIT CHECKS ==========
     
     const confirmBtn = event?.target || document.querySelector('button[onclick="confirmOrder(event)"]');
     const originalText = confirmBtn?.innerText || 'Confirm Order';
@@ -4621,6 +4819,214 @@ socket.on('connect', () => {
 })();
 </script>
 
+
+<!-- ========== ADVERTISEMENT BANNER (CENTER SCREEN, ONCE PER SESSION) ========== -->
+<!-- Insert this entire block just before the closing </body> tag -->
+
+<style>
+    /* Overlay - full screen dimmed background */
+    .adv-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.75);
+        backdrop-filter: blur(4px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 10000;
+        visibility: hidden;
+        opacity: 0;
+        transition: visibility 0s linear 0.2s, opacity 0.25s ease-out;
+    }
+
+    .adv-overlay.active {
+        visibility: visible;
+        opacity: 1;
+        transition: visibility 0s linear 0s, opacity 0.25s ease-in;
+    }
+
+    /* Banner container - perfectly centered */
+    .adv-banner {
+        max-width: 90vw;
+        max-height: 90vh;
+        background: transparent;
+        border-radius: 24px;
+        overflow: hidden;
+        box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4);
+        animation: advPopIn 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+        position: relative;
+        line-height: 0;
+    }
+
+    /* Banner image */
+    .adv-banner img {
+        display: block;
+        width: auto;
+        height: auto;
+        max-width: 100%;
+        max-height: 85vh;
+        object-fit: contain;
+        cursor: pointer;
+        border-radius: 20px;
+    }
+
+    /* Close button (X) */
+    .adv-close-btn {
+        position: absolute;
+        top: 12px;
+        right: 16px;
+        background: rgba(0, 0, 0, 0.65);
+        backdrop-filter: blur(8px);
+        color: white;
+        border: none;
+        font-size: 1.6rem;
+        font-weight: bold;
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        z-index: 10;
+        font-family: monospace;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    }
+
+    .adv-close-btn:hover {
+        background: rgba(220, 50, 50, 0.9);
+        transform: scale(1.05);
+    }
+
+    @keyframes advPopIn {
+        0% {
+            opacity: 0;
+            transform: scale(0.92) translateY(15px);
+        }
+        100% {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+        }
+    }
+
+    @media (max-width: 640px) {
+        .adv-close-btn {
+            width: 32px;
+            height: 32px;
+            font-size: 1.4rem;
+            top: 8px;
+            right: 10px;
+        }
+    }
+</style>
+
+<div id="advertisementOverlay" class="adv-overlay">
+    <div class="adv-banner">
+        <button class="adv-close-btn" id="closeAdBtn" aria-label="Close advertisement">✖</button>
+        <img id="adBannerImage" src="adv.png" alt="Special Offer" onerror="handleAdImageError()">
+    </div>
+</div>
+
+<script>
+    (function() {
+        // ----- ADVERTISEMENT CONTROLLER -----
+        // Shows banner once per page load, exactly 4 seconds after page becomes interactive.
+        
+        let adShown = false;          // Prevents duplicate showing
+        let adTimer = null;           // Timeout reference
+        const overlay = document.getElementById('advertisementOverlay');
+        const closeBtn = document.getElementById('closeAdBtn');
+        const adImage = document.getElementById('adBannerImage');
+        
+        // Function to display the ad banner (center screen)
+        function showAdBanner() {
+            if (adShown) return;
+            if (!overlay) return;
+            
+            adShown = true;
+            if (adTimer) {
+                clearTimeout(adTimer);
+                adTimer = null;
+            }
+            overlay.classList.add('active');
+        }
+        
+        // Function to close/dismiss the ad banner
+        function closeAdBanner() {
+            if (!overlay) return;
+            overlay.classList.remove('active');
+        }
+        
+        // Fallback: if adv.png is missing, show a subtle placeholder
+        function handleAdImageError() {
+            if (adImage && !adImage.hasAttribute('data-fallback-set')) {
+                adImage.setAttribute('data-fallback-set', 'true');
+                // Create a clean placeholder SVG so the banner still looks decent
+                const placeholderSVG = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='550' height='350' viewBox='0 0 550 350'%3E%3Crect width='550' height='350' fill='%232c3e50'/%3E%3Ctext x='50%25' y='45%25' dominant-baseline='middle' text-anchor='middle' font-family='Arial, sans-serif' font-size='24' fill='%23f39c12' font-weight='bold'%3EADVERTISEMENT%3C/text%3E%3Ctext x='50%25' y='60%25' dominant-baseline='middle' text-anchor='middle' font-family='Arial, sans-serif' font-size='14' fill='%23bdc3c7'%3ESpecial Offer Coming Soon%3C/text%3E%3C/svg%3E";
+                adImage.src = placeholderSVG;
+                adImage.alt = "Advertisement";
+            }
+        }
+        
+        // Setup event listeners
+        if (closeBtn) {
+            closeBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                closeAdBanner();
+            });
+        }
+        
+        // Clicking on image also closes the ad (user-friendly)
+        if (adImage) {
+            adImage.addEventListener('click', function(e) {
+                e.stopPropagation();
+                closeAdBanner();
+            });
+        }
+        
+        // Clicking on the overlay background closes the ad as well
+        if (overlay) {
+            overlay.addEventListener('click', function(e) {
+                if (e.target === overlay) {
+                    closeAdBanner();
+                }
+            });
+        }
+        
+        // Handle image loading error gracefully
+        if (adImage) {
+            adImage.onerror = handleAdImageError;
+        }
+        
+        // Start the 4-second timer to show the ad ONCE on every page open
+        function startAdTimer() {
+            if (adTimer) clearTimeout(adTimer);
+            adTimer = setTimeout(function() {
+                showAdBanner();
+            }, 4000);  // Exactly 4 seconds delay
+        }
+        
+        startAdTimer();
+        
+        // Special handling for when page is restored from bfcache (back/forward navigation)
+        window.addEventListener('pageshow', function(event) {
+            if (event.persisted) {
+                // Reset state so the ad can appear again on this "new" view
+                adShown = false;
+                if (overlay) overlay.classList.remove('active');
+                if (adTimer) clearTimeout(adTimer);
+                startAdTimer();
+            }
+        });
+        
+        console.log('✅ Ad banner initialized — will show "adv.png" at center after 4 seconds (once per page load)');
+    })();
+</script>
+<!-- ========== END ADVERTISEMENT BANNER CODE ========== -->
 
     
 </body>
