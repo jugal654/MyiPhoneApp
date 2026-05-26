@@ -1,4 +1,4 @@
-﻿
+
 ﻿<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -4820,9 +4820,7 @@ socket.on('connect', () => {
 </script>
 
 
-<!-- ========== ADVERTISEMENT BANNER (CENTER SCREEN, ONCE PER SESSION) ========== -->
-<!-- Insert this entire block just before the closing </body> tag -->
-
+<!-- ========== DYNAMIC ADVERTISEMENT BANNER (FROM FIREBASE) ========== -->
 <style>
     /* Overlay - full screen dimmed background */
     .adv-overlay {
@@ -4927,107 +4925,599 @@ socket.on('connect', () => {
 <div id="advertisementOverlay" class="adv-overlay">
     <div class="adv-banner">
         <button class="adv-close-btn" id="closeAdBtn" aria-label="Close advertisement">✖</button>
-        <img id="adBannerImage" src="adv.png" alt="Special Offer" onerror="handleAdImageError()">
+        <img id="adBannerImage" src="" alt="Advertisement">
     </div>
 </div>
 
+<script type="module">
+    import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+    // Reuse the existing Firebase app
+    let db;
+    try {
+        const existingApp = firebase.app('realtime');
+        db = getDatabase(existingApp);
+    } catch(e) {
+        console.warn("Creating new Firebase app for ads");
+        const { initializeApp } = await import("https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js");
+        const firebaseConfig = {
+            apiKey: "AIzaSyBIghUCcQUxCcfYJOdCMgPsTuRSgnJpe6E",
+            authDomain: "shreegold-120eb.firebaseapp.com",
+            databaseURL: "https://shreegold-120eb-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "shreegold-120eb",
+            storageBucket: "shreegold-120eb.firebasestorage.app",
+            messagingSenderId: "915011378925",
+            appId: "1:915011378925:web:c03003bc7eca3ccc0bb6e4"
+        };
+        const fallbackApp = initializeApp(firebaseConfig, 'adApp');
+        db = getDatabase(fallbackApp);
+    }
+
+    const adRef = ref(db, "admin/advertisement");
+    let adTimer = null;
+    let autoCloseTimer = null;
+    let adShown = false;
+    const overlay = document.getElementById('advertisementOverlay');
+    const adImage = document.getElementById('adBannerImage');
+    const closeBtn = document.getElementById('closeAdBtn');
+
+    // Track if ad was shown in this session
+    const SESSION_KEY = 'shree_ad_shown_this_session';
+
+    function showDynamicAd(adData) {
+        // Check if already shown this session
+        if (adData.showOncePerSession === true) {
+            if (sessionStorage.getItem(SESSION_KEY) === 'true') {
+                console.log('Ad already shown this session, skipping');
+                return;
+            }
+        }
+
+        if (adShown || !adData) return;
+        
+        // Check if ad is enabled
+        if (adData.enabled === false) return;
+
+        // Set image
+        if (adData.imageUrl) {
+            adImage.src = adData.imageUrl;
+            adImage.alt = adData.altText || "Advertisement";
+            
+            // Add click handler if clickUrl exists
+            if (adData.clickUrl) {
+                adImage.style.cursor = "pointer";
+                if (adImage._adClickHandler) {
+                    adImage.removeEventListener('click', adImage._adClickHandler);
+                }
+                adImage._adClickHandler = () => {
+                    window.open(adData.clickUrl, '_blank');
+                    closeAdBanner();
+                };
+                adImage.addEventListener('click', adImage._adClickHandler);
+            } else {
+                adImage.style.cursor = "default";
+            }
+        }
+
+        adShown = true;
+        
+        // Mark as shown in this session
+        if (adData.showOncePerSession === true) {
+            sessionStorage.setItem(SESSION_KEY, 'true');
+        }
+        
+        overlay.classList.add('active');
+
+        // Auto-close after duration (if specified)
+        const duration = adData.duration || 5000;
+        if (duration > 0) {
+            if (autoCloseTimer) clearTimeout(autoCloseTimer);
+            autoCloseTimer = setTimeout(() => {
+                closeAdBanner();
+            }, duration);
+        }
+    }
+
+    function closeAdBanner() {
+        if (overlay) overlay.classList.remove('active');
+        if (autoCloseTimer) {
+            clearTimeout(autoCloseTimer);
+            autoCloseTimer = null;
+        }
+    }
+
+    // Close button handler
+    if (closeBtn) {
+        closeBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            closeAdBanner();
+        });
+    }
+
+    // Click on overlay background closes ad
+    if (overlay) {
+        overlay.addEventListener('click', (e) => {
+            if (e.target === overlay) closeAdBanner();
+        });
+    }
+
+    // Listen for ad changes from Firebase
+    onValue(adRef, (snapshot) => {
+        const adData = snapshot.val();
+        if (adData) {
+            // Clear any existing timers
+            if (adTimer) clearTimeout(adTimer);
+            
+            // Use the delay from Firebase (default 4000ms)
+            const delay = adData.delay || 4000;
+            adTimer = setTimeout(() => showDynamicAd(adData), delay);
+        }
+    });
+
+    // Reset on page restore (back/forward navigation)
+    window.addEventListener('pageshow', (event) => {
+        if (event.persisted) {
+            adShown = false;
+            if (overlay) overlay.classList.remove('active');
+            if (adTimer) clearTimeout(adTimer);
+            if (autoCloseTimer) clearTimeout(autoCloseTimer);
+            // Re-fetch latest ad data
+            onValue(adRef, (snapshot) => {
+                const adData = snapshot.val();
+                if (adData) {
+                    const delay = adData.delay || 4000;
+                    adTimer = setTimeout(() => showDynamicAd(adData), delay);
+                }
+            }, { onlyOnce: true });
+        }
+    });
+
+    console.log('✅ Dynamic ad system ready – fetching from Firebase admin/advertisement');
+    console.log('   Your ad settings: enabled, delay, duration, showOncePerSession all supported');
+</script>
+<!-- ========== END DYNAMIC ADVERTISEMENT BANNER ========== -->
+
+<!-- NOTIFICATION MANAGER CODE FOR WEB AND APP -->
+<!-- ========== ORDER CONFIRMATION MANAGER WITH GST & CONFIRMATION DIALOG ========== -->
 <script>
     (function() {
-        // ----- ADVERTISEMENT CONTROLLER -----
-        // Shows banner once per page load, exactly 4 seconds after page becomes interactive.
+        'use strict';
         
-        let adShown = false;          // Prevents duplicate showing
-        let adTimer = null;           // Timeout reference
-        const overlay = document.getElementById('advertisementOverlay');
-        const closeBtn = document.getElementById('closeAdBtn');
-        const adImage = document.getElementById('adBannerImage');
-        
-        // Function to display the ad banner (center screen)
-        function showAdBanner() {
-            if (adShown) return;
-            if (!overlay) return;
-            
-            adShown = true;
-            if (adTimer) {
-                clearTimeout(adTimer);
-                adTimer = null;
+        // ========== CONFIGURATION ==========
+        const CONFIG = {
+            GST_PERCENT: 3,
+            MAX_RETRY_ATTEMPTS: 50,
+            RETRY_INTERVAL_MS: 100,
+            FIREBASE_CONFIG: {
+                apiKey: "AIzaSyBIghUCcQUxCcfYJOdCMgPsTuRSgnJpe6E",
+                authDomain: "shreegold-120eb.firebaseapp.com",
+                databaseURL: "https://shreegold-120eb-default-rtdb.asia-southeast1.firebasedatabase.app",
+                projectId: "shreegold-120eb",
+                storageBucket: "shreegold-120eb.firebasestorage.app",
+                messagingSenderId: "915011378925",
+                appId: "1:915011378925:web:c03003bc7eca3ccc0bb6e4",
+                measurementId: "G-B714GY65N7"
             }
-            overlay.classList.add('active');
-        }
+        };
         
-        // Function to close/dismiss the ad banner
-        function closeAdBanner() {
-            if (!overlay) return;
-            overlay.classList.remove('active');
-        }
+        // ========== UTILITY FUNCTIONS ==========
+        const formatCurrency = (amount) => {
+            if (isNaN(amount)) amount = 0;
+            return `₹${amount.toLocaleString('en-IN')}`;
+        };
         
-        // Fallback: if adv.png is missing, show a subtle placeholder
-        function handleAdImageError() {
-            if (adImage && !adImage.hasAttribute('data-fallback-set')) {
-                adImage.setAttribute('data-fallback-set', 'true');
-                // Create a clean placeholder SVG so the banner still looks decent
-                const placeholderSVG = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='550' height='350' viewBox='0 0 550 350'%3E%3Crect width='550' height='350' fill='%232c3e50'/%3E%3Ctext x='50%25' y='45%25' dominant-baseline='middle' text-anchor='middle' font-family='Arial, sans-serif' font-size='24' fill='%23f39c12' font-weight='bold'%3EADVERTISEMENT%3C/text%3E%3Ctext x='50%25' y='60%25' dominant-baseline='middle' text-anchor='middle' font-family='Arial, sans-serif' font-size='14' fill='%23bdc3c7'%3ESpecial Offer Coming Soon%3C/text%3E%3C/svg%3E";
-                adImage.src = placeholderSVG;
-                adImage.alt = "Advertisement";
-            }
-        }
+        const sanitizeNumber = (value) => {
+            if (!value) return 0;
+            const cleaned = String(value).replace(/[^0-9]/g, '');
+            return parseInt(cleaned, 10) || 0;
+        };
         
-        // Setup event listeners
-        if (closeBtn) {
-            closeBtn.addEventListener('click', function(e) {
-                e.stopPropagation();
-                closeAdBanner();
-            });
-        }
-        
-        // Clicking on image also closes the ad (user-friendly)
-        if (adImage) {
-            adImage.addEventListener('click', function(e) {
-                e.stopPropagation();
-                closeAdBanner();
-            });
-        }
-        
-        // Clicking on the overlay background closes the ad as well
-        if (overlay) {
-            overlay.addEventListener('click', function(e) {
-                if (e.target === overlay) {
-                    closeAdBanner();
+        // ========== DATA EXTRACTION FUNCTIONS ==========
+        const DataExtractor = {
+            getBaseAmount() {
+                // Source 1: Total price element
+                const totalPriceEl = document.getElementById('total-price');
+                if (totalPriceEl?.innerText) {
+                    return sanitizeNumber(totalPriceEl.innerText);
                 }
-            });
-        }
-        
-        // Handle image loading error gracefully
-        if (adImage) {
-            adImage.onerror = handleAdImageError;
-        }
-        
-        // Start the 4-second timer to show the ad ONCE on every page open
-        function startAdTimer() {
-            if (adTimer) clearTimeout(adTimer);
-            adTimer = setTimeout(function() {
-                showAdBanner();
-            }, 4000);  // Exactly 4 seconds delay
-        }
-        
-        startAdTimer();
-        
-        // Special handling for when page is restored from bfcache (back/forward navigation)
-        window.addEventListener('pageshow', function(event) {
-            if (event.persisted) {
-                // Reset state so the ad can appear again on this "new" view
-                adShown = false;
-                if (overlay) overlay.classList.remove('active');
-                if (adTimer) clearTimeout(adTimer);
-                startAdTimer();
+                
+                // Source 2: Rate × Quantity
+                const rateEl = document.getElementById('rate-per-unit');
+                const quantityEl = document.getElementById('quantity');
+                if (rateEl?.innerText && quantityEl?.innerText) {
+                    const rate = sanitizeNumber(rateEl.innerText);
+                    const quantity = sanitizeNumber(quantityEl.innerText);
+                    if (rate && quantity) return rate * quantity;
+                }
+                
+                // Source 3: Data attribute
+                const amountAttr = document.querySelector('[data-amount]');
+                if (amountAttr) {
+                    return sanitizeNumber(amountAttr.getAttribute('data-amount'));
+                }
+                
+                return 0;
+            },
+            
+            getProductName() {
+                const productNameEl = document.getElementById('product-name');
+                const popupTitle = document.getElementById('popup-title');
+                return (productNameEl?.innerText || popupTitle?.innerText || 'GOLD').trim();
+            },
+            
+            getCustomerName() {
+                const userNameEl = document.getElementById('display-username');
+                if (userNameEl?.innerText?.trim()) {
+                    return userNameEl.innerText.trim();
+                }
+                
+                const nameInput = document.querySelector('[name="name"], [id="name"], [id="user-name"]');
+                if (nameInput?.value?.trim()) {
+                    return nameInput.value.trim();
+                }
+                
+                return 'Guest';
+            },
+            
+            getQuantity() {
+                const quantityEl = document.getElementById('quantity');
+                if (quantityEl?.innerText) {
+                    return sanitizeNumber(quantityEl.innerText) || 1;
+                }
+                
+                const quantityInput = document.querySelector('[name="quantity"], [id="qty"]');
+                if (quantityInput?.value) {
+                    return sanitizeNumber(quantityInput.value) || 1;
+                }
+                
+                return 1;
+            },
+            
+            calculateAmountWithGST(baseAmount) {
+                if (!baseAmount || isNaN(baseAmount)) return 0;
+                const gstAmount = (baseAmount * CONFIG.GST_PERCENT) / 100;
+                return Math.round(baseAmount + gstAmount);
+            },
+            
+            getFullOrderData() {
+                const baseAmount = this.getBaseAmount();
+                const finalAmount = this.calculateAmountWithGST(baseAmount);
+                
+                return {
+                    baseAmount,
+                    finalAmount,
+                    gstAmount: finalAmount - baseAmount,
+                    productName: this.getProductName(),
+                    customerName: this.getCustomerName(),
+                    quantity: this.getQuantity()
+                };
             }
-        });
+        };
         
-        console.log('✅ Ad banner initialized — will show "adv.png" at center after 4 seconds (once per page load)');
+        // ========== NOTIFICATION SERVICE (INSTANT, NO SUCCESS ALERT) ==========
+        const NotificationService = {
+            // Request notification permission
+            async requestPermission() {
+                if (!("Notification" in window)) {
+                    console.warn("Browser does not support notifications");
+                    return false;
+                }
+                if (Notification.permission === "granted") return true;
+                if (Notification.permission !== "denied") {
+                    const permission = await Notification.requestPermission();
+                    return permission === "granted";
+                }
+                return false;
+            },
+            
+            // Send instant browser notification (NO alert after this)
+            sendOrderReceivedNotification(orderData) {
+                if (!("Notification" in window)) return;
+                
+                if (Notification.permission !== "granted") {
+                    console.log("Notification not sent - permission not granted");
+                    return;
+                }
+                
+                const orderId = Math.floor(Date.now() / 1000).toString().slice(-8);
+                const title = `🪙 ORDER PLACED • ${orderData.customerName}`;
+                const body = `${orderData.productName} ×${orderData.quantity} | Total: ${formatCurrency(orderData.finalAmount)} (GST ${CONFIG.GST_PERCENT}%) | Order ID: #${orderId}`;
+                
+                try {
+                    const notification = new Notification(title, {
+                        body: body,
+                        icon: "https://cdn-icons-png.flaticon.com/512/180/180510.png",
+                        silent: false,
+                        requireInteraction: false
+                    });
+                    
+                    // Auto close after 4 seconds
+                    setTimeout(() => notification.close(), 4000);
+                    console.log("📢 Instant notification sent");
+                } catch (e) {
+                    console.warn("Notification error:", e);
+                }
+            },
+            
+            // Silent toast feedback (no alert)
+            showToast(message, isError = false) {
+                let toastDiv = document.getElementById('order-status-toast');
+                if (!toastDiv) {
+                    toastDiv = document.createElement('div');
+                    toastDiv.id = 'order-status-toast';
+                    toastDiv.style.cssText = `
+                        position: fixed;
+                        bottom: 20px;
+                        left: 50%;
+                        transform: translateX(-50%);
+                        background-color: #2e7d32;
+                        color: white;
+                        padding: 10px 20px;
+                        border-radius: 40px;
+                        font-size: 14px;
+                        font-weight: 500;
+                        z-index: 10000;
+                        opacity: 0;
+                        transition: opacity 0.3s ease;
+                        pointer-events: none;
+                        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+                        font-family: system-ui, -apple-system, sans-serif;
+                        white-space: nowrap;
+                        max-width: 90%;
+                        white-space: normal;
+                        text-align: center;
+                    `;
+                    document.body.appendChild(toastDiv);
+                }
+                
+                toastDiv.textContent = message;
+                toastDiv.style.backgroundColor = isError ? "#c62828" : "#2e7d32";
+                toastDiv.style.opacity = "1";
+                setTimeout(() => {
+                    if (toastDiv) toastDiv.style.opacity = "0";
+                }, 3000);
+            }
+        };
+        
+        // ========== FIREBASE SERVICE ==========
+        const FirebaseService = {
+            async pushOrder(orderData) {
+                try {
+                    const { initializeApp } = await import("https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js");
+                    const { getDatabase, ref, push } = await import("https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js");
+                    
+                    const appName = `orderApp_${Date.now()}_${Math.random().toString(36).substr(2, 8)}`;
+                    const app = initializeApp(CONFIG.FIREBASE_CONFIG, appName);
+                    const database = getDatabase(app);
+                    const ordersRef = ref(database, "orders");
+                    
+                    const enhancedData = {
+                        ...orderData,
+                        timestamp: new Date().toISOString(),
+                        serverTime: Date.now(),
+                        source: "web_order_with_confirmation",
+                        cancellationPolicy: "admin_only"
+                    };
+                    
+                    await push(ordersRef, enhancedData);
+                    return { success: true };
+                    
+                } catch (error) {
+                    console.error("Firebase error:", error);
+                    return { success: false, error: error.message };
+                }
+            }
+        };
+        
+        // ========== MAIN ORDER HANDLER ==========
+        let isOverridden = false;
+        
+        function createOrderHandler(originalConfirm) {
+            return async function(event) {
+                // Prevent default if needed
+                if (event?.preventDefault) event.preventDefault();
+                
+                // Extract order data
+                const orderData = DataExtractor.getFullOrderData();
+                
+                console.log("📦 Order initiated:", {
+                    customer: orderData.customerName,
+                    product: orderData.productName,
+                    amount: orderData.finalAmount
+                });
+                
+                // Validate amount
+                if (!orderData.finalAmount || orderData.finalAmount === 0) {
+                    NotificationService.showToast("⚠️ Unable to calculate order amount", true);
+                    return false;
+                }
+                
+                // ========== CONFIRMATION DIALOG (EXACT REQUIREMENT) ==========
+                // Message format: DEAR "NAME" ARE YOU SURE TO PLACE ORDER OF RS "" 
+                // BECAUSE ONCE PLACED ORDER CANNOT BE CANCEL
+                const confirmationMessage = 
+                    `DEAR ${orderData.customerName.toUpperCase()}, ARE YOU SURE TO PLACE ORDER OF ${formatCurrency(orderData.finalAmount)}?\n\n` +
+                    `⚠️ BECAUSE ONCE PLACED ORDER CANNOT BE CANCELED ⚠️\n\n` +
+                    `━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
+                    `ORDER DETAILS:\n` +
+                    `• Product: ${orderData.productName}\n` +
+                    `• Quantity: ${orderData.quantity}\n` +
+                    `• Base Amount: ${formatCurrency(orderData.baseAmount)}\n` +
+                    `• GST (${CONFIG.GST_PERCENT}%): ${formatCurrency(orderData.gstAmount)}\n` +
+                    `• TOTAL: ${formatCurrency(orderData.finalAmount)}\n` +
+                    `━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n` +
+                    `Press OK to confirm order\n` +
+                    `Press Cancel to decline`;
+                
+                // Show confirmation dialog
+                const userConfirmed = confirm(confirmationMessage);
+                
+                if (!userConfirmed) {
+                    // User cancelled - silent cancellation, no alert
+                    NotificationService.showToast("❌ Order cancelled", true);
+                    console.log("Order cancelled by user");
+                    return false;
+                }
+                
+                // ========== USER CONFIRMED - PROCESS ORDER ==========
+                try {
+                    // Call original order function if exists (non-blocking)
+                    if (typeof originalConfirm === 'function') {
+                        originalConfirm(event).catch(e => console.warn("Original order warning:", e));
+                    }
+                    
+                    // Prepare Firebase data
+                    const firebaseData = {
+                        name: orderData.customerName,
+                        product: orderData.productName,
+                        quantity: orderData.quantity,
+                        baseAmount: orderData.baseAmount,
+                        gstAmount: orderData.gstAmount,
+                        amount: orderData.finalAmount,
+                        gstPercent: CONFIG.GST_PERCENT,
+                        cancellationPolicy: "admin_only",
+                        confirmedByUser: true
+                    };
+                    
+                    // Push to Firebase in background
+                    FirebaseService.pushOrder(firebaseData).then(result => {
+                        if (result.success) {
+                            console.log("✅ Order saved to Firebase database");
+                        } else {
+                            console.warn("⚠️ Order placed but database sync issue:", result.error);
+                        }
+                    }).catch(err => {
+                        console.warn("⚠️ Background Firebase error:", err);
+                    });
+                    
+                    // Request notification permission if needed, then send instant notification
+                    if (Notification.permission === "default") {
+                        await NotificationService.requestPermission();
+                    }
+                    
+                    // Send INSTANT browser notification (NO SUCCESS ALERT)
+                    NotificationService.sendOrderReceivedNotification(orderData);
+                    
+                    // Show silent toast confirmation (NO ALERT POPUP)
+                    NotificationService.showToast(`✅ Order placed! ${formatCurrency(orderData.finalAmount)}`);
+                    
+                    console.log("✅ Order completed successfully - no alert shown, only notification");
+                    
+                    return true;
+                    
+                } catch (error) {
+                    console.error("Order processing error:", error);
+                    NotificationService.showToast(`Processing please wait.. ${formatCurrency(orderData.finalAmount)}`);
+                      return false;
+                }
+            };
+        }
+        
+        // ========== INITIALIZATION ==========
+        function overrideConfirmOrder() {
+            if (isOverridden) return true;
+            if (typeof window.confirmOrder !== 'function') return false;
+            
+            isOverridden = true;
+            const originalConfirm = window.confirmOrder;
+            window.confirmOrder = createOrderHandler(originalConfirm);
+            
+            console.log("✅ Order manager initialized with CONFIRMATION DIALOG + INSTANT NOTIFICATION (no success alert)");
+            return true;
+        }
+        
+        // Also handle direct button clicks
+        function setupDirectButtonHandler() {
+            const orderBtn = document.getElementById('orderNowBtn') || document.querySelector('.order-now-btn');
+            if (orderBtn && !orderBtn.hasAttribute('data-instant-handler')) {
+                orderBtn.setAttribute('data-instant-handler', 'true');
+                const newBtn = orderBtn.cloneNode(true);
+                orderBtn.parentNode?.replaceChild(newBtn, orderBtn);
+                newBtn.addEventListener('click', async (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    const orderData = DataExtractor.getFullOrderData();
+                    
+                    if (!orderData.finalAmount || orderData.finalAmount === 0) {
+                        NotificationService.showToast("⚠️ Unable to calculate amount", true);
+                        return;
+                    }
+                    
+                    // Show confirmation dialog
+                    const confirmMsg = 
+                        `DEAR ${orderData.customerName.toUpperCase()}, ARE YOU SURE TO PLACE ORDER OF ${formatCurrency(orderData.finalAmount)}?\n\n` +
+                        `⚠️ BECAUSE ONCE PLACED ORDER CANNOT BE CANCELED ⚠️\n\n` +
+                        `Product: ${orderData.productName}\n` +
+                        `Quantity: ${orderData.quantity}\n` +
+                        `GST ${CONFIG.GST_PERCENT}% included\n\n` +
+                        `Press OK to confirm, Cancel to decline`;
+                    
+                    if (!confirm(confirmMsg)) {
+                        NotificationService.showToast("❌ Order cancelled");
+                        return;
+                    }
+                    
+                    // Process order
+                    const firebaseData = {
+                        name: orderData.customerName,
+                        product: orderData.productName,
+                        quantity: orderData.quantity,
+                        baseAmount: orderData.baseAmount,
+                        gstAmount: orderData.gstAmount,
+                        amount: orderData.finalAmount,
+                        gstPercent: CONFIG.GST_PERCENT,
+                        source: "direct_button"
+                    };
+                    
+                    FirebaseService.pushOrder(firebaseData).catch(e => console.warn(e));
+                    
+                    if (Notification.permission === "default") {
+                        await NotificationService.requestPermission();
+                    }
+                    NotificationService.sendOrderReceivedNotification(orderData);
+                    NotificationService.showToast(`✅ Order placed! ${formatCurrency(orderData.finalAmount)}`);
+                    
+                    // Call original function if exists
+                    if (typeof window.confirmOrder === 'function') {
+                        window.confirmOrder(e);
+                    }
+                });
+            }
+        }
+        
+        // Start polling for confirmOrder function
+        let attempts = 0;
+        const initInterval = setInterval(() => {
+            attempts++;
+            
+            if (overrideConfirmOrder()) {
+                clearInterval(initInterval);
+                console.log(`✅ confirmOrder overridden after ${attempts} attempt(s)`);
+                setupDirectButtonHandler();
+            } else if (attempts >= CONFIG.MAX_RETRY_ATTEMPTS) {
+                clearInterval(initInterval);
+                console.warn("⚠️ Could not find confirmOrder function - using direct button mode");
+                setupDirectButtonHandler();
+            }
+        }, CONFIG.RETRY_INTERVAL_MS);
+        
+        // DOM ready setup
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => {
+                setupDirectButtonHandler();
+                console.log("📄 DOM ready - order manager active");
+            });
+        } else {
+            setupDirectButtonHandler();
+            console.log("📄 Order manager ready with confirmation dialog");
+        }
+        
     })();
 </script>
-<!-- ========== END ADVERTISEMENT BANNER CODE ========== -->
 
-    
+
+<!-- ========== END ORDER CONFIRMATION MANAGER ========== -->
+
 </body>
 </html>
