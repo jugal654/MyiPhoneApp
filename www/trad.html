@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SHREE GOLD • Trade Logs | GST Logic: SL/GLD no extra tax</title>
+    <title>SHREE GOLD • Live Trade Logs | Clear Local View</title>
     <script src="js/tailwindcss.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -12,28 +12,16 @@
         .gold-gradient { background: linear-gradient(180deg, #3d251a 0%, #23140e 100%); }
         .trade-card { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.05); transition: all 0.2s; backdrop-filter: blur(4px); }
         .status-EXECUTED { color: #10b981; background: rgba(16, 185, 129, 0.15); }
-        .status-PENDING { color: #f59e0b; background: rgba(245, 158, 11, 0.15); }
-        .status-EXPIRED { color: #ef4444; background: rgba(239, 68, 68, 0.15); }
+        .status-WAITING { color: #f97316; background: rgba(249, 115, 22, 0.15); }
         .status-CANCELLED { color: #94a3b8; background: rgba(148, 163, 184, 0.15); }
         .tab-active { color: #f59e0b; border-bottom: 2px solid #f59e0b; }
         ::-webkit-scrollbar { display: none; }
-        .type-badge-buy { background: rgba(16, 185, 129, 0.1); color: #10b981; border-left: 3px solid #10b981; }
-        .type-badge-sell { background: rgba(239, 68, 68, 0.1); color: #ef4444; border-left: 3px solid #ef4444; }
         .glass-divider { height: 1px; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent); }
-        .dustbin-btn {
-            transition: all 0.2s ease;
-            backdrop-filter: blur(8px);
-        }
-        .dustbin-btn:active {
-            transform: scale(0.9);
-            background-color: rgba(220, 38, 38, 0.5);
-        }
         .gst-exempt-badge {
             background: rgba(245, 158, 11, 0.2);
             color: #fbbf24;
             font-size: 7px;
             font-weight: bold;
-            letter-spacing: 0.5px;
             border-radius: 20px;
             padding: 2px 8px;
             display: inline-flex;
@@ -60,32 +48,21 @@
             opacity: 0;
             transition: opacity 0.2s ease;
         }
-        .toast-notify.show {
-            opacity: 1;
-        }
-        .clear-shake {
-            animation: shakeAnim 0.3s ease-in-out 0s 1;
-        }
-        @keyframes shakeAnim {
-            0% { transform: translateX(0px); }
-            25% { transform: translateX(-3px); }
-            50% { transform: translateX(3px); }
-            75% { transform: translateX(-2px); }
-            100% { transform: translateX(0px); }
-        }
-        /* Fix for proper text wrapping */
-        .trade-card .grid div {
-            word-break: keep-all;
-            white-space: normal;
-        }
-        .rate-text, .gst-text, .total-text {
-            display: block;
-            line-height: 1.3;
+        .toast-notify.show { opacity: 1; }
+        .loading-spinner { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2rem; }
+        .spinner { width: 32px; height: 32px; border: 3px solid rgba(255,255,255,0.2); border-top-color: #f59e0b; border-radius: 50%; animation: spin 0.8s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .reload-link {
+            color: #f59e0b;
+            text-decoration: underline;
+            cursor: pointer;
+            font-size: 11px;
+            margin-top: 10px;
+            display: inline-block;
         }
     </style>
 </head>
 <body class="max-w-md mx-auto relative shadow-2xl">
-
 
     <header class="fixed top-0 w-full max-w-md bg-white pt-6 pb-4 px-6 rounded-b-[30px] shadow-xl z-50 text-gray-800">
         <div><br><br></div>
@@ -95,386 +72,233 @@
             </button>
             <div class="text-center">
                 <h1 class="text-xl font-black tracking-tighter text-[#3d251a] leading-none">TRADE LOGS</h1>
-                <p class="text-[8px] tracking-[0.4em] font-bold text-amber-700 uppercase">Real-Time Ledger | SL/GLD = GST exempt</p>
+                <p class="text-[8px] tracking-[0.4em] font-bold text-amber-700 uppercase">Local Clear Only | No DB Delete</p>
             </div>
-            <button id="clearHistoryBtn" class="dustbin-btn w-9 h-9 bg-red-50/80 border border-red-200 rounded-full flex items-center justify-center active:scale-90 transition-transform text-red-700 hover:bg-red-100" title="Permanently delete all trade history">
+            <button id="clearLocalViewBtn" class="dustbin-btn w-9 h-9 bg-red-50/80 border border-red-200 rounded-full flex items-center justify-center active:scale-90 transition-transform text-red-700 hover:bg-red-100" title="Clear all orders from screen (database unchanged)">
                 <i class="fa-solid fa-trash-can text-sm"></i>
             </button>
         </div>
-        
         <div class="flex border-b border-gray-100">
-            <div class="flex-1 pb-3 text-[10px] font-bold uppercase tracking-widest tab-active text-center">HISTORY LEDGER</div>
+            <div class="flex-1 pb-3 text-[10px] font-bold uppercase tracking-widest tab-active text-center">LIVE LEDGER</div>
         </div>
         <div class="text-[8px] text-amber-600 text-center mt-1 flex items-center justify-center gap-2">
-            <i class="fa-regular fa-receipt"></i>
-            <span>🔹 SL / GLD items: GST already included → no extra tax added</span>
+            <i class="fa-regular fa-eye-slash"></i>
+            <span>🔹 Dustbin clears your screen only – data stays safe in database</span>
         </div>
     </header>
 
-
     <main class="gold-gradient flex-grow pt-44 px-4 pb-24 overflow-y-auto relative">
         <div id="trade-list" class="space-y-3"></div>
-        <div id="empty-state" class="flex flex-col items-center justify-center py-20 opacity-30">
+        <div id="empty-state" class="flex flex-col items-center justify-center py-20 opacity-30" style="display: none;">
             <i class="fa-solid fa-clock-rotate-left text-6xl mb-4 text-amber-600"></i>
             <p class="font-bold uppercase tracking-widest text-xs text-gray-400">No trade records</p>
-            <p class="text-[9px] text-gray-500 mt-2">SL/GLD orders: GST already applied at source</p>
-            <p class="text-[8px] text-amber-700/50 mt-3">✨ Place your first order to see it here</p>
+            <p class="text-[9px] text-gray-500 mt-2">You cleared the local view</p>
+            <a id="reloadDataLink" class="reload-link"><i class="fa-solid fa-rotate-right mr-1"></i> Reload data from database</a>
+        </div>
+        <div id="loading-state" class="loading-spinner">
+            <div class="spinner"></div>
+            <p class="text-xs text-amber-400/70 mt-3">Syncing live orders...</p>
         </div>
         <div id="bottom-anchor" class="h-4"></div>
     </main>
 
+    <div id="toastMsg" class="toast-notify">🧹 Local display cleared (data not deleted)</div>
 
-    <div id="toastMsg" class="toast-notify">🗑️ All trade logs permanently deleted</div>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
+        const firebaseConfig = {
+            apiKey: "AIzaSyBIghUCcQUxCcfYJOdCMgPsTuRSgnJpe6E",
+            authDomain: "shreegold-120eb.firebaseapp.com",
+            projectId: "shreegold-120eb",
+            storageBucket: "shreegold-120eb.appspot.com",
+            messagingSenderId: "915011378925",
+            appId: "1:915011378925:web:c03003bc7eca3ccc0bb6e4"
+        };
 
-    <script>
-        (function() {
-            const container = document.getElementById('trade-list');
-            const emptyState = document.getElementById('empty-state');
-            const clearBtn = document.getElementById('clearHistoryBtn');
-            const toastMsgDiv = document.getElementById('toastMsg');
-            
-            const GST_PERCENT = 3;
-            
-            function isGstPreAppliedProduct(productName) {
-                if (!productName) return false;
-                const upper = productName.toUpperCase();
-                return upper.includes('GLD WITH GST') || 
-                       upper.includes('SIL WITH GST') || 
-                       upper.includes('SILVER WITH GST') || 
-                       upper.includes('SL') || 
-                       upper.includes('GLD');
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        
+        const container = document.getElementById('trade-list');
+        const emptyState = document.getElementById('empty-state');
+        const loadingState = document.getElementById('loading-state');
+        const clearBtn = document.getElementById('clearLocalViewBtn');
+        const toastMsgDiv = document.getElementById('toastMsg');
+        const reloadLink = document.getElementById('reloadDataLink');
+        
+        let currentUnsubscribe = null;
+        let isViewCleared = false;
+        
+        const GST_PERCENT = 3;
+
+        function isSilverProduct(productName) {
+            if (!productName) return false;
+            const upper = productName.toUpperCase();
+            return upper.includes("SILVER") || upper.includes("SLVR") || upper.includes("AG") || upper.includes("SILV");
+        }
+        
+        function isGSTPreApplied(productName) {
+            if (!productName) return false;
+            const upper = productName.toUpperCase();
+            return upper.includes("SL") || upper.includes("GLD") || upper.includes("WITH GST");
+        }
+        
+        function getEffectiveAmount(order) {
+            const originalAmount = order.grandTotal || 0;
+            const productName = order.product || '';
+            const isPreGst = isGSTPreApplied(productName);
+            if (isPreGst) {
+                const baseAmount = originalAmount / (1 + (GST_PERCENT / 100));
+                const gstDeducted = originalAmount - baseAmount;
+                return { displayAmount: Math.round(baseAmount), originalAmount: Math.round(originalAmount), gstDeducted: Math.round(gstDeducted), isPreGST: true };
+            } else {
+                return { displayAmount: Math.round(originalAmount), originalAmount: Math.round(originalAmount), gstDeducted: 0, isPreGST: false };
             }
-
-            function formatNumber(num) {
-                if (num === undefined || num === null || isNaN(num)) return '0';
-                return Math.round(num).toLocaleString('en-IN');
+        }
+        
+        function calculateRates(order) {
+            const effective = getEffectiveAmount(order);
+            const displayAmount = effective.displayAmount;
+            const qtyGrams = order.quantity || 0;
+            const productName = order.product || '';
+            const isSilver = isSilverProduct(productName);
+            const isPre = effective.isPreGST;
+            if (!qtyGrams) return { exclGST: 0, inclGST: 0, isPreGST: isPre, displayAmount, isSilver, unitLabel: isSilver ? "per KG" : "per 10GM" };
+            let pricePerGram;
+            if (isPre) pricePerGram = displayAmount / qtyGrams;
+            else pricePerGram = (displayAmount / (1 + GST_PERCENT/100)) / qtyGrams;
+            const inclPricePerGram = displayAmount / qtyGrams;
+            const multiplier = isSilver ? 1000 : 10;
+            return { exclGST: pricePerGram * multiplier, inclGST: inclPricePerGram * multiplier, isPreGST: isPre, displayAmount, isSilver, unitLabel: isSilver ? "per KG" : "per 10GM" };
+        }
+        
+        function formatINR(v) { return Math.round(v || 0).toLocaleString('en-IN'); }
+        function formatRate(v, isSilver) { return `₹${Math.round(v).toLocaleString('en-IN')}`; }
+        function formatDateTime(timestamp) {
+            if (!timestamp) return "N/A";
+            const d = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+            return `${d.getDate().toString().padStart(2,'0')}-${(d.getMonth()+1).toString().padStart(2,'0')}-${d.getFullYear().toString().slice(-2)} ${d.getHours()%12||12}:${d.getMinutes().toString().padStart(2,'0')} ${d.getHours()>=12?'PM':'AM'}`;
+        }
+        
+        function showToast(msg, isErr = false) {
+            if (!toastMsgDiv) return;
+            toastMsgDiv.innerText = msg;
+            toastMsgDiv.classList.add('show');
+            setTimeout(() => toastMsgDiv.classList.remove('show'), 2200);
+        }
+        
+        function renderOrders(ordersList) {
+            if (isViewCleared) return;
+            if (!ordersList.length) {
+                container.innerHTML = '';
+                emptyState.style.display = 'flex';
+                loadingState.style.display = 'none';
+                return;
             }
-
-            function showToast(message) {
-                if (!toastMsgDiv) return;
-                toastMsgDiv.innerText = message;
-                toastMsgDiv.classList.add('show');
-                setTimeout(() => {
-                    toastMsgDiv.classList.remove('show');
-                }, 2200);
-            }
-
-            function calculateCorrectValues(order) {
-                const product = order.product || '';
-                const isSlGld = isGstPreAppliedProduct(product);
-                let qty = Number(order.quantity) || 0;
-                let ratePerUnit = Number(order.ratePerUnit) || 0;
+            emptyState.style.display = 'none';
+            loadingState.style.display = 'none';
+            const sorted = [...ordersList].sort((a,b) => (b.createdAt?.toDate?.() || 0) - (a.createdAt?.toDate?.() || 0));
+            container.innerHTML = sorted.map(order => {
+                let displayStatus = "WAITING", statusClass = "status-WAITING", statusIcon = "fa-regular fa-hourglass-half";
+                if (order.status === 'success') { displayStatus = "EXECUTED"; statusClass = "status-EXECUTED"; statusIcon = "fa-solid fa-circle-check"; }
+                else if (order.status === 'cancelled') { displayStatus = "CANCELLED"; statusClass = "status-CANCELLED"; statusIcon = "fa-solid fa-ban"; }
                 
-                const isSilver = product.toUpperCase().includes('SILVER') || 
-                                 product.toUpperCase().includes('SLVR') || 
-                                 product.toUpperCase().includes('AG');
+                const type = (order.type || 'BUY').toUpperCase();
+                const typeColor = type === 'BUY' ? 'border-l-green-500' : 'border-l-red-500';
+                const timeString = formatDateTime(order.createdAt);
+                const product = order.product || 'GOLD';
+                const userId = order.user?.phone?.slice(-4) || order.user?.name?.slice(0,6) || 'GUEST';
+                const shortId = order.orderId?.slice(-6) || order.id?.slice(-6) || '---';
+                const effective = getEffectiveAmount(order);
+                const rates = calculateRates(order);
+                const isSlGld = isGSTPreApplied(product);
+                const finalTotalDisplay = `₹${formatINR(effective.displayAmount)}`;
+                const gstAmountDisplay = formatINR(effective.gstDeducted);
+                const rateDisplay = formatRate(rates.inclGST, rates.isSilver);
+                const unitLabelShort = rates.isSilver ? "KG" : "10GM";
                 
-                let baseAmount = 0;
-                
-                if (isSilver) {
-                    const perGramRate = ratePerUnit / 1000;
-                    baseAmount = qty * perGramRate;
-                } else {
-                    const perGramRate = ratePerUnit / 10;
-                    baseAmount = qty * perGramRate;
-                }
-                
-                let gstAmount = 0;
-                let finalTotal = 0;
-                
-                if (isSlGld) {
-                    gstAmount = 0;
-                    finalTotal = Math.round(baseAmount);
-                } else {
-                    gstAmount = Math.round(baseAmount * GST_PERCENT / 100);
-                    finalTotal = Math.round(baseAmount + gstAmount);
-                }
-                
-                let displayRate = ratePerUnit;
-                let rateUnitLabel = isSilver ? "/KG" : "/10GM";
-                
-                return {
-                    baseAmount: Math.round(baseAmount),
-                    gstAmount: gstAmount,
-                    finalTotal: finalTotal,
-                    displayRate: displayRate,
-                    rateUnitLabel: rateUnitLabel,
-                    isSlGld: isSlGld,
-                    isSilver: isSilver,
-                    quantity: qty,
-                    unit: order.unit || 'GM'
-                };
-            }
-
-            function renderTrades() {
-                const ordersRaw = localStorage.getItem("shree_order_history");
-                let orders = [];
-                if (ordersRaw) {
-                    try {
-                        orders = JSON.parse(ordersRaw);
-                        if (!Array.isArray(orders)) orders = [];
-                    } catch(e) { orders = []; }
-                }
-                
-                if (!orders.length) {
-                    container.innerHTML = '';
-                    emptyState.style.display = 'flex';
-                    return;
-                }
-                
-                emptyState.style.display = 'none';
-                const sorted = [...orders].sort((a,b) => (b.timestamp || 0) - (a.timestamp || 0));
-                
-                container.innerHTML = sorted.map((order, idx) => {
-                    const status = 'EXECUTED';
-                    const type = (order.type || 'BUY').toUpperCase();
-                    const typeColor = type === 'BUY' ? 'border-l-green-500' : 'border-l-red-500';
-                    const statusClass = `status-${status}`;
-                    
-                    const timestamp = order.timestamp ? new Date(order.timestamp) : new Date();
-                    const timeString = timestamp.toLocaleString('en-IN', { hour: '2-digit', minute: '2-digit', day: '2-digit', month: 'short' }).replace(',', ' •');
-                    
-                    const product = order.product || 'GOLD';
-                    const userId = order.user?.phone ? order.user.phone.slice(-4) : (order.user?.name || 'GUEST');
-                    const shortId = order.timestamp ? order.timestamp.toString().slice(-6) : (idx+1000).toString();
-                    
-                    const correct = calculateCorrectValues(order);
-                    
-                    const rateDisplay = `₹${formatNumber(correct.displayRate)}`;
-                    const gstDisplayValue = formatNumber(correct.gstAmount);
-                    const finalTotalDisplay = `₹${formatNumber(correct.finalTotal)}`;
-                    
-                    let gstHtml = '';
-                    let gstBadgeExtra = '';
-                    
-                    if (correct.isSlGld) {
-                        gstHtml = `<span class="font-bold text-white">₹0 <span class="text-[9px] text-amber-400">(inclusive)</span></span>`;
-                        gstBadgeExtra = `<div class="mt-2 text-[8px] text-emerald-600/70 bg-emerald-900/20 rounded-full px-2 py-0.5 inline-block w-auto"><i class="fa-regular fa-rectangle-ad"></i> GST already applied at source • no extra tax</div>`;
-                    } else {
-                        gstHtml = `<span class="font-bold text-white">₹${gstDisplayValue}</span>`;
-                        gstBadgeExtra = '';
-                    }
-                    
-                    return `
-                    <div class="trade-card p-4 rounded-2xl relative border-l-4 ${typeColor}">
-                        <div class="flex justify-between items-start mb-3">
-                            <div class="flex-1">
-                                <div class="flex items-center flex-wrap gap-1">
-                                    <p class="text-[9px] font-black text-amber-500 uppercase tracking-widest mb-1">
-                                        <i class="fa-regular fa-clock mr-1"></i>${timeString}
-                                    </p>
-                                    ${correct.isSlGld ? `<span class="gst-exempt-badge"><i class="fa-regular fa-gem"></i> GST locked</span>` : ''}
-                                </div>
-                                <h3 class="text-sm font-extrabold text-white flex items-center gap-1">
-                                    ${escapeHtml(product)}
-                                    ${correct.isSlGld ? `<i class="fa-regular fa-circle-check text-[10px] text-emerald-400"></i>` : ''}
-                                </h3>
-                                <div class="flex gap-2 mt-1 items-center flex-wrap">
-                                    <span class="text-[8px] bg-white/10 px-1.5 py-0.5 rounded text-gray-300 font-bold"><i class="fa-regular fa-user mr-1"></i>${escapeHtml(userId)}</span>
-                                    <span class="text-[8px] text-gray-500 font-bold uppercase">Ref: ${shortId}</span>
-                                </div>
+                return `
+                <div class="trade-card p-4 rounded-2xl relative border-l-4 ${typeColor}">
+                    <div class="flex justify-between items-start mb-3">
+                        <div class="flex-1">
+                            <div class="flex items-center flex-wrap gap-1">
+                                <p class="text-[9px] font-black text-amber-500 uppercase tracking-widest"><i class="fa-regular fa-clock mr-1"></i>${timeString}</p>
+                                ${isSlGld ? `<span class="gst-exempt-badge"><i class="fa-regular fa-gem"></i> GST locked</span>` : ''}
                             </div>
-                            <div class="text-right">
-                                <span class="inline-flex items-center px-2 py-1 rounded-md text-[8px] font-black tracking-widest uppercase ${statusClass}">
-                                    ${status}
-                                    <i class="fa-solid fa-circle-check ml-1.5 text-[9px]"></i>
-                                </span>
-                                <p class="text-[10px] mt-2 font-bold ${type === 'BUY' ? 'text-green-500' : 'text-red-500'}">
-                                    ${type} ORDER
-                                </p>
-                            </div>
+                            <h3 class="text-sm font-extrabold text-white">${escapeHtml(product)}</h3>
+                            <div class="flex gap-2 mt-1"><span class="text-[8px] bg-white/10 px-1.5 py-0.5 rounded text-gray-300"><i class="fa-regular fa-user mr-1"></i>${escapeHtml(userId)}</span><span class="text-[8px] text-gray-500">Ref: ${shortId}</span></div>
                         </div>
-                        
-                        <!-- Grid for Qty, Rate, GST - properly aligned -->
-                        <div class="grid grid-cols-3 gap-2 mt-2 text-center">
-                            <div>
-                                <p class="text-[8px] text-gray-500 font-bold uppercase">Qty</p>
-                                <p class="font-bold text-white text-sm">${correct.quantity} ${correct.unit}</p>
-                            </div>
-                            <div>
-                                <p class="text-[8px] text-gray-500 font-bold uppercase">Rate</p>
-                                <p class="font-bold text-white text-sm">${rateDisplay}<span class="text-[9px] text-gray-400">${correct.rateUnitLabel}</span></p>
-                            </div>
-                            <div>
-                                <p class="text-[8px] text-gray-500 font-bold uppercase">GST</p>
-                                <p class="font-bold text-white text-sm">${gstHtml}</p>
-                            </div>
+                        <div class="text-right">
+                            <span class="inline-flex items-center px-2 py-1 rounded-md text-[8px] font-black uppercase ${statusClass}">${displayStatus} <i class="${statusIcon} ml-1.5 text-[9px]"></i></span>
+                            <p class="text-[10px] mt-2 font-bold ${type === 'BUY' ? 'text-green-500' : 'text-red-500'}">${type} ORDER</p>
                         </div>
-                        
-                        ${correct.isSlGld ? `<div class="mt-1 text-center"><span class="gst-exempt-badge text-[7px]"><i class="fa-regular fa-check-circle"></i> GST inclusive rate</span></div>` : ''}
-                        
-                        <div class="glass-divider my-3"></div>
-                        
-                        <div class="flex justify-between items-center">
-                            <div>
-                                <p class="text-[8px] text-gray-500 font-bold uppercase">Final total</p>
-                                <p class="text-base font-bold text-white">${finalTotalDisplay}</p>
-                                ${!correct.isSlGld ? `<p class="text-[7px] text-amber-500/70 mt-0.5">✓ +${GST_PERCENT}% GST added</p>` : `<p class="text-[7px] text-amber-500/70 mt-0.5">✓ rate inclusive of GST</p>`}
-                            </div>
-                            <div class="text-right">
-                                <p class="text-[8px] text-gray-500 font-bold uppercase">Phone</p>
-                                <p class="text-[9px] font-mono text-gray-400">${order.user?.phone || '—'}</p>
-                            </div>
-                        </div>
-                        
-                        ${order.user?.name ? `<div class="mt-2 text-[9px] text-amber-700/50 flex items-center"><i class="fa-regular fa-note-sticky mr-1"></i>${escapeHtml(order.user.name)}</div>` : ''}
-                        ${gstBadgeExtra}
-                    </div>`;
-                }).join('');
-            }
-            
-            function escapeHtml(str) {
-                if (!str) return '';
-                return String(str).replace(/[&<>]/g, function(m) {
-                    if (m === '&') return '&amp;';
-                    if (m === '<') return '&lt;';
-                    if (m === '>') return '&gt;';
-                    return m;
-                });
-            }
-            
-            function permanentlyClearAllHistory() {
-                const userConfirmed = confirm('⚠️ PERMANENT ACTION: This will delete ALL trade records permanently. This action cannot be undone. Are you sure?');
-                if (!userConfirmed) return;
-                
-                localStorage.removeItem('shree_order_history');
-                renderTrades();
-                
-                clearBtn.classList.add('clear-shake');
-                setTimeout(() => {
-                    clearBtn.classList.remove('clear-shake');
-                }, 300);
-                
-                showToast('🗑️ All trade logs permanently deleted');
-            }
-            
-            function fixAllData() {
-                let ordersRaw = localStorage.getItem("shree_order_history");
-                if (!ordersRaw) return;
-                let orders = [];
-                try {
-                    orders = JSON.parse(ordersRaw);
-                    if (!Array.isArray(orders)) orders = [];
-                } catch(e) { return; }
-                
-                let modified = false;
-                const fixedOrders = orders.map(order => {
-                    const correct = calculateCorrectValues(order);
-                    
-                    if (order.grandTotal !== correct.finalTotal || order.gstAmount !== correct.gstAmount) {
-                        modified = true;
-                        return { 
-                            ...order, 
-                            grandTotal: correct.finalTotal, 
-                            gstAmount: correct.gstAmount,
-                            _fixed: true 
-                        };
-                    }
-                    return order;
-                });
-                
-                if (modified) {
-                    localStorage.setItem('shree_order_history', JSON.stringify(fixedOrders));
-                    console.log('✅ Fixed corrupted data');
-                }
-            }
-            
-            window.addTradeToHistory = function(orderDetails) {
-                if (!orderDetails || !orderDetails.product || !orderDetails.quantity || !orderDetails.ratePerUnit) {
-                    console.error('Invalid order details', orderDetails);
-                    return false;
-                }
-                
-                const product = orderDetails.product;
-                const isSlGld = isGstPreAppliedProduct(product);
-                let qty = Number(orderDetails.quantity);
-                let ratePerUnit = Number(orderDetails.ratePerUnit);
-                
-                const isSilver = product.toUpperCase().includes('SILVER') || 
-                                 product.toUpperCase().includes('SLVR') || 
-                                 product.toUpperCase().includes('AG');
-                
-                let baseAmount = 0;
-                
-                if (isSilver) {
-                    const perGramRate = ratePerUnit / 1000;
-                    baseAmount = qty * perGramRate;
-                } else {
-                    const perGramRate = ratePerUnit / 10;
-                    baseAmount = qty * perGramRate;
-                }
-                
-                let gstAmount = 0;
-                let finalTotal = 0;
-                
-                if (isSlGld) {
-                    gstAmount = 0;
-                    finalTotal = Math.round(baseAmount);
-                } else {
-                    gstAmount = Math.round(baseAmount * GST_PERCENT / 100);
-                    finalTotal = Math.round(baseAmount + gstAmount);
-                }
-                
-                const newOrder = {
-                    timestamp: Date.now(),
-                    product: product,
-                    quantity: qty,
-                    unit: orderDetails.unit || 'GM',
-                    ratePerUnit: ratePerUnit,
-                    grandTotal: finalTotal,
-                    gstAmount: gstAmount,
-                    type: orderDetails.type || 'BUY',
-                    user: {
-                        phone: orderDetails.user?.phone || '___________',
-                        name: orderDetails.user?.name || 'Customer'
-                    },
-                    note: isSlGld ? "GST inclusive rate - no extra tax" : `GST ${GST_PERCENT}% applied`
-                };
-                
-                const existingOrders = JSON.parse(localStorage.getItem("shree_order_history") || "[]");
-                existingOrders.unshift(newOrder);
-                localStorage.setItem('shree_order_history', JSON.stringify(existingOrders));
-                
-                renderTrades();
-                showToast(`✅ ${product} order added to history`);
-                return newOrder;
-            };
-            
-            window.addSimpleTrade = function(product, qty, rate, phone, name) {
-                return window.addTradeToHistory({
-                    product: product,
-                    quantity: qty,
-                    ratePerUnit: rate,
-                    unit: 'GM',
-                    type: 'BUY',
-                    user: { phone: phone || '9999999999', name: name || 'Walk-in Customer' }
-                });
-            };
-            
-            clearBtn.addEventListener('click', (e) => {
-                e.preventDefault();
-                permanentlyClearAllHistory();
+                    </div>
+                    <div class="grid grid-cols-3 gap-2 mt-2 text-center">
+                        <div><p class="text-[8px] text-gray-500">Qty</p><p class="font-bold text-white text-sm">${order.quantity || 0} ${order.unit || 'GM'}</p></div>
+                        <div><p class="text-[8px] text-gray-500">Rate</p><p class="font-bold text-white text-sm">${rateDisplay}<span class="text-[9px] text-gray-400">/${unitLabelShort}</span></p></div>
+                        <div><p class="text-[8px] text-gray-500">GST</p><p class="font-bold text-white text-sm">${isSlGld ? '₹0 <span class="text-[9px] text-amber-400">(inclusive)</span>' : `₹${gstAmountDisplay}`}</p></div>
+                    </div>
+                    <div class="glass-divider my-3"></div>
+                    <div class="flex justify-between items-center">
+                        <div><p class="text-[8px] text-gray-500">Final total</p><p class="text-base font-bold text-white">${finalTotalDisplay}</p></div>
+                        <div class="text-right"><p class="text-[8px] text-gray-500">Phone</p><p class="text-[9px] font-mono text-gray-400">${order.user?.phone || '—'}</p></div>
+                    </div>
+                    ${displayStatus === 'WAITING' ? `<div class="mt-2 text-[7px] text-orange-400/70"><i class="fa-solid fa-bell"></i> Awaiting acceptance</div>` : ''}
+                    ${displayStatus === 'EXECUTED' ? `<div class="mt-2 text-[7px] text-emerald-400/70"><i class="fa-solid fa-stamp"></i> Order confirmed & executed</div>` : ''}
+                </div>`;
+            }).join('');
+        }
+        
+        function escapeHtml(str) { if (!str) return ''; return String(str).replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m])); }
+        
+        function startLiveListener() {
+            if (currentUnsubscribe) currentUnsubscribe();
+            const q = query(collection(db, "orders"), orderBy("createdAt", "desc"));
+            currentUnsubscribe = onSnapshot(q, (snap) => {
+                if (isViewCleared) return;
+                const orders = [];
+                snap.forEach(d => orders.push({ ...d.data(), id: d.id }));
+                renderOrders(orders);
+            }, (err) => { 
+                console.error(err); 
+                loadingState.style.display = 'none'; 
+                container.innerHTML = `<div class="text-red-400 text-center p-4">⚠️ Firestore connection error</div>`;
             });
-            
-            fixAllData();
-            renderTrades();
-            
-            window.addEventListener('storage', (e) => {
-                if (e.key === 'shree_order_history') {
-                    fixAllData();
-                    renderTrades();
-                }
-            });
-            
-            window.refreshTradeLogs = function() {
-                fixAllData();
-                renderTrades();
-                showToast("Trade logs refreshed & fixed");
-            };
-            
-            console.log('✅ Trade Logs Ready | Display formatting fixed');
-        })();
+        }
+        
+        function clearLocalView() {
+            if (isViewCleared) return;
+            isViewCleared = true;
+            if (currentUnsubscribe) {
+                currentUnsubscribe();
+                currentUnsubscribe = null;
+            }
+            container.innerHTML = '';
+            emptyState.style.display = 'flex';
+            loadingState.style.display = 'none';
+            showToast("🧹 Local display cleared (data not deleted)");
+        }
+        
+        function reloadData() {
+            if (!isViewCleared) return;
+            isViewCleared = false;
+            emptyState.style.display = 'none';
+            loadingState.style.display = 'flex';
+            startLiveListener();
+        }
+        
+        clearBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            clearLocalView();
+        });
+        
+        reloadLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            reloadData();
+        });
+        
+        startLiveListener();
     </script>
 </body>
 </html>
