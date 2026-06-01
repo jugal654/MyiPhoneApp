@@ -747,28 +747,29 @@ input[type=range]::-webkit-slider-runnable-track {
                 <div class="text-center text-amber-500/50 text-[10px] py-2">Loading Official Rates...</div>
             </div>
         </div>
-        <div class="rounded-2xl overflow-hidden border border-white/5 shadow-2xl bg-black/10">
-    
-            <div class="bg-black/20 py-2 px-4 border-y border-white/5">
+     
+
+        <div id="spot-rates-frame">
+            <div class="bg-black/20 py-2 px-4 border-b border-white/5">
                 <p class="text-[10px] font-black tracking-[0.2em] text-gray-400 uppercase italic">
                     Spot Retail Rates
                 </p>
             </div>
-            
+        
             <div id="spot-gold-row" onclick="handleBookingSpot('Gold 99.5', window.cloudSettings?.goldCash, 'gold')" class="grid grid-cols-3 items-center px-4 py-4 border-b border-white/5 cursor-pointer relative">
                 <div class="text-[12px] font-black text-amber-500 uppercase">Gold 99.5</div>
                 <div id="gold-cash-content" class="col-span-2 text-right">
                     <span id="cash-gold-display" class="text-xl font-black text-white">--</span>
                 </div>
             </div>
-            
+        
             <div id="spot-silver-row" onclick="handleBookingSpot('Silver 99.9', window.cloudSettings?.silverCash, 'silver')" class="grid grid-cols-3 items-center px-4 py-4 border-b border-white/5 cursor-pointer relative">
                 <div class="text-[12px] font-black text-amber-500 uppercase">Silver 99.9</div>
                 <div id="silver-cash-content" class="col-span-2 text-right">
                     <span id="cash-silver-display" class="text-xl font-black text-white">--</span>
                 </div>
             </div>
-
+        </div>
 
 
 
@@ -1918,7 +1919,6 @@ onValue(settingsRef, (snapshot) => {
 
 
 
-
         function updateUIDatabase(data) {
     try {
         // Update news ticker
@@ -1926,58 +1926,74 @@ onValue(settingsRef, (snapshot) => {
         if (newsTicker) {
             newsTicker.innerText = data.news || "Welcome to SHREE GOLD Bullion";
         }
-        
+
         // ========== UPDATE OFFSETS IN LOCALSTORAGE (BACKUP) ==========
-        // This ensures offsets are always updated when data changes
         if (data.offset !== undefined) {
             localStorage.setItem('shree_gold_offset', data.offset);
         }
         if (data.silverOffset !== undefined) {
             localStorage.setItem('shree_silver_offset', data.silverOffset);
         }
-        
-        // Update gold spot rate display
-       // Update gold spot rate display - ALWAYS VISIBLE, NO STOP BADGE
-const goldRow = document.getElementById('spot-gold-row');
-const goldContent = document.getElementById('gold-cash-content');
 
-if (goldRow && goldContent) {
-    goldRow.classList.remove('row-disabled');
-    const goldRate = Number(data.goldCash || 0);
-    const displayRate = goldRate.toLocaleString('en-IN');
-    goldContent.innerHTML = `<span id="cash-gold-display" class="text-xl font-black text-white"> ${displayRate}</span>`;
-}
+        // ========== FRAME CONTROL SYSTEM ==========
+        const spotRatesFrame = document.getElementById('spot-rates-frame');
+        if (spotRatesFrame) {
+            if (data.disableSpotFrame === true) {
+                spotRatesFrame.style.display = 'none';
+            } else {
+                spotRatesFrame.style.display = 'block';
+            }
+        }
 
-// Update silver spot rate display - ALWAYS VISIBLE, NO STOP BADGE
-const silverRow = document.getElementById('spot-silver-row');
-const silverContent = document.getElementById('silver-cash-content');
+        // ========== GOLD SPOT RATE DISPLAY & CALL/BOOK BADGE ==========
+        const goldRow = document.getElementById('spot-gold-row');
+        const goldContent = document.getElementById('gold-cash-content');
 
-if (silverRow && silverContent) {
-    silverRow.classList.remove('row-disabled');
-    const silverRate = Number(data.silverCash || 0);
-    const displayRate = silverRate.toLocaleString('en-IN');
-    silverContent.innerHTML = `<span id="cash-silver-display" class="text-xl font-black text-white"> ${displayRate}</span>`;
-}
+        if (goldRow && goldContent) {
+            goldRow.classList.remove('row-disabled');
+            const goldRate = Number(data.goldCash || 0);
+            const displayRate = goldRate.toLocaleString('en-IN');
+            const isGoldOnCall = data.goldOnCall === true;
+            const badgeText = isGoldOnCall ? 'CALL' : 'BOOK';
+            const badgeClass = isGoldOnCall ? 'bg-green-600 text-white' : 'bg-amber-600 text-white';
+
+            goldContent.innerHTML = `
+                <div class="flex items-center justify-end gap-2">
+                    <span id="cash-gold-display" class="text-xl font-black text-white">${displayRate}</span>
+                    <span class="px-2.5 py-0.5 rounded text-[10px] font-black tracking-wider ${badgeClass}">${badgeText}</span>
+                </div>
+            `;
+        }
+
+        // ========== SILVER SPOT RATE DISPLAY & CALL/BOOK BADGE ==========
+        const silverRow = document.getElementById('spot-silver-row');
+        const silverContent = document.getElementById('silver-cash-content');
+
+        if (silverRow && silverContent) {
+            silverRow.classList.remove('row-disabled');
+            const silverRate = Number(data.silverCash || 0);
+            const displayRate = silverRate.toLocaleString('en-IN');
+            const isSilverOnCall = data.silverOnCall === true;
+            const badgeText = isSilverOnCall ? 'CALL' : 'BOOK';
+            const badgeClass = isSilverOnCall ? 'bg-green-600 text-white' : 'bg-amber-600 text-white';
+
+            silverContent.innerHTML = `
+                <div class="flex items-center justify-end gap-2">
+                    <span id="cash-silver-display" class="text-xl font-black text-white">${displayRate}</span>
+                    <span class="px-2.5 py-0.5 rounded text-[10px] font-black tracking-wider ${badgeClass}">${badgeText}</span>
+                </div>
+            `;
+        }
+
         // Update global stop indicator
-    
-        
-        // Optional: Update last sync time
-        const lastSyncElement = document.getElementById('last-sync-time');
-        if (lastSyncElement) {
-            const now = new Date();
-            const timeStr = now.toLocaleTimeString('en-IN', { 
-                hour: '2-digit', 
-                minute: '2-digit',
-                second: '2-digit'
-            });
-            lastSyncElement.innerHTML = `<span class="text-[8px] text-gray-400">Synced: ${timeStr}</span>`;
+        const stopDiv = document.getElementById('global-stop-indicator');
+        if (stopDiv) {
+            stopDiv.innerHTML = '';
+            if (data.stopGold) stopDiv.innerHTML += `<span class="text-red-500 font-black">GOLD STOP</span> `;
+            if (data.stopSilver) stopDiv.innerHTML += `<span class="text-red-500 font-black">SILVER STOP</span>`;
+            if (!data.stopGold && !data.stopSilver) stopDiv.innerHTML = `<span class="text-green-500">ALL BOOKING OPEN</span>`;
         }
 
-                // Re-render if we have cached data with new offsets
-                if (window.lastSocketData && typeof renderRatesWithAutoLabels === 'function') {
-            renderRatesWithAutoLabels(window.lastSocketData);
-        }
-        
     } catch (error) {
         console.error('Error in updateUIDatabase:', error);
     }
@@ -2642,13 +2658,15 @@ window.handleManualBooking = function(label, rateKey, type) {
 
 
         function handleBookingSpot(label, rate, type) {
-    if (label === 'Gold 99.5' || label === 'Silver 99.9') {
+    const isGold = type === 'gold';
+    const onCall = isGold ? (window.cloudSettings?.goldOnCall === true) : (window.cloudSettings?.silverOnCall === true);
+
+    if (onCall) {
         window.location.href = "tel:+917020152697";
         return;
     }
-    
+
     if (!rate) rate = 0;
-    // STOP CHECK REMOVED - Spot Retail Rates always bookable
     openBuyPopup(label, rate);
 }
 
