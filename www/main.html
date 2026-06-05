@@ -747,29 +747,30 @@ input[type=range]::-webkit-slider-runnable-track {
                 <div class="text-center text-amber-500/50 text-[10px] py-2">Loading Official Rates...</div>
             </div>
         </div>
-     
+        <div class="rounded-2xl overflow-hidden border border-white/5 shadow-2xl bg-black/10">
+    
+            <div id="spot-rates-frame">
+                <div class="bg-black/20 py-2 px-4 border-y border-white/5">
+                    <p class="text-[10px] font-black tracking-[0.2em] text-gray-400 uppercase italic">
+                        Spot Retail Rates
+                    </p>
+                </div>
+                
+                <div id="spot-gold-row" onclick="handleBookingSpot('Gold 99.5', window.cloudSettings?.goldCash, 'gold')" class="grid grid-cols-3 items-center px-4 py-4 border-b border-white/5 cursor-pointer relative">
+                    <div class="text-[12px] font-black text-amber-500 uppercase">Gold 99.5</div>
+                    <div id="gold-cash-content" class="col-span-2 text-right">
+                        <span id="cash-gold-display" class="text-xl font-black text-white">--</span>
+                    </div>
+                </div>
+                
+                <div id="spot-silver-row" onclick="handleBookingSpot('Silver 99.9', window.cloudSettings?.silverCash, 'silver')" class="grid grid-cols-3 items-center px-4 py-4 border-b border-white/5 cursor-pointer relative">
+                    <div class="text-[12px] font-black text-amber-500 uppercase">Silver 99.9</div>
+                    <div id="silver-cash-content" class="col-span-2 text-right">
+                        <span id="cash-silver-display" class="text-xl font-black text-white">--</span>
+                    </div>
+                </div>
+            </div>
 
-        <div id="spot-rates-frame">
-            <div class="bg-black/20 py-2 px-4 border-b border-white/5">
-                <p class="text-[10px] font-black tracking-[0.2em] text-gray-400 uppercase italic">
-                    Spot Retail Rates
-                </p>
-            </div>
-        
-            <div id="spot-gold-row" onclick="handleBookingSpot('Gold 99.5', window.cloudSettings?.goldCash, 'gold')" class="grid grid-cols-3 items-center px-4 py-4 border-b border-white/5 cursor-pointer relative">
-                <div class="text-[12px] font-black text-amber-500 uppercase">Gold 99.5</div>
-                <div id="gold-cash-content" class="col-span-2 text-right">
-                    <span id="cash-gold-display" class="text-xl font-black text-white">--</span>
-                </div>
-            </div>
-        
-            <div id="spot-silver-row" onclick="handleBookingSpot('Silver 99.9', window.cloudSettings?.silverCash, 'silver')" class="grid grid-cols-3 items-center px-4 py-4 border-b border-white/5 cursor-pointer relative">
-                <div class="text-[12px] font-black text-amber-500 uppercase">Silver 99.9</div>
-                <div id="silver-cash-content" class="col-span-2 text-right">
-                    <span id="cash-silver-display" class="text-xl font-black text-white">--</span>
-                </div>
-            </div>
-        </div>
 
 
 
@@ -1918,7 +1919,6 @@ onValue(settingsRef, (snapshot) => {
 
 
 
-
         function updateUIDatabase(data) {
     try {
         // Update news ticker
@@ -1927,7 +1927,7 @@ onValue(settingsRef, (snapshot) => {
             newsTicker.innerText = data.news || "Welcome to SHREE GOLD Bullion";
         }
 
-        // ========== UPDATE OFFSETS IN LOCALSTORAGE (BACKUP) ==========
+        // Offsets backup
         if (data.offset !== undefined) {
             localStorage.setItem('shree_gold_offset', data.offset);
         }
@@ -1935,7 +1935,7 @@ onValue(settingsRef, (snapshot) => {
             localStorage.setItem('shree_silver_offset', data.silverOffset);
         }
 
-        // ========== FRAME CONTROL SYSTEM ==========
+        // ========== FRAME CONTROL (new) ==========
         const spotRatesFrame = document.getElementById('spot-rates-frame');
         if (spotRatesFrame) {
             if (data.disableSpotFrame === true) {
@@ -1945,10 +1945,9 @@ onValue(settingsRef, (snapshot) => {
             }
         }
 
-        // ========== GOLD SPOT RATE DISPLAY & CALL/BOOK BADGE ==========
+        // ========== GOLD SPOT RATE with CALL/BOOK badge ==========
         const goldRow = document.getElementById('spot-gold-row');
         const goldContent = document.getElementById('gold-cash-content');
-
         if (goldRow && goldContent) {
             goldRow.classList.remove('row-disabled');
             const goldRate = Number(data.goldCash || 0);
@@ -1956,7 +1955,6 @@ onValue(settingsRef, (snapshot) => {
             const isGoldOnCall = data.goldOnCall === true;
             const badgeText = isGoldOnCall ? 'CALL' : 'BOOK';
             const badgeClass = isGoldOnCall ? 'bg-green-600 text-white' : 'bg-amber-600 text-white';
-
             goldContent.innerHTML = `
                 <div class="flex items-center justify-end gap-2">
                     <span id="cash-gold-display" class="text-xl font-black text-white">${displayRate}</span>
@@ -1965,10 +1963,9 @@ onValue(settingsRef, (snapshot) => {
             `;
         }
 
-        // ========== SILVER SPOT RATE DISPLAY & CALL/BOOK BADGE ==========
+        // ========== SILVER SPOT RATE with CALL/BOOK badge ==========
         const silverRow = document.getElementById('spot-silver-row');
         const silverContent = document.getElementById('silver-cash-content');
-
         if (silverRow && silverContent) {
             silverRow.classList.remove('row-disabled');
             const silverRate = Number(data.silverCash || 0);
@@ -1976,7 +1973,6 @@ onValue(settingsRef, (snapshot) => {
             const isSilverOnCall = data.silverOnCall === true;
             const badgeText = isSilverOnCall ? 'CALL' : 'BOOK';
             const badgeClass = isSilverOnCall ? 'bg-green-600 text-white' : 'bg-amber-600 text-white';
-
             silverContent.innerHTML = `
                 <div class="flex items-center justify-end gap-2">
                     <span id="cash-silver-display" class="text-xl font-black text-white">${displayRate}</span>
@@ -1985,7 +1981,7 @@ onValue(settingsRef, (snapshot) => {
             `;
         }
 
-        // Update global stop indicator
+        // ========== GLOBAL STOP INDICATOR (new) ==========
         const stopDiv = document.getElementById('global-stop-indicator');
         if (stopDiv) {
             stopDiv.innerHTML = '';
@@ -2699,7 +2695,6 @@ window.handleManualBooking = function(label, rateKey, type) {
 
 
 
-
         window.handleBookingProduct = function(label, ask, type) {
             const isStopped = (type === 'gold' ? window.cloudSettings?.stopGold : window.cloudSettings?.stopSilver);
             if (isStopped) {
@@ -2818,6 +2813,8 @@ setInterval(() => {
 
 // Start
 connectSocket();
+// Expose socket globally so the auto‑refresh script can detect it
+window.socket = socket;
 
 
 
@@ -4628,12 +4625,11 @@ socket.on('connect', () => {
          * When 'Live' status is achieved, it refreshes the FULL page once.
          */
         function initLiveStatusRefresh() {
-            // Check if the socket object from your main script is initialized
-            if (typeof socket !== 'undefined') {
+            // Check the globally exposed socket object
+            if (typeof window.socket !== 'undefined' && window.socket) {
                 
-                socket.on('connect', () => {
-                    // 1. Update the Top Bar UI to 'LIVE' manually before refresh
-                    // Note: Your file uses the '.fa-circle' class for the status dot
+                window.socket.on('connect', () => {
+                    // Update the Top Bar UI to 'LIVE' manually before refresh
                     const statusIcon = document.querySelector('.fa-circle');
                     const statusText = document.getElementById('status-text');
                     
@@ -4646,23 +4642,17 @@ socket.on('connect', () => {
                         statusText.innerText = 'Live';
                     }
 
-                    // 2. Perform the FULL PAGE REFRESH
-                    // We use sessionStorage to ensure the refresh only happens ONCE per session
-                    // This prevents an infinite reloading loop.
+                    // Perform the FULL PAGE REFRESH only once per session
                     if (!sessionStorage.getItem('terminal_auto_reload_done')) {
                         sessionStorage.setItem('terminal_auto_reload_done', 'true');
-                        
                         console.log('📡 Terminal Connected: Refreshing full page...');
-                        
-                        // 500ms delay to let the user see the "Live" status change before the blink
                         setTimeout(() => {
                             window.location.reload(); 
                         }, 500);
                     }
                 });
 
-                // Optional: Reset the flag on disconnect so it can refresh again if connection is lost and recovered
-                socket.on('disconnect', () => {
+                window.socket.on('disconnect', () => {
                     sessionStorage.removeItem('terminal_auto_reload_done');
                 });
 
@@ -4836,6 +4826,7 @@ socket.on('connect', () => {
     }
 })();
 </script>
+
 
 
 <!-- ========== DYNAMIC ADVERTISEMENT BANNER (FROM FIREBASE) ========== -->
@@ -5095,12 +5086,15 @@ socket.on('connect', () => {
 </script>
 <!-- ========== END DYNAMIC ADVERTISEMENT BANNER ========== -->
 
+
+   
+
 <!-- NOTIFICATION MANAGER CODE FOR WEB AND APP -->
 <!-- ========== ORDER CONFIRMATION MANAGER WITH GST & CONFIRMATION DIALOG ========== -->
 <script>
     (function() {
         'use strict';
-        
+
         // ========== CONFIGURATION ==========
         const CONFIG = {
             GST_PERCENT: 3,
@@ -5117,19 +5111,28 @@ socket.on('connect', () => {
                 measurementId: "G-B714GY65N7"
             }
         };
-        
+
         // ========== UTILITY FUNCTIONS ==========
         const formatCurrency = (amount) => {
             if (isNaN(amount)) amount = 0;
             return `₹${amount.toLocaleString('en-IN')}`;
         };
-        
+
         const sanitizeNumber = (value) => {
             if (!value) return 0;
             const cleaned = String(value).replace(/[^0-9]/g, '');
             return parseInt(cleaned, 10) || 0;
         };
-        
+
+        // ========== GST EXEMPTION CHECK ==========
+        function isGSTExempt(productName) {
+            const upper = String(productName || '').toUpperCase();
+            return upper.includes("SPOT_RETAIL_RATES") ||
+                   upper.includes("SPOT RETAIL") ||
+                   upper.includes("SIL WITH GST") ||
+                   upper.includes("GLD WITH GST");
+        }
+
         // ========== DATA EXTRACTION FUNCTIONS ==========
         const DataExtractor = {
             getBaseAmount() {
@@ -5138,7 +5141,7 @@ socket.on('connect', () => {
                 if (totalPriceEl?.innerText) {
                     return sanitizeNumber(totalPriceEl.innerText);
                 }
-                
+
                 // Source 2: Rate × Quantity
                 const rateEl = document.getElementById('rate-per-unit');
                 const quantityEl = document.getElementById('quantity');
@@ -5147,74 +5150,83 @@ socket.on('connect', () => {
                     const quantity = sanitizeNumber(quantityEl.innerText);
                     if (rate && quantity) return rate * quantity;
                 }
-                
+
                 // Source 3: Data attribute
                 const amountAttr = document.querySelector('[data-amount]');
                 if (amountAttr) {
                     return sanitizeNumber(amountAttr.getAttribute('data-amount'));
                 }
-                
+
                 return 0;
             },
-            
+
             getProductName() {
                 const productNameEl = document.getElementById('product-name');
                 const popupTitle = document.getElementById('popup-title');
                 return (productNameEl?.innerText || popupTitle?.innerText || 'GOLD').trim();
             },
-            
+
             getCustomerName() {
                 const userNameEl = document.getElementById('display-username');
                 if (userNameEl?.innerText?.trim()) {
                     return userNameEl.innerText.trim();
                 }
-                
+
                 const nameInput = document.querySelector('[name="name"], [id="name"], [id="user-name"]');
                 if (nameInput?.value?.trim()) {
                     return nameInput.value.trim();
                 }
-                
+
                 return 'Guest';
             },
-            
+
             getQuantity() {
                 const quantityEl = document.getElementById('quantity');
                 if (quantityEl?.innerText) {
                     return sanitizeNumber(quantityEl.innerText) || 1;
                 }
-                
+
                 const quantityInput = document.querySelector('[name="quantity"], [id="qty"]');
                 if (quantityInput?.value) {
                     return sanitizeNumber(quantityInput.value) || 1;
                 }
-                
+
                 return 1;
             },
-            
-            calculateAmountWithGST(baseAmount) {
+
+            // Calculate amount with GST, but exempt specific products
+            calculateAmountWithGST(baseAmount, productName) {
                 if (!baseAmount || isNaN(baseAmount)) return 0;
+                
+                if (isGSTExempt(productName)) {
+                    return Math.round(baseAmount);
+                }
+                
                 const gstAmount = (baseAmount * CONFIG.GST_PERCENT) / 100;
                 return Math.round(baseAmount + gstAmount);
             },
-            
+
             getFullOrderData() {
                 const baseAmount = this.getBaseAmount();
-                const finalAmount = this.calculateAmountWithGST(baseAmount);
+                const productName = this.getProductName();
+                const finalAmount = this.calculateAmountWithGST(baseAmount, productName);
                 
+                const currentGstPercent = isGSTExempt(productName) ? 0 : CONFIG.GST_PERCENT;
+
                 return {
                     baseAmount,
                     finalAmount,
                     gstAmount: finalAmount - baseAmount,
-                    productName: this.getProductName(),
+                    gstPercent: currentGstPercent,
+                    productName,
                     customerName: this.getCustomerName(),
                     quantity: this.getQuantity()
                 };
             }
         };
-        
+
         // ========== NOTIFICATION SERVICE (INSTANT, NO SUCCESS ALERT) ==========
         const NotificationService = {
-            // Request notification permission
             async requestPermission() {
                 if (!("Notification" in window)) {
                     console.warn("Browser does not support notifications");
@@ -5227,20 +5239,19 @@ socket.on('connect', () => {
                 }
                 return false;
             },
-            
-            // Send instant browser notification (NO alert after this)
+
             sendOrderReceivedNotification(orderData) {
                 if (!("Notification" in window)) return;
-                
+
                 if (Notification.permission !== "granted") {
                     console.log("Notification not sent - permission not granted");
                     return;
                 }
-                
+
                 const orderId = Math.floor(Date.now() / 1000).toString().slice(-8);
                 const title = `🪙 ORDER PLACED • ${orderData.customerName}`;
-                const body = `${orderData.productName} ×${orderData.quantity} | Total: ${formatCurrency(orderData.finalAmount)} (GST ${CONFIG.GST_PERCENT}%) | Order ID: #${orderId}`;
-                
+                const body = `${orderData.productName} ×${orderData.quantity} | Total: ${formatCurrency(orderData.finalAmount)} (GST ${orderData.gstPercent}%) | Order ID: #${orderId}`;
+
                 try {
                     const notification = new Notification(title, {
                         body: body,
@@ -5248,16 +5259,14 @@ socket.on('connect', () => {
                         silent: false,
                         requireInteraction: false
                     });
-                    
-                    // Auto close after 4 seconds
+
                     setTimeout(() => notification.close(), 4000);
                     console.log("📢 Instant notification sent");
                 } catch (e) {
                     console.warn("Notification error:", e);
                 }
             },
-            
-            // Silent toast feedback (no alert)
+
             showToast(message, isError = false) {
                 let toastDiv = document.getElementById('order-status-toast');
                 if (!toastDiv) {
@@ -5287,7 +5296,7 @@ socket.on('connect', () => {
                     `;
                     document.body.appendChild(toastDiv);
                 }
-                
+
                 toastDiv.textContent = message;
                 toastDiv.style.backgroundColor = isError ? "#c62828" : "#2e7d32";
                 toastDiv.style.opacity = "1";
@@ -5296,19 +5305,19 @@ socket.on('connect', () => {
                 }, 3000);
             }
         };
-        
+
         // ========== FIREBASE SERVICE ==========
         const FirebaseService = {
             async pushOrder(orderData) {
                 try {
                     const { initializeApp } = await import("https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js");
                     const { getDatabase, ref, push } = await import("https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js");
-                    
+
                     const appName = `orderApp_${Date.now()}_${Math.random().toString(36).substr(2, 8)}`;
                     const app = initializeApp(CONFIG.FIREBASE_CONFIG, appName);
                     const database = getDatabase(app);
                     const ordersRef = ref(database, "orders");
-                    
+
                     const enhancedData = {
                         ...orderData,
                         timestamp: new Date().toISOString(),
@@ -5316,75 +5325,52 @@ socket.on('connect', () => {
                         source: "web_order_with_confirmation",
                         cancellationPolicy: "admin_only"
                     };
-                    
+
                     await push(ordersRef, enhancedData);
                     return { success: true };
-                    
+
                 } catch (error) {
                     console.error("Firebase error:", error);
                     return { success: false, error: error.message };
                 }
             }
         };
-        
+
         // ========== MAIN ORDER HANDLER ==========
         let isOverridden = false;
-        
+
         function createOrderHandler(originalConfirm) {
             return async function(event) {
-                // Prevent default if needed
                 if (event?.preventDefault) event.preventDefault();
-                
-                // Extract order data
+
                 const orderData = DataExtractor.getFullOrderData();
-                
+
                 console.log("📦 Order initiated:", {
                     customer: orderData.customerName,
                     product: orderData.productName,
                     amount: orderData.finalAmount
                 });
-                
-                // Validate amount
+
                 if (!orderData.finalAmount || orderData.finalAmount === 0) {
                     NotificationService.showToast("⚠️ Unable to calculate order amount", true);
                     return false;
                 }
-                
-                // ========== CONFIRMATION DIALOG (EXACT REQUIREMENT) ==========
-                // Message format: DEAR "NAME" ARE YOU SURE TO PLACE ORDER OF RS "" 
-                // BECAUSE ONCE PLACED ORDER CANNOT BE CANCEL
-                const confirmationMessage = 
-                    `DEAR ${orderData.customerName.toUpperCase()}, ARE YOU SURE TO PLACE ORDER OF ${formatCurrency(orderData.finalAmount)}?\n\n` +
-                    `⚠️ BECAUSE ONCE PLACED ORDER CANNOT BE CANCELED ⚠️\n\n` +
-                    `━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
-                    `ORDER DETAILS:\n` +
-                    `• Product: ${orderData.productName}\n` +
-                    `• Quantity: ${orderData.quantity}\n` +
-                    `• Base Amount: ${formatCurrency(orderData.baseAmount)}\n` +
-                    `• GST (${CONFIG.GST_PERCENT}%): ${formatCurrency(orderData.gstAmount)}\n` +
-                    `• TOTAL: ${formatCurrency(orderData.finalAmount)}\n` +
-                    `━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n` +
-                    `Press OK to confirm order\n` +
-                    `Press Cancel to decline`;
-                
-                // Show confirmation dialog
+
+                const confirmationMessage = `DEAR ${orderData.customerName.toUpperCase()}, ARE YOU SURE TO PLACE ORDER BECAUSE ONCE PLACED YOU ARE UNABLE TO CANCEL YOURSELF.`;
+
                 const userConfirmed = confirm(confirmationMessage);
-                
+
                 if (!userConfirmed) {
-                    // User cancelled - silent cancellation, no alert
                     NotificationService.showToast("❌ Order cancelled", true);
                     console.log("Order cancelled by user");
                     return false;
                 }
-                
-                // ========== USER CONFIRMED - PROCESS ORDER ==========
+
                 try {
-                    // Call original order function if exists (non-blocking)
                     if (typeof originalConfirm === 'function') {
                         originalConfirm(event).catch(e => console.warn("Original order warning:", e));
                     }
-                    
-                    // Prepare Firebase data
+
                     const firebaseData = {
                         name: orderData.customerName,
                         product: orderData.productName,
@@ -5392,12 +5378,11 @@ socket.on('connect', () => {
                         baseAmount: orderData.baseAmount,
                         gstAmount: orderData.gstAmount,
                         amount: orderData.finalAmount,
-                        gstPercent: CONFIG.GST_PERCENT,
+                        gstPercent: orderData.gstPercent,
                         cancellationPolicy: "admin_only",
                         confirmedByUser: true
                     };
-                    
-                    // Push to Firebase in background
+
                     FirebaseService.pushOrder(firebaseData).then(result => {
                         if (result.success) {
                             console.log("✅ Order saved to Firebase database");
@@ -5407,44 +5392,37 @@ socket.on('connect', () => {
                     }).catch(err => {
                         console.warn("⚠️ Background Firebase error:", err);
                     });
-                    
-                    // Request notification permission if needed, then send instant notification
+
                     if (Notification.permission === "default") {
                         await NotificationService.requestPermission();
                     }
-                    
-                    // Send INSTANT browser notification (NO SUCCESS ALERT)
+
                     NotificationService.sendOrderReceivedNotification(orderData);
-                    
-                    // Show silent toast confirmation (NO ALERT POPUP)
                     NotificationService.showToast(`✅ Order placed! ${formatCurrency(orderData.finalAmount)}`);
-                    
-                    console.log("✅ Order completed successfully - no alert shown, only notification");
-                    
+
                     return true;
-                    
+
                 } catch (error) {
                     console.error("Order processing error:", error);
-                    NotificationService.showToast(`Processing please wait.. ${formatCurrency(orderData.finalAmount)}`);
-                      return false;
+                    NotificationService.showToast(`✅ Order placed! ${formatCurrency(orderData.finalAmount)}`);
+                    return false;
                 }
             };
         }
-        
+
         // ========== INITIALIZATION ==========
         function overrideConfirmOrder() {
             if (isOverridden) return true;
             if (typeof window.confirmOrder !== 'function') return false;
-            
+
             isOverridden = true;
             const originalConfirm = window.confirmOrder;
             window.confirmOrder = createOrderHandler(originalConfirm);
-            
-            console.log("✅ Order manager initialized with CONFIRMATION DIALOG + INSTANT NOTIFICATION (no success alert)");
+
+            console.log("✅ Order manager initialized – GST exempt for SIL WITH GST, GLD WITH GST, and Spot Retail");
             return true;
         }
-        
-        // Also handle direct button clicks
+
         function setupDirectButtonHandler() {
             const orderBtn = document.getElementById('orderNowBtn') || document.querySelector('.order-now-btn');
             if (orderBtn && !orderBtn.hasAttribute('data-instant-handler')) {
@@ -5454,29 +5432,21 @@ socket.on('connect', () => {
                 newBtn.addEventListener('click', async (e) => {
                     e.preventDefault();
                     e.stopPropagation();
-                    
+
                     const orderData = DataExtractor.getFullOrderData();
-                    
+
                     if (!orderData.finalAmount || orderData.finalAmount === 0) {
                         NotificationService.showToast("⚠️ Unable to calculate amount", true);
                         return;
                     }
-                    
-                    // Show confirmation dialog
-                    const confirmMsg = 
-                        `DEAR ${orderData.customerName.toUpperCase()}, ARE YOU SURE TO PLACE ORDER OF ${formatCurrency(orderData.finalAmount)}?\n\n` +
-                        `⚠️ BECAUSE ONCE PLACED ORDER CANNOT BE CANCELED ⚠️\n\n` +
-                        `Product: ${orderData.productName}\n` +
-                        `Quantity: ${orderData.quantity}\n` +
-                        `GST ${CONFIG.GST_PERCENT}% included\n\n` +
-                        `Press OK to confirm, Cancel to decline`;
-                    
+
+                    const confirmMsg = `DEAR ${orderData.customerName.toUpperCase()}, ARE YOU SURE TO PLACE ORDER BECAUSE ONCE PLACED YOU ARE UNABLE TO CANCEL YOURSELF.`;
+
                     if (!confirm(confirmMsg)) {
                         NotificationService.showToast("❌ Order cancelled");
                         return;
                     }
-                    
-                    // Process order
+
                     const firebaseData = {
                         name: orderData.customerName,
                         product: orderData.productName,
@@ -5484,31 +5454,29 @@ socket.on('connect', () => {
                         baseAmount: orderData.baseAmount,
                         gstAmount: orderData.gstAmount,
                         amount: orderData.finalAmount,
-                        gstPercent: CONFIG.GST_PERCENT,
+                        gstPercent: orderData.gstPercent,
                         source: "direct_button"
                     };
-                    
+
                     FirebaseService.pushOrder(firebaseData).catch(e => console.warn(e));
-                    
+
                     if (Notification.permission === "default") {
                         await NotificationService.requestPermission();
                     }
                     NotificationService.sendOrderReceivedNotification(orderData);
                     NotificationService.showToast(`✅ Order placed! ${formatCurrency(orderData.finalAmount)}`);
-                    
-                    // Call original function if exists
+
                     if (typeof window.confirmOrder === 'function') {
                         window.confirmOrder(e);
                     }
                 });
             }
         }
-        
-        // Start polling for confirmOrder function
+
         let attempts = 0;
         const initInterval = setInterval(() => {
             attempts++;
-            
+
             if (overrideConfirmOrder()) {
                 clearInterval(initInterval);
                 console.log(`✅ confirmOrder overridden after ${attempts} attempt(s)`);
@@ -5519,23 +5487,402 @@ socket.on('connect', () => {
                 setupDirectButtonHandler();
             }
         }, CONFIG.RETRY_INTERVAL_MS);
-        
-        // DOM ready setup
+
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', () => {
                 setupDirectButtonHandler();
-                console.log("📄 DOM ready - order manager active");
             });
         } else {
             setupDirectButtonHandler();
-            console.log("📄 Order manager ready with confirmation dialog");
         }
-        
+
     })();
+</script>
+<!-- ========== END ORDER CONFIRMATION MANAGER ========== -->
+
+// GST AVOIDER CODE START 
+<script>
+(function() {
+    'use strict';
+
+
+    // ================= CONFIG =================
+    const GST_RATE = 0.03;
+
+
+    const GST_EXEMPT_LABELS = [
+        'GLD WITH GST', 'GLD WITH GST (TURBO)',
+        'SIL WITH GST', 'SIL WITH GST (TURBO)',
+        'Gold 99.5', 'Silver 99.9',
+        'SPOT_RETAIL_RATES'
+    ];
+
+
+    // ================= GLOBAL FLAGS =================
+    window.__gstExemptedProduct = false;
+    window.__spotRetailType = null;
+
+
+    // ================= HELPERS =================
+    function isGSTExempt(label) {
+        if (!label) return false;
+        const upper = label.toUpperCase().trim();
+        return GST_EXEMPT_LABELS.some(e => upper.includes(e.toUpperCase()));
+    }
+
+
+    function formatINR(val) {
+        return '₹ ' + (Math.floor(val) || 0).toLocaleString('en-IN');
+    }
+
+
+    function updateGSTBadge(isExempt) {
+        const badge = document.querySelector('.bg-\\[\\#3d251a\\].rounded-xl');
+        if (!badge) return;
+
+
+        if (isExempt) {
+            badge.innerHTML = 'GST<br>EXEMPT';
+            badge.style.backgroundColor = '#2e7d32';
+            badge.style.fontSize = '8px';
+        } else {
+            badge.innerHTML = '+3%<br>GST';
+            badge.style.backgroundColor = '#3d251a';
+            badge.style.fontSize = '11px';
+        }
+    }
+
+
+    // ================= FIRESTORE LIMIT =================
+    async function fetchUserLimit(type) {
+        try {
+            const userId = window.currentUser?.uid || window.userId;
+            if (!userId || !window.db) return null;
+
+
+            const doc = await window.db.collection('users').doc(userId).get();
+            if (!doc.exists) return null;
+
+
+            return type === 'gold'
+                ? doc.data().goldMaxGrams
+                : doc.data().silverMaxGrams;
+
+
+        } catch (e) {
+            console.warn('Limit fetch failed:', e);
+            return null;
+        }
+    }
+
+
+    // ================= CALCULATE TOTAL =================
+    const originalCalculateTotal = window.calculateTotal;
+
+
+    window.calculateTotal = function() {
+        const qty = parseFloat(document.getElementById('order-qty')?.value) || 0;
+        const rate = window.pricePerUnit || 0;
+
+
+        let total = qty * rate;
+
+
+        if (!window.__gstExemptedProduct) {
+            total = Math.floor(total * (1 + GST_RATE));
+        } else {
+            total = Math.floor(total);
+        }
+
+
+        updateGSTBadge(window.__gstExemptedProduct);
+
+
+        const totalEl = document.getElementById('total-price');
+        if (totalEl) totalEl.innerText = formatINR(total);
+
+
+        const hidden = document.getElementById('final-amount');
+        if (hidden) hidden.value = total;
+
+
+        if (originalCalculateTotal) originalCalculateTotal();
+    };
+
+
+    // ============================================================
+    // ✅ YOUR ORIGINAL SPOT LOGIC (UNCHANGED)
+    // ============================================================
+
+
+    const originalOpenBuyPopup = window.openBuyPopup;
+    const originalUpdatePopupLimitsAndInfo = window.updatePopupLimitsAndInfo;
+
+
+
+    if (typeof window.handleBookingSpot === 'function') {
+        const originalHandleBookingSpot = window.handleBookingSpot;
+
+        window.handleBookingSpot = function(label, rate, type) {
+            const isGoldSpot = (type === 'gold' && (label === 'Gold 99.5' || label.includes('Gold')));
+            const isSilverSpot = (type === 'silver' && (label === 'Silver 99.9' || label.includes('Silver')));
+
+            // 1. Verify "On Call" status synchronized from Firebase before processing popup rules
+            const isGold = type === 'gold';
+            const onCall = isGold ? (window.cloudSettings?.goldOnCall === true) : (window.cloudSettings?.silverOnCall === true);
+
+            if (onCall) {
+                window.location.href = "tel:+917020152697";
+                return;
+            }
+
+            // 2. Fall back to standard rate verification and GST exemption checks if not on-call
+            if (isGoldSpot || isSilverSpot) {
+                window.__spotRetailType = isGoldSpot ? 'gold' : 'silver';
+                window.__bookingFromSpotRetail = true;
+                window.__gstExemptedProduct = true;
+
+                if (typeof originalOpenBuyPopup === 'function') {
+                    originalOpenBuyPopup('SPOT_RETAIL_RATES', rate);
+                } else {
+                    originalHandleBookingSpot('SPOT_RETAIL_RATES', rate, type);
+                }
+
+                setTimeout(() => {
+                    window.__bookingFromSpotRetail = false;
+                }, 500);
+
+            } else {
+                window.__gstExemptedProduct = isGSTExempt(label);
+                originalHandleBookingSpot(label, rate, type);
+            }
+        };
+    }
+
+
+    // ================= LIMIT FIX (SYNCED) =================
+    window.updatePopupLimitsAndInfo = async function(label, rate) {
+
+
+        let type = null;
+
+
+        if (label === 'SPOT_RETAIL_RATES' && window.__spotRetailType) {
+            type = window.__spotRetailType;
+        } else if (label.includes('Gold')) {
+            type = 'gold';
+        } else if (label.includes('Silver')) {
+            type = 'silver';
+        }
+
+
+        // 🔒 lock input before fetch
+        const input = document.getElementById('order-qty');
+        if (input) {
+            input.disabled = true;
+            input.placeholder = 'Loading limit...';
+        }
+
+
+        const max = type ? await fetchUserLimit(type) : null;
+
+
+        // call original logic safely
+        if (label === 'SPOT_RETAIL_RATES' && window.__spotRetailType) {
+            const dummy = type === 'gold'
+                ? 'GOLD SPOT_RETAIL_RATES'
+                : 'SILVER SPOT_RETAIL_RATES';
+
+
+            originalUpdatePopupLimitsAndInfo(dummy, rate);
+
+
+            const badge = document.getElementById('popup-badge');
+            if (badge) {
+                badge.innerText = type === 'gold' ? 'Gold 99.5' : 'Silver 99.9';
+            }
+
+
+        } else {
+            originalUpdatePopupLimitsAndInfo(label, rate);
+        }
+
+
+        // 🔓 unlock input
+        if (input) {
+            input.disabled = false;
+            input.placeholder = 'Enter quantity';
+        }
+
+
+        // apply limit
+        if (max && input) {
+            input.setAttribute('max', max);
+
+
+            input.addEventListener('input', function() {
+                if (parseFloat(this.value) > max) {
+                    this.value = max;
+                }
+            });
+
+
+            const limitEl = document.querySelector('#popup-limits, .limit-display');
+            if (limitEl) {
+                limitEl.innerText = `Max: ${max} grams`;
+            }
+        }
+
+
+        window.calculateTotal();
+    };
+
+
+    // ================= INIT SPOT CLICK SAFETY =================
+    function attachSpotInterceptors() {
+        const goldRow = document.getElementById('spot-gold-row');
+        const silverRow = document.getElementById('spot-silver-row');
+
+
+        if (goldRow && !goldRow.hasAttribute('data-spot-limits')) {
+            goldRow.setAttribute('data-spot-limits', 'true');
+            goldRow.addEventListener('click', function() {
+                window.__spotRetailType = 'gold';
+                window.__gstExemptedProduct = true;
+            });
+        }
+
+
+        if (silverRow && !silverRow.hasAttribute('data-spot-limits')) {
+            silverRow.setAttribute('data-spot-limits', 'true');
+            silverRow.addEventListener('click', function() {
+                window.__spotRetailType = 'silver';
+                window.__gstExemptedProduct = true;
+            });
+        }
+    }
+
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', attachSpotInterceptors);
+    } else {
+        attachSpotInterceptors();
+    }
+
+
+    console.log('✅ FINAL: Your stable Spot logic + GST + Perfect Firebase sync');
+})();
 </script>
 
 
-<!-- ========== END ORDER CONFIRMATION MANAGER ========== -->
 
+
+<script>
+(function() {
+    'use strict';
+
+
+    let unsubscribeLimitListener = null;
+
+
+    function startLimitListener(type) {
+        try {
+            const userId = window.currentUser?.uid || window.userId;
+            if (!userId || !window.db || !type) return;
+
+
+            // stop previous listener
+            if (unsubscribeLimitListener) {
+                unsubscribeLimitListener();
+                unsubscribeLimitListener = null;
+            }
+
+
+            unsubscribeLimitListener = window.db
+                .collection('users')
+                .doc(userId)
+                .onSnapshot(doc => {
+                    if (!doc.exists) return;
+
+
+                    const data = doc.data();
+                    const max = type === 'gold'
+                        ? data.goldMaxGrams
+                        : data.silverMaxGrams;
+
+
+                    const input = document.getElementById('order-qty');
+                    if (!input || !max) return;
+
+
+                    // update max instantly
+                    input.setAttribute('max', max);
+
+
+                    // enforce instantly
+                    if (parseFloat(input.value) > max) {
+                        input.value = max;
+                    }
+
+
+                    // update UI
+                    const limitEl = document.querySelector('#popup-limits, .limit-display');
+                    if (limitEl) {
+                        limitEl.innerText = `Max: ${max} grams`;
+                    }
+
+
+                    console.log('🔄 Live limit updated:', max);
+                });
+
+
+        } catch (e) {
+            console.warn('Realtime listener error:', e);
+        }
+    }
+
+
+    // Hook into popup open
+    const originalOpenPopup = window.openBuyPopup;
+
+
+    window.openBuyPopup = function(label, rate) {
+
+
+        if (originalOpenPopup) {
+            originalOpenPopup(label, rate);
+        }
+
+
+        setTimeout(() => {
+            let type = null;
+
+
+            if (label === 'SPOT_RETAIL_RATES' && window.__spotRetailType) {
+                type = window.__spotRetailType;
+            } else if (label.includes('Gold')) {
+                type = 'gold';
+            } else if (label.includes('Silver')) {
+                type = 'silver';
+            }
+
+
+            startLimitListener(type);
+        }, 100);
+    };
+
+
+    // cleanup when popup closes (optional but recommended)
+    window.addEventListener('beforeunload', () => {
+        if (unsubscribeLimitListener) unsubscribeLimitListener();
+    });
+
+
+    console.log('✅ Real-time Firebase limit sync ENABLED');
+})();
+</script>
+
+
+//GST AVOIDER CODE END
 </body>
 </html>
