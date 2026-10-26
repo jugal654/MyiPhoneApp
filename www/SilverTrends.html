@@ -1,0 +1,583 @@
+<!DOCTYPE HTML>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <title>VOTS Game Limit</title>
+
+    <link href="css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+    <link href="css/font-awesome.min.css" rel="stylesheet">
+    <link href="css/sticky-footer-navbar.css" rel="stylesheet" type="text/css" />
+    <link href="css/normalize.min.css" rel="stylesheet" type="text/css" />
+    <link href="css/swiper.min.css" rel="stylesheet" type="text/css" />
+    <link href="css/custom.css" rel="stylesheet" type="text/css" />
+    <link href="css/custom2.css" rel="stylesheet" type="text/css" />
+    <link href="css/nav.css" rel="stylesheet" type="text/css" />
+
+    <style>
+        .color-white {
+            color: White !important;
+        }
+
+        a:link,
+        a:visited,
+        a:hover,
+        a:active {
+            color: black;
+            text-decoration: none;
+        }
+    </style>
+
+    <style type="text/css">
+        .style2 { height: 107px; }
+    </style>
+
+    <style type="text/css">
+        body {
+            background-color: #3d251a;
+            background-position: center center;
+            background-attachment: scroll;
+            background-size: 100% 100%;
+        }
+        .ui-header,
+        .ui-page,
+        .ui-content {
+            background: transparent;
+            text-shadow: none;
+        }
+    </style>
+
+    <style>
+        .col-xs-3 {
+            width: 24%;
+            text-align: center;
+        }
+        footer .fa { font-size: 22px !important; }
+    </style>
+
+    <style>
+        /*=====================
+        CIRCLE PROGRESS BAR
+        ======================*/
+        .progressbar {
+            display: inline-block;
+            width: 100%;
+            margin: 0 0 25px 0;
+            text-align: center;
+            padding: 15px 0 20px;
+        }
+        .circle {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto;
+            margin-top: 10px;
+            display: inline-block;
+            position: relative;
+            text-align: center;
+        }
+        .circle canvas {
+            vertical-align: middle;
+            border-radius: 50%;
+        }
+        .circle div {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            margin: -18px 0 0 -58px;
+            width: 100%;
+            text-align: center;
+            line-height: 40px;
+            font-size: 22px;
+            color: #e3c070;
+        }
+        .circle strong i {
+            font-style: normal;
+            font-size: 0.6em;
+            font-weight: normal;
+        }
+        .circle span {
+            display: block;
+            color: white;
+            margin-top: 12px;
+        }
+    </style>
+
+    <style>
+        .indicator { color: #e3c070 !Important; }
+
+        .title {
+            text-align: right;
+            font-size: 0.8rem;
+            font-weight: 700;
+            width: 50%;
+            color: #e3c070;
+        }
+
+        .value {
+            padding-left: 1em;
+            font-size: 0.9rem;
+            font-weight: 700;
+            text-align: left;
+            color: #e3c070;
+        }
+
+        a.Disclaimerr { color: #e3c070 !Important; }
+    </style>
+
+    <!-- ===== top-right close button styles ===== -->
+    <style>
+        .close-btn {
+            position: fixed;
+            top: 16px;
+            right: 16px;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            border: 1px solid rgba(227,192,112,.55);
+            background: rgba(0,0,0,.28);
+            color: #e3c070;
+            font-size: 24px;
+            line-height: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 1000;
+            padding: 0;
+            transition: transform .25s ease, background .25s ease, color .25s ease;
+        }
+        .close-btn:hover,
+        .close-btn:focus {
+            background: #e3c070;
+            color: #2b1a11;
+            transform: rotate(90deg);
+            outline: none;
+        }
+        .close-btn:active { transform: rotate(90deg) scale(.92); }
+
+        @media (max-width: 600px) {
+            .close-btn { width: 40px; height: 40px; font-size: 22px; top: 12px; right: 12px; }
+        }
+    </style>
+
+</head>
+<body style="background:#3d251a;">
+
+    <!-- ===== top-right close button ===== -->
+    <button type="button" class="close-btn" aria-label="Close" title="Close" onclick="goBack()">&#10005;</button>
+
+    <div data-role="page" class="ui-page">
+
+        <main role="main" class="container main-container" style="">
+
+            <div class="row">
+                <div class="col-lg-6 col-lg-offset-3 col-md-12" style="color:#FFF;padding-top: 10px;">
+                    <table style="width:100%">
+                        <tr>
+                            <td align="center" style="width:40%;box-shadow:2px 2px 4px 2px #000;border-radius:10px;background:#fff;padding: 2px;color: #000;font-weight: 600;text-transform:uppercase;">
+                                Silver Trends
+                            </td>
+                            <td style="width:60%"></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <div class="row" style="margin-bottom:10px;">
+                <div class="col-lg-6 col-lg-offset-3 col-md-12" style="color:#FFF;padding-top: 10px;">
+
+                    <div class="col-lg-4 col-xs-6" id="div2">
+                        <!-- populated by AJAX / existing scripts -->
+                    </div>
+
+                    <br/><br/><br/><br/><br/>
+                    <br/><br/><br/><br/><br/>
+
+                </div>
+            </div>
+
+        </main>
+
+        <!-- Bootstrap core JavaScript
+        ================================================== -->
+        <script src="js/jquery.min.js" type="text/javascript"></script>
+        <script src="js/bootstrap.min.js" type="text/javascript"></script>
+        <script src="js/custom.js" type="text/javascript"></script>
+        <script src="Scripts/jquery-1.11.3.min.js"></script>
+        <script src="js/AJAX-disable.Jugal.js" type="text/javascript"></script>
+        <script src="js/Alert.Jugal.js" type="text/javascript"></script>
+        <script src="js/circle-progress.min.js" type="text/javascript"></script>
+        <script src="js/AutoCallsJs_Silver.js" type="text/javascript"></script>
+        <script src="js/internet.js" type="text/javascript"></script>
+
+        <div id="connectiondiv" class="connectiondiv" style="">
+            <label align="center" id="connectionmsg" class="connectionmsg">Please check your internet connection</label>
+            <a id="connectionbtn" onclick="javascript:connectionbtn()" class="retry_connection_btn">Retry</a>
+        </div>
+
+        <script>
+            $(document).ready(function () {
+                if (localStorage.username) {
+                    var pendingCode = "<a href=\"Orders.html\" data-ajax='false'>" +
+                       "<button type=\"button\" style=\"background: transparent;border: 0;\">" +
+                        "<i class=\"fa fa-pencil-square-o\" style=\"color: #FFF;\"></i>" +
+                          "</button>" +
+                        "<span class=\"d-block font_footer\" style=\"color:#FFF\">Pending</span>" +
+                       "</a>";
+                    $("#divLoginPending").html(pendingCode);
+                }
+                else {
+                    var loginCode = "<a href=\"Login.html\" data-ajax='false'>" +
+                       "<button type=\"button\" style=\"background: transparent;border: 0;\">" +
+                        "<i class=\"fa fa-sign-in\" style=\"color: #FFF;\"></i>" +
+                          "</button>" +
+                        "<span class=\"d-block font_footer\" style=\"color:#FFF\">Login</span>" +
+                       "</a>";
+                    $("#divLoginPending").html(loginCode);
+                }
+            });
+        </script>
+
+        <script>
+            var myColor_Background = "#e2ba3e";
+            var Color_ForeColor = "#FFF";
+            var Color_ScriptColor = "#011d28";
+
+            var something = (function () {
+                var executed = false;
+                return function () {
+                    if (!executed) {
+                        $(".modal-content").css("background", myColor_Background);
+                        $(".color-white").css("color", Color_ForeColor);
+                        $(".swiper-pagination1.swiper-pagination-clickable .swiper-pagination-bullet").css("background", Color_ScriptColor);
+                        $(".back_fore_color_td").css("background", Color_ScriptColor);
+                        CallWebServiceFromJquery_Alert2();
+                    }
+                };
+            })();
+
+            something();
+        </script>
+
+        <!--Progress Bar-->
+        <script>
+            var tempbottomOfWindow;
+
+            var something = (function () {
+                var executed = false;
+                return function () {
+                    if (!executed) {
+                        executed = true;
+                        tempbottomOfWindow = $(window).scrollTop() + $(window).height();
+                        CallWebServiceFromJquery_1();
+                    }
+                };
+            })();
+
+            something();
+
+            function Call_Animation(signal) {
+
+                var emptyFillColor = "transparent";
+                var fillColor = "#e3c070";
+
+                if (signal == "Buy") {
+                    emptyFillColor = "white";
+                    fillColor = "#e3c070";
+                }
+                else {
+                    emptyFillColor = "white";
+                    fillColor = "#e3c070";
+                }
+
+                function animateElements() {
+                    $('.progressbar').each(function () {
+                        var elementPos = $(this).offset().top;
+                        var topOfWindow = $(window).scrollTop();
+                        var bottomOfWindow = $(window).scrollTop() + $(window).height();
+
+                        var percent = $(this).find('.circle').attr('data-percent');
+                        var percentage = parseInt(percent, 10) / parseInt(100, 10);
+                        var animate = $(this).data('animate');
+
+                        if (elementPos < topOfWindow + $(window).height() - 30 && !animate) {
+                            $(this).data('animate', true);
+                            $(this).find('.circle').circleProgress({
+                                startAngle: -Math.PI / 2,
+                                value: percent / 100,
+                                size: 120,
+                                thickness: 20,
+                                emptyFill: emptyFillColor,
+                                fill: { color: fillColor }
+                            }).on('circle-animation-progress', function (event, progress, stepValue) {
+                                $(this).find('div').text((stepValue * 100).toFixed(1) + "%");
+                            }).stop();
+                        }
+                        else if (elementPos > topOfWindow + $(window).height() + 30) {
+                            $(this).data('animate', true);
+                            $(this).find('.circle').circleProgress({
+                                startAngle: -Math.PI / 2,
+                                value: percent / 100,
+                                size: 120,
+                                thickness: 20,
+                                emptyFill: emptyFillColor,
+                                fill: { color: fillColor }
+                            }).on('circle-animation-progress', function (event, progress, stepValue) {
+                                $(this).find('div').text((stepValue * 100).toFixed(1) + "%");
+                            }).stop();
+                        }
+                        else if (bottomOfWindow == tempbottomOfWindow) {
+                            $(this).data('animate', true);
+                            $(this).find('.circle').circleProgress({
+                                startAngle: -Math.PI / 2,
+                                value: percent / 100,
+                                size: 120,
+                                thickness: 20,
+                                emptyFill: emptyFillColor,
+                                fill: { color: fillColor }
+                            }).on('circle-animation-progress', function (event, progress, stepValue) {
+                                $(this).find('div').text((stepValue * 100).toFixed(1) + "%");
+                            }).stop();
+                        }
+                    });
+                }
+
+                animateElements();
+                $(window).scroll(animateElements);
+            }
+
+            function RunAnimationn(signal) {
+                Call_Animation(signal);
+            }
+        </script>
+
+        <script type="text/javascript">
+            app.initialize();
+        </script>
+
+        <script>
+            var modal1 = document.getElementById("myModal1");
+            var btn = document.getElementById("phonecall");
+            var span = document.getElementsByClassName("close1")[0];
+
+            btn.onclick = function () { modal1.style.display = "block"; }
+            span.onclick = function () { modal1.style.display = "none"; }
+            window.onclick = function (event) {
+                if (event.target == modal1) { modal1.style.display = "none"; }
+            }
+        </script>
+
+        <script>
+            var modal = document.getElementById("myModal");
+            var btn1 = document.getElementById("whatsappcall");
+            var span = document.getElementsByClassName("close")[0];
+
+            btn1.onclick = function () { modal.style.display = "block"; }
+            span.onclick = function () { modal.style.display = "none"; }
+            window.onclick = function (event) {
+                if (event.target == modal) { modal.style.display = "none"; }
+            }
+        </script>
+
+        <script type="text/javascript">
+            document.addEventListener("deviceready", onDeviceReady, false);
+
+            function onDeviceReady() {
+                document.addEventListener("backbutton", onBackKeyDown, false);
+                document.addEventListener("pause", onPause, false);
+                try { window.ga.trackView('About Us'); } catch (e) {}
+            }
+
+            function onPause() {}
+
+            function onBackKeyDown() {
+                var r = confirm("Do you want to Exit?");
+                if (r == true) {
+                    navigator.app.exitApp();
+                } else {}
+            }
+
+            $(document).ready(function () {
+                try {} catch (err) {}
+            });
+        </script>
+    </div>
+
+    <!--Model 2-->
+    <div class="modal fade" id="myModal_QuickCall" role="dialog">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content goldblock" style="border: 1px solid rgba(255, 247, 216, 0.63);">
+
+                <table width="100%" align="center" style="text-align: center;">
+                    <tr>
+                        <td>
+                            <table id="Table11" class="color-white Trending_Table_Child2" width="100%">
+                                <tr>
+                                    <td colspan="2">
+                                        <div class="color-gold" style="text-align: center;text-decoration: underline;padding: 7px 10px; text-transform: uppercase;">
+                                            Dealing Desk</div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="" style="text-align: left;padding: 7px 10px 7px 70px;">
+                                            <i class="fa fa-phone color-gold color-scroll-black" aria-hidden="true" style="font-size:20px; margin-right:5px;"></i>
+                                            <a class="color-white" href="tel:02261837523">022 61837523</a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="" style="text-align: left;padding: 7px 10px 7px 70px;">
+                                            <i class="fa fa-phone color-gold color-scroll-black" aria-hidden="true" style="font-size:20px; margin-right:5px;"></i>
+                                            <a class="color-white" href="tel:02261838989">022 61838989</a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="" style="text-align: left;padding: 7px 10px 7px 70px;">
+                                            <i class="fa fa-phone color-gold color-scroll-black" aria-hidden="true" style="font-size:20px; margin-right:5px;"></i>
+                                            <a class="color-white" href="tel:+919820769155">+91 9820769155</a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <table id="Table1" class="color-white Trending_Table_Child2" width="100%">
+                                <tr>
+                                    <td colspan="2">
+                                        <div class="color-gold" style="text-align: center;text-decoration: underline;padding: 7px 10px;text-transform: uppercase;">
+                                            Accounts and Delivery</div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="" style="text-align: left;padding: 7px 10px 7px 70px;">
+                                            <i class="fa fa-briefcase color-gold color-scroll-black" aria-hidden="true" style="font-size:20px; margin-right:5px;"></i>
+                                            <a class="color-white" href="tel:022 61832780">022 61832780</a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="" style="text-align: left;padding: 7px 10px 7px 70px;">
+                                            <i class="fa fa-briefcase color-gold color-scroll-black" aria-hidden="true" style="font-size:20px; margin-right:5px;"></i>
+                                            <a class="color-white" href="tel:+91 7738515739">+91 7738515739</a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <table id="Table2" class="color-white Trending_Table_Child2" width="100%">
+                                <tr>
+                                    <td colspan="2">
+                                        <div class="color-gold" style="text-align: center;text-decoration: underline;padding: 7px 10px;text-transform: uppercase;">
+                                            Gold Coin</div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="" style="text-align: left;padding: 7px 10px 7px 70px;">
+                                            <i class="fa fa-balance-scale color-gold color-scroll-black" aria-hidden="true" style="font-size:20px; margin-right:5px;"></i>
+                                            <a class="color-white" href="tel:022 61838993">022 61838993</a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="" style="text-align: left;padding: 7px 10px 7px 70px;">
+                                            <i class="fa fa-balance-scale color-gold color-scroll-black" aria-hidden="true" style="font-size:20px; margin-right:5px;"></i>
+                                            <a class="color-white" href="tel:+91 9869209699">+91 9869209699</a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
+
+                        </td>
+                    </tr>
+                </table>
+
+                <button type="button" class="close" data-dismiss="modal" style="padding-top: 20px;padding-bottom: 20px; text-decoration: underline;background-color: rgb(1, 20, 27);">
+                    Close &times;</button>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== close button handler ===== -->
+    <script>
+        function goBack() {
+            try {
+                if (document.referrer && document.referrer.indexOf(window.location.origin) === 0) {
+                    window.history.back();
+                    return;
+                }
+            } catch (e) {}
+            window.location.href = 'index.html';
+        }
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape' || e.keyCode === 27) goBack();
+        });
+        document.addEventListener('deviceready', function () {
+            try { document.addEventListener('backbutton', goBack, false); } catch (e) {}
+        }, false);
+    </script>
+
+    <script>
+        (function() {
+            var btn = document.createElement('div');
+            btn.id = 'topRightCrossBtn';
+            btn.innerHTML = '&#10005;';
+
+            btn.style.cssText = `
+                position: fixed;
+                top: 12px;
+                right: 14px;
+                z-index: 999999;
+                width: 44px;
+                height: 44px;
+                background: rgba(255, 255, 255, 0.92);
+                color: #222;
+                font-size: 26px;
+                font-weight: 700;
+                font-family: Arial, Helvetica, sans-serif;
+                line-height: 1;
+                text-align: center;
+                border-radius: 50%;
+                box-shadow: 0 4px 14px rgba(0, 0, 0, 0.30);
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                transition: transform 0.2s ease, box-shadow 0.2s ease;
+                border: 2px solid rgba(0, 0, 0, 0.20);
+                user-select: none;
+                -webkit-tap-highlight-color: transparent;
+            `;
+
+            btn.addEventListener('mouseenter', function() {
+                this.style.transform = 'scale(1.12)';
+                this.style.boxShadow = '0 6px 20px rgba(0, 0, 0, 0.40)';
+            });
+            btn.addEventListener('mouseleave', function() {
+                this.style.transform = 'scale(1)';
+                this.style.boxShadow = '0 4px 14px rgba(0, 0, 0, 0.30)';
+            });
+            btn.addEventListener('touchstart', function() {
+                this.style.transform = 'scale(0.92)';
+            }, { passive: true });
+            btn.addEventListener('touchend', function() {
+                this.style.transform = 'scale(1)';
+            }, { passive: true });
+
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                window.location.href = 'menu.html';
+            });
+
+            document.body.appendChild(btn);
+        })();
+    </script>
+</body>
+</html>
