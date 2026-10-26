@@ -1,0 +1,179 @@
+/*the container must be positioned relative:*/
+.custom-select {
+  position: relative;
+  font-family: Arial;
+}
+.custom-select select {
+  display: none; /*hide original SELECT element:*/
+}
+.select-selected {
+  background-color: DodgerBlue;
+}
+/*style the arrow inside the select element:*/
+.select-selected:after {
+  position: absolute;
+  content: "";
+  top: 14px;
+  right: 10px;
+  width: 0;
+  height: 0;
+  border: 6px solid transparent;
+  border-color: #fff transparent transparent transparent;
+}
+/*point the arrow upwards when the select box is open (active):*/
+.select-selected.select-arrow-active:after {
+  border-color: transparent transparent #fff transparent;
+  top: 7px;
+}
+/*style the items (options), including the selected item:*/
+.select-items option,.select-selected {
+  color: #ffffff;
+  padding: 8px 16px;
+  border: 1px solid transparent;
+  border-color: transparent transparent rgba(0, 0, 0, 0.1) transparent;
+  cursor: pointer;
+  user-select: none;
+}
+/*style items (options):*/
+.select-items {
+  position: absolute;
+  background-color: DodgerBlue;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 99;
+}
+/*hide the items when the select box is closed:*/
+.select-hide {
+  display: none;
+}
+.select-items option:hover, .same-as-selected {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+/*End DropDown*/
+
+
+.form-control {
+    text-align: center;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+@media (min-width: 601px){
+
+.col-lg-push-12
+{
+    left: 100%;
+}
+.col-lg-push-11
+{
+    left: 91.66666667%;
+}
+.col-lg-push-10
+{
+    left: 83.33333333%;
+}
+.col-lg-push-9
+{
+    left: 75%;
+}
+.col-lg-push-8
+{
+    left: 66.66666667%;
+}
+.col-lg-push-7
+{
+    left: 58.33333333%;
+}
+.col-lg-push-6
+{
+    left: 50%;
+}
+.col-lg-push-5
+{
+    left: 41.66666667%;
+}
+.col-lg-push-4
+{
+    left: 33.33333333%;
+}
+.col-lg-push-3
+{
+    left: 25%;
+}
+.col-lg-push-2
+{
+    left: 16.66666667%;
+}
+.col-lg-push-1
+{
+    left: 8.33333333%;
+}
+.col-lg-push-0
+{
+    left: auto;
+}
+.col-lg-offset-12
+{
+    margin-left: 100%;
+}
+.col-lg-offset-11
+{
+    margin-left: 91.66666667%;
+}
+.col-lg-offset-10
+{
+    margin-left: 83.33333333%;
+}
+.col-lg-offset-9
+{
+    margin-left: 75%;
+}
+.col-lg-offset-8
+{
+    margin-left: 66.66666667%;
+}
+.col-lg-offset-7
+{
+    margin-left: 58.33333333%;
+}
+.col-lg-offset-6
+{
+    margin-left: 50%;
+}
+.col-lg-offset-5
+{
+    margin-left: 41.66666667%;
+}
+.col-lg-offset-4
+{
+    margin-left: 33.33333333%;
+}
+.col-lg-offset-3
+{
+    margin-left: 25%;
+}
+.col-lg-offset-2
+{
+    margin-left: 16.66666667%;
+}
+.col-lg-offset-1
+{
+    margin-left: 8.33333333%;
+}
+.col-lg-offset-0
+{
+    margin-left: 0;
+}
+}
